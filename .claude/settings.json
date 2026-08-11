@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "bash_commands": [
+      "git",
+      "npm",
+      "python",
+      "pip",
+      "node",
+      "ls",
+      "find",
+      "grep",
+      "cat",
+      "cd",
+      "pwd",
+      "chmod",
+      "mkdir",
+      "rm",
+      "cp",
+      "mv",
+      "touch",
+      "head",
+      "tail",
+      "wc",
+      "sed",
+      "awk",
+      "sort",
+      "uniq",
+      "jq",
+      "curl",
+      "wget",
+      "make",
+      "docker",
+      "docker-compose"
+    ]
+  },
+  "autoAccept": {
+    "all": true
+  }
+}

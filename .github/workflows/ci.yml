@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
+          uv run maturin develop --release
+
+      - name: Lint
+        run: uv run ruff check src tests
+
+      - name: Rust tests
+        run: cd rust/socrates_numerics && cargo test --lib
+
+      - name: Python tests (offline only)
+        run: uv run pytest -m "not network" -q

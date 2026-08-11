@@ -1,0 +1,35 @@
+# Data (fetched, never committed)
+data/
+!data/README.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.ipynb_checkpoints/
+
+# Rust
+target/
+Cargo.lock
+
+# Docs build
+site/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+figures/*
+!figures/stage1_cascade.png
+
+# Compiled Rust extension (built by maturin)
+*.so
+*.pyd

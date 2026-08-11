@@ -1,0 +1,89 @@
+[build-system]
+requires = ["maturin>=1.8,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "socrates"
+version = "0.1.0"
+description = "SOCRATES: unified algebraic-topological framework for multi-scale scientific data (string theory, genetics, astrophysics)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [{ name = "Xavier Callens", email = "callensxavier@gmail.com" }]
+keywords = [
+    "topological-data-analysis",
+    "algebraic-geometry",
+    "astrophysics",
+    "phylogenetics",
+    "calabi-yau",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "sympy>=1.12",
+    "ripser>=0.6",
+    "persim>=0.3",
+    "gudhi>=3.9",
+    "astropy>=6.0",
+    "astroquery>=0.4.7",
+    "dendropy>=5.0",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-benchmark>=4.0",
+    "hypothesis>=6.100",
+    "mypy>=1.10",
+    "ruff>=0.6",
+    "maturin>=1.8",
+    "pre-commit>=3.7",
+]
+notebooks = [
+    "jupyterlab>=4.0",
+    "ipympl>=0.9",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+]
+
+[tool.maturin]
+manifest-path = "rust/socrates_numerics/Cargo.toml"
+module-name = "socrates._numerics"
+python-source = "src"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "network: tests requiring network access (deselected in CI)",
+    "slow: long-running tests",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "NPY"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
