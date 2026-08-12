@@ -76,12 +76,22 @@ native int (document the constant, don't chase it).
 **Goal G4:** the paper, the Lean development, and this repo state the same
 theorems.
 
-| Step | Tier | Task |
-|---|---|---|
-| 1 | Haiku | Extract every LEAN-tagged theorem from the paper into a checklist table |
-| 2 | Opus | For each: does the Python certificate check the *same statement*? (Theorem 2.5 already caught; the spec's `sym2_recurrence`-proves-bit-width overload already caught) |
-| 3 | Sonnet | Write the Python-side certificate for any statement lacking one |
-| 4 | Opus | Produce the errata list for the next paper draft |
+**Status:** `lean/CallensDualScale.lean` received and checked (Lean 4.32.2 +
+Mathlib, builds clean, axiom footprint verified — see `docs/FINDINGS.md` §2b).
+It contains 3 theorems: `genesis_no_singularity`, `Reff_ge_sqrt`,
+`sym2_recurrence`. Step 1's checklist below is therefore partially done —
+these three are checked; the *rest* of the paper's LEAN-tagged theorems
+(notably anything addressing Theorem 2.5's invariance form, and Theorems
+2.3–2.4) have not been located and remain open. The full original paper
+source (LaTeX, with LEAN tags) has not been supplied to this repo, so step 1
+cannot be completed exhaustively until it is.
+
+| Step | Tier | Task | Status |
+|---|---|---|---|
+| 1 | Haiku | Extract every LEAN-tagged theorem from the paper into a checklist table | Partial — 3 theorems checked ad hoc; full paper source needed for the rest |
+| 2 | Opus | For each: does the Python certificate check the *same statement*? (Theorem 2.5 already caught; the spec's `sym2_recurrence`-proves-bit-width overload already caught) | Done for the 3 received theorems — see FINDINGS §2b cross-validation |
+| 3 | Sonnet | Write the Python-side certificate for any statement lacking one | Not started |
+| 4 | Opus | Produce the errata list for the next paper draft | Not started |
 
 **Loop L4:** rerun after every paper revision; the checklist diff is the
 review.

@@ -23,13 +23,29 @@ Cargo.lock
 # Docs build
 site/
 
+# LaTeX build artifacts (pdf and tex are committed, these are not)
+reports/*.aux
+reports/*.log
+reports/*.out
+reports/*.toc
+
 # OS / editors
 .DS_Store
 .idea/
 .vscode/
 figures/*
 !figures/stage1_cascade.png
+!figures/solver_ladder_validation.png
+!figures/cascade_classical_vs_tdual.png
+!figures/comparative_regularization_methods.png
+!figures/numerical_controls.png
+!figures/exact_arithmetic_certification.png
 
 # Compiled Rust extension (built by maturin)
 *.so
 *.pyd
+
+# Lean build artifacts (regenerate with lake build; lake-manifest.json IS committed)
+lean/.lake/
+lean/AxiomCheck.olean
+lean/AxiomCheck.ilean

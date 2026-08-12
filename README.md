@@ -46,6 +46,26 @@ a convention value — the same discipline, enforced in Python.
 - **Apéry sequences** — $\zeta(3)$: 1, 5, 73, 1445, 33001, 819005;
   $\zeta(2)$: 1, 3, 19, 147, 1251, 11253. Integrality preserved.
 
+### 🅰️ Tier A — Lean 4 kernel-verified
+
+`lean/CallensDualScale.lean` (Lean 4.32.2 + Mathlib; `cd lean && lake build
+CallensDualScale`) — three theorems, all kernel-checked with no `sorry` and no
+axioms beyond the one declared ($\alpha' > 0$) plus Lean's standard
+foundational axioms (verified via `#print axioms`, see
+[docs/FINDINGS.md §2b](docs/FINDINGS.md)):
+
+- `genesis_no_singularity` — $R_{\text{eff}}(\alpha',R) > 0$ for all $R>0$.
+- `Reff_ge_sqrt` — $R_{\text{eff}}(\alpha',R) \ge \sqrt{\alpha'}$. **As
+  received this proof did not compile** (four type-mismatch errors); fixed
+  and now green — see FINDINGS for the diff.
+- `sym2_recurrence` — the squares-case closed form of the Sym² lock,
+  independently matching the Python `closed_form_symmetric_square()`
+  coefficients exactly. Two independent methods (kernel proof, exact-rational
+  computation) agree.
+
+T-duality invariance and inertial invisibility (Theorems 2.3–2.4) remain
+**Tier B only** — no Lean statement of either has been located yet.
+
 ### ⚠️ Correction required
 
 **Theorem 2.5 as written in the draft is false.** The paper states

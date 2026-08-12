@@ -25,10 +25,13 @@ since $\max(\alpha'/R,\, R) = \max(R,\, \alpha'/R)$ identically. This is also th
 statement the physics requires — "effective geometry cannot distinguish a radius
 from its dual" is an invariance claim, not a reciprocal one.
 
-**Action required:** check whether the Lean theorem `Reff_tdual` proves the
-invariance form (likely, since it was kernel-accepted) and correct the paper's
-prose to match. If the Lean statement carries the spurious factor, it cannot
-have been proved and the audit needs revisiting.
+**Action required — still open.** The Lean file received and checked in §6 below
+(`lean/CallensDualScale.lean`) does **not** contain a `Reff_tdual` theorem or
+any statement of the reciprocal/invariance claim — it proves positivity
+(`genesis_no_singularity`) and a lower bound (`Reff_ge_sqrt`) instead. Theorem
+2.5's Lean audit therefore remains unresolved: if a Lean statement of the
+invariance form exists elsewhere, it still needs to be located and checked
+against the corrected form below.
 
 Pinned as a regression test: `test_draft_theorem_2_5_as_written_is_false`.
 
@@ -57,6 +60,55 @@ element of the symmetric square's solution space.
 
 Apéry sequences reproduce known values exactly with integrality preserved —
 $\zeta(3)$: 1, 5, 73, 1445, 33001, 819005; $\zeta(2)$: 1, 3, 19, 147, 1251, 11253.
+
+---
+
+## 2b. Lean 4 kernel verification — three theorems now Tier A
+
+`lean/CallensDualScale.lean` (Lean 4.32.2 + Mathlib, built against a full
+Mathlib cache in ~6–20s per target, reproducible via `cd lean && lake build
+CallensDualScale`) contains three theorems. All three now **kernel-check
+successfully** — this required a fix, documented below.
+
+| Theorem | Statement | Status |
+|---|---|---|
+| `genesis_no_singularity` | $R>0 \Rightarrow R_{\text{eff}}(\alpha',R) > 0$ | Compiled as received |
+| `Reff_ge_sqrt` | $R>0 \Rightarrow \sqrt{\alpha'} \le R_{\text{eff}}(\alpha',R)$ | **Compiled only after a fix — see below** |
+| `sym2_recurrence` | $u_{n+2}=au_{n+1}+bu_n \Rightarrow v_n=u_n^2$ satisfies $v_{n+3}=(a^2+b)v_{n+2}+b(a^2+b)v_{n+1}-b^3v_n$ | Compiled as received |
+
+**`Reff_ge_sqrt` as submitted did not compile** — four errors (type mismatches
+from a `sq`/`*`-form confusion around `Real.sq_sqrt`, a misapplied
+`mul_div_assoc` direction, and a `¬R < √α'` vs `√α' ≤ R` mismatch in the second
+branch). This is exactly the failure mode the project's tier discipline exists
+to catch: a proof script that *looks* complete is not the same as one the
+kernel accepts. The proof was rewritten (same statement, `le_div_iff₀` plus a
+direct `mul_le_mul_of_nonneg_left` calc step) and now compiles clean.
+
+**Axiom footprint** (`lake env lean AxiomCheck.lean`, i.e. `#print axioms` on
+each): `genesis_no_singularity` and `Reff_ge_sqrt` depend on
+`[propext, CallensDualScale.alpha_prime_pos, Classical.choice, Quot.sound]` —
+only the one declared axiom (α' > 0) plus Lean/Mathlib's standard foundational
+axioms. `sym2_recurrence` depends on `[propext, Classical.choice, Quot.sound]`
+— it doesn't even need the α' axiom, as expected for a pure recurrence-algebra
+result. No `sorry`, no smuggled axioms in any of the three.
+
+**Cross-validation with the Python Tier B certificate.** `sym2_recurrence`'s
+conclusion — $v_{n+3}=(a^2+b)v_{n+2}+b(a^2+b)v_{n+1}-b^3v_n$ — is *exactly* the
+coefficient triple `(-b**3, b*(a**2+b), a**2+b)` that
+`closed_form_symmetric_square()` in `src/socrates/operators/recurrence.py`
+returns, and that `verify_symmetric_square()` checks by exact `Fraction`
+arithmetic (Theorem 3.1, §2 above). Two independent methods — a Lean kernel
+proof and exact-rational computation — now agree on the same closed form. This
+promotes the squares-case of Theorem 3.1 from Tier B to Tier A; the
+cross-products case (also certified in §2) has no Lean counterpart yet.
+
+Note the scope: `t_dual_radius` in the Lean file is definitionally the same
+function as `effective_radius` in `dualscale/geometry.py` (the `if R <
+√α′ then α′/R else R` form equals `max(R, α′/R)` identically, since the two
+branches agree at the boundary). `genesis_no_singularity` and `Reff_ge_sqrt`
+are therefore Tier A confirmations of (part of) Theorem 2.2 — but note neither
+proves T-duality invariance or inertial-range invisibility (Theorems 2.3–2.4),
+which remain Tier B only.
 
 ---
 

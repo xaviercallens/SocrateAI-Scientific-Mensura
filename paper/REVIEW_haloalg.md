@@ -9,8 +9,8 @@ review the document would receive under the programme's stated discipline.
 | Claim | Status |
 |---|---|
 | RNS add/sub/mul in parallel channels, CRT reconstruction | Textbook-correct (Garner, Szabó–Tanaka). Implemented and tested in `socrates/eiu/rns.py`, with corrections below. |
-| T-dual metric `max(R, α'/R)`, bounce, minimal scale | Certified exactly (see `docs/FINDINGS.md`); note the Theorem 2.5 correction carried over from the first paper. |
-| Sym² spectral restriction {λ², λμ, μ²} | Certified exactly for constant-coefficient order-2 operators. |
+| T-dual metric `max(R, α'/R)`, bounce, minimal scale | Certified exactly (see `docs/FINDINGS.md`); note the Theorem 2.5 correction carried over from the first paper. Positivity and the √α' lower bound are now additionally **Tier A**: kernel-checked in `lean/CallensDualScale.lean` (`genesis_no_singularity`, `Reff_ge_sqrt`). T-duality invariance and inertial invisibility remain Tier B only — no Lean statement of either has been located yet. |
+| Sym² spectral restriction {λ², λμ, μ²} | Certified exactly for constant-coefficient order-2 operators (Tier B). The squares-case closed form is now additionally **Tier A**: `sym2_recurrence` in `lean/CallensDualScale.lean`, cross-validated against the Python coefficients — see `docs/FINDINGS.md` §2b. |
 | Exact rationals distinguish real singularities from float artifacts | Correct in principle and demonstrated concretely by the Stage 1 controls. |
 
 Corrections applied in the production RNS implementation:
@@ -48,10 +48,16 @@ Corrections applied in the production RNS implementation:
   does optimization-dynamics work (conditioning), not only numeric stabilization;
   removing it is an empirical question, not a corollary of exactness.
 - **`sym2_recurrence` "proves bit-width growth is bounded"** — the Lean theorem
-  of that name (verified in the first paper) proves a recurrence identity about
-  squares of solutions. It says nothing about bit-width. The spec overloads a
-  kernel-checked name onto an unproven claim; this is exactly the failure mode
-  the tier system exists to prevent.
+  of that name, now received and kernel-checked in this repo at
+  `lean/CallensDualScale.lean` (see `docs/FINDINGS.md` §2b), proves a
+  recurrence identity about squares of solutions:
+  $v_{n+3}=(a^2+b)v_{n+2}+b(a^2+b)v_{n+1}-b^3v_n$. It says nothing about
+  bit-width — confirmed by reading the actual statement, not just the name.
+  The spec overloads a kernel-checked name onto an unproven claim; this is
+  exactly the failure mode the tier system exists to prevent. (The theorem
+  itself is sound and now cross-validated against the independent Python
+  exact-rational certificate in `operators/recurrence.py`; the *unsound* part
+  was only the spec's onward claim about bit-width.)
 
 ## Improvements adopted into the codebase
 
