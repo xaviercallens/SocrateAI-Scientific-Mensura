@@ -360,7 +360,7 @@ def _spectral_radius_for(z: np.ndarray, lock: str) -> float:
     return float("nan")
 
 
-def locked_rhs(
+def _locked_zdot(
     z: np.ndarray,
     k: np.ndarray,
     viscosity: float,
@@ -368,32 +368,21 @@ def locked_rhs(
     lock: str,
     closure: str = "galerkin",
     rcond: float = 1e-10,
-) -> tuple[np.ndarray, dict[str, float]]:
-    """zdot per eq. 4.5, plus per-step diagnostics.
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """zdot per eq. 4.5 and nothing else: returns (zdot, u, jac, F).
 
-    closure="galerkin" uses the Moore-Penrose pseudo-inverse
-    (numpy.linalg.lstsq with rcond). Tikhonov regularisation is FORBIDDEN by
-    the contract: it breaks Lemma 4.4 (Pu=u) and turns the energy-drift
-    oracle into a measurement of the closure instead of the integrator.
+    The bare field, factored out of `locked_rhs` so the RK stages do not pay
+    for the per-step diagnostics (a second `lstsq` for the Euler identity plus
+    a full SVD).  `locked_rhs` is the public entry point and still returns the
+    diagnostics; this one is what the integrator calls 12 times per step.
+    Numerically identical -- same `lstsq`, same `rcond`, same arguments.
     """
-    _check_lock(lock)
-    k = np.asarray(k, dtype=float)
     n_shells = k.size
-    z = np.asarray(z, dtype=float)
 
     if lock == "none":
-        u = z
+        u = np.asarray(z, dtype=float)
         f = _rhs(u, k, viscosity)
-        diagnostics = {
-            "tangency_defect": 0.0,
-            "live_fraction": 1.0,
-            "removed_production": 0.0,
-            "euler_residual": 0.0,
-            "sigma_min": 1.0,
-            "sigma_max": 1.0,
-            "spectral_radius": float("nan"),
-        }
-        return f, diagnostics
+        return f, u, np.empty((n_shells, 0)), f
 
     u = reconstruct_profile(z, n_shells, lock=lock)
     jac = reconstruct_jacobian(z, n_shells, lock=lock)
@@ -417,6 +406,44 @@ def locked_rhs(
         zdot = np.linalg.pinv(a_mat, rcond=rcond) @ rhs_vec
     else:
         raise ValueError(f"unknown closure {closure!r}")
+
+    return zdot, u, jac, f
+
+
+def locked_rhs(
+    z: np.ndarray,
+    k: np.ndarray,
+    viscosity: float,
+    *,
+    lock: str,
+    closure: str = "galerkin",
+    rcond: float = 1e-10,
+) -> tuple[np.ndarray, dict[str, float]]:
+    """zdot per eq. 4.5, plus per-step diagnostics.
+
+    closure="galerkin" uses the Moore-Penrose pseudo-inverse
+    (numpy.linalg.lstsq with rcond). Tikhonov regularisation is FORBIDDEN by
+    the contract: it breaks Lemma 4.4 (Pu=u) and turns the energy-drift
+    oracle into a measurement of the closure instead of the integrator.
+    """
+    _check_lock(lock)
+    k = np.asarray(k, dtype=float)
+    z = np.asarray(z, dtype=float)
+
+    if lock == "none":
+        f, _u, _jac, _f = _locked_zdot(z, k, viscosity, lock=lock, closure=closure, rcond=rcond)
+        diagnostics = {
+            "tangency_defect": 0.0,
+            "live_fraction": 1.0,
+            "removed_production": 0.0,
+            "euler_residual": 0.0,
+            "sigma_min": 1.0,
+            "sigma_max": 1.0,
+            "spectral_radius": float("nan"),
+        }
+        return f, diagnostics
+
+    zdot, u, jac, f = _locked_zdot(z, k, viscosity, lock=lock, closure=closure, rcond=rcond)
 
     pf = jac @ zdot
     f_norm = float(np.linalg.norm(f))
@@ -446,6 +473,130 @@ def locked_rhs(
         "spectral_radius": _spectral_radius_for(z, lock),
     }
     return zdot, diagnostics
+
+
+# ---------------------------------------------------------------------------
+# Timestep control (contract section 4.7; eq. 4.8 -> 4.8' -> 4.8'')
+# ---------------------------------------------------------------------------
+
+STEP_EPS: float = 1e-3  # eq. 4.8's epsilon, the lock-parameter softening
+
+
+def stability_rate(
+    z: np.ndarray,
+    u: np.ndarray,
+    zdot: np.ndarray,
+    k: np.ndarray,
+    viscosity: float,
+    *,
+    lock: str,
+    eps: float = STEP_EPS,
+) -> float:
+    """eq. 4.8' -- the smooth 2-norm blend of the contract's eq. 4.8 rates.
+
+        rate' = sqrt( sum_n (k_n u_n)**2
+                      + sum_theta thetadot**2 / (theta**2 + eps**2)
+                      + (nu max_n k_n**2)**2 )
+
+    This is a *stability* rate: the fastest nonlinear timescale plus the drift
+    timescales of the lock parameters. It is >= eq. 4.8's max() form term by
+    term (the 2-norm dominates the max, and
+    (theta**2+eps**2)**-1/2 >= (|theta|+eps)**-1), so it never permits a longer
+    step than the contract allows. It is NOT an accuracy estimate and must not
+    be used as one: see `error_density` and eq. 4.8''.
+    """
+    if lock == "none":
+        rate = float(np.max(k * np.abs(u)))
+        if viscosity > 0:
+            rate = max(rate, viscosity * float(np.max(k**2)))
+        return rate
+    rate_sq = float(np.sum((k * u) ** 2))
+    n_params = 2 if lock in ("sym2", "veronese") else 3
+    for pidx in range(len(z) - n_params, len(z)):
+        pv, pd = float(z[pidx]), float(zdot[pidx])
+        rate_sq += pd * pd / (pv * pv + eps * eps)
+    if viscosity > 0:
+        rate_sq += (viscosity * float(np.max(k**2))) ** 2
+    return math.sqrt(rate_sq)
+
+
+def step_rate(stability: float, error_density: float) -> float:
+    """eq. 4.8'' -- lift the stability rate by the measured local-error density.
+
+        rate'' = ( rate'**5  +  C )**(1/5)
+
+    `C` is the *relative local-error density* returned by `error_density()`:
+    the constant for which one RK4 step of length dt has relative local error
+    ~ C*dt**5. Choosing dt = cfl/rate'' therefore equidistributes local error
+    at ~cfl**5 per step wherever accuracy binds, and falls back to eq. 4.8'
+    wherever stability binds. Because rate'' >= rate' >= eq. 4.8's rate, this
+    is a strict tightening of both -- no step is ever longer than the contract
+    already permitted.
+
+    WHY this term is necessary (FINDINGS section 8.1). eq. 4.8' is blind to
+    accuracy.  Measured on the flagship trajectory at cfl = 0.05: its rate has
+    a local minimum of 2.115 at t = 0.182, and the step-doubling error density
+    measured at that state is C**(1/5) = 4.05 -- accuracy binds there and
+    stability does not.  eq. 4.8' therefore steps dt = 2.4e-2 straight through
+    that passage, and that single step carries 105.3% of the whole run's
+    energy drift (contract bug signature B2).  Refining cfl only moves where
+    the step lands, so the drift is an erratic, sign-flipping function of cfl.
+    eq. 4.8'' shortens exactly that step by 2.73x and changes almost nothing
+    else: the median rate''/rate' over the run is 1.000.
+
+    The fifth-power blend is the natural one: local error scales as dt**5, so
+    adding densities in the 5-norm adds the two step-length constraints in the
+    units they are each expressed in.
+    """
+    return float((stability**5 + max(error_density, 0.0)) ** 0.2)
+
+
+# Noise floor of the step-doubling estimator, in ulps of ||u||.  Measured on
+# the flagship seed (FINDINGS 8.1), sweeping dt down: the gap is 114 ulps at
+# dt = 2e-5 with local slope 4.86 (still truncation) and 4-7 ulps at dt = 1e-5
+# with slope 4.93 (arithmetic noise), essentially independently of N.  64 ulps
+# therefore sits between the two.  See `error_density`.
+RICHARDSON_NOISE_ULPS: float = 64.0
+
+
+def error_density(
+    u_full: np.ndarray,
+    u_half: np.ndarray,
+    dt: float,
+    *,
+    noise_ulps: float = RICHARDSON_NOISE_ULPS,
+) -> float:
+    """Relative local-error density C from a step-doubling (Richardson) pair.
+
+    `u_full` is Phi(z) after one RK4 step of length dt, `u_half` after two of
+    length dt/2. For a 4th-order method u_full - u_exact = C_abs*dt**5 and
+    u_half - u_exact = C_abs*dt**5/16, hence
+
+        C = (16/15) * ||u_full - u_half|| / (||u_half|| * dt**5)
+
+    and a step of length dt has relative local error ~ C*dt**5 (the propagated
+    two-half-step solution has 1/16 of that). Measured on the reconstructed
+    profile u = Phi(z) rather than on z because ||u||**2 = 2E is the energy
+    oracle's own scale, and because u has uniform units where z does not.
+
+    NOISE FLOOR, and why it is not optional.  Below a gap of ~`noise_ulps`
+    ulps of ||u|| the difference is floating-point noise, not truncation, and
+    C then measures machine epsilon divided by dt**5 -- which *diverges* as dt
+    shrinks.  Left unfloored that is a positive feedback loop: at the fixed
+    point the map is dt -> cfl*dt / ((16/15)*eps)**(1/5), whose gain is
+    ~1333*cfl, so for cfl below ~7.5e-4 dt spirals to zero and the run
+    terminates "dt_collapse" with nothing wrong with it.  Measured without the
+    floor: fine at cfl = 5e-4, "dt_collapse" after 23 steps at cfl = 2e-4 and
+    below.  Returning 0.0 when the estimator has no signal makes eq. 4.8''
+    fall back to eq. 4.8' there, which is the self-correcting direction.
+    """
+    scale = float(np.linalg.norm(u_half))
+    if scale <= 0 or dt <= 0:
+        return 0.0
+    gap = float(np.linalg.norm(np.asarray(u_full) - np.asarray(u_half)))
+    if gap <= noise_ulps * float(np.spacing(scale)):
+        return 0.0
+    return (16.0 / 15.0) * gap / (scale * dt**5)
 
 
 def _order3_coefficients_from_profile(u_target: np.ndarray) -> tuple[float, float, float] | None:
@@ -746,23 +897,30 @@ def simulate_sym2_shell_model(
     a pure integrator diagnostic under closure="galerkin". With lock="none"
     this reduces exactly to simulate_shell_model (gate T1/B4).
 
-    Timestep rule (repaired eq. 4.8, W1 round 2).  For lock="none" the rate is
-    bit-for-bit `shell.py`'s ``max(max_n k_n|u_n|, nu max_n k_n**2)`` -- that is
-    what gate T1 pins.  For a locked run the contract's ``max(...)`` of eq. 4.8
-    is replaced by the 2-norm blend
+    Timestep rule (eq. 4.8'', W1 round 2 phase 3).  For lock="none" the rate is
+    bit-for-bit `shell.py`'s ``max(max_n k_n|u_n|, nu max_n k_n**2)`` and the
+    step is a single RK4 -- that is what gate T1 pins, and nothing below
+    touches it.  For a locked run,
 
-        rate**2 = sum_n (k_n u_n)**2
-                  + sum_theta thetadot**2 / (theta**2 + eps**2)
-                  + (nu max_n k_n**2)**2,          eps = 1e-3
+        dt = cfl / ( stability_rate(...)**5 + C )**(1/5)
 
-    which is smooth in z, where eq. 4.8's ``max`` of ``abs``-quotients has
-    kinks wherever the argmax switches or a parameter crosses zero.  Smoothness
-    matters because a kinked step-size map makes the global error a
-    non-smooth function of cfl, which is exactly what stops a refinement table
-    from showing a clean 16x.  The blend is a strict *tightening*: the 2-norm
-    dominates the max, ``||k*u||_2 >= max_n k_n|u_n|``, and
-    ``1/sqrt(theta**2+eps**2) >= 1/(|theta|+eps)``, so every step is at most as
-    long as eq. 4.8 would have allowed.
+    where `stability_rate` is eq. 4.8' (the smooth 2-norm blend of eq. 4.8's
+    terms) and `C` is the relative local-error density measured by step
+    doubling on the *previous* step (`error_density`).  The step itself is
+    taken as two half RK4 steps, with the single full step retained only as
+    the Richardson estimator -- so `C` is available for the next step at no
+    extra field evaluations beyond the doubling itself.
+
+    eq. 4.8' alone is blind to accuracy.  On the flagship trajectory its rate
+    has a local minimum (2.115) at t = 0.182, where the measured local-error
+    density is C**(1/5) = 4.05: accuracy binds and stability does not, so
+    eq. 4.8' steps dt = 2.4e-2 straight through, and that one step carries
+    105.3% of the run's energy drift.  Refining cfl only moves where the step
+    lands, which is the erratic, sign-flipping refinement table FINDINGS 7.2
+    refuted the previous repair on.  eq. 4.8'' keeps eq. 4.8' as a floor (so
+    it remains a strict tightening of the contract's eq. 4.8) and lifts it
+    only where the measured error says the step must be shorter -- the median
+    rate''/rate' over a run is 1.000.  See `step_rate` and FINDINGS 8.
 
     `cond_ceiling` terminates the run "lock_singular" if cond(J) exceeds it for
     20 consecutive steps.  This is a *new, tighter* guard than the previous
@@ -810,6 +968,9 @@ def simulate_sym2_shell_model(
     def rhs_of(zstate: np.ndarray) -> tuple[np.ndarray, dict[str, float]]:
         return locked_rhs(zstate, k, viscosity, lock=lock, closure=closure, rcond=rcond)
 
+    def field(zstate: np.ndarray) -> np.ndarray:
+        return _locked_zdot(zstate, k, viscosity, lock=lock, closure=closure, rcond=rcond)[0]
+
     def record(t: float, zstate: np.ndarray) -> None:
         u = profile_of(zstate)
         _zdot, diag = rhs_of(zstate)
@@ -830,39 +991,48 @@ def simulate_sym2_shell_model(
         sigma_min.append(diag["sigma_min"])
 
     def rk4_step(zstate: np.ndarray, dt: float) -> np.ndarray:
-        k1, _ = rhs_of(zstate)
-        k2, _ = rhs_of(zstate + 0.5 * dt * k1)
-        k3, _ = rhs_of(zstate + 0.5 * dt * k2)
-        k4, _ = rhs_of(zstate + dt * k3)
+        k1 = field(zstate)
+        k2 = field(zstate + 0.5 * dt * k1)
+        k3 = field(zstate + 0.5 * dt * k2)
+        k4 = field(zstate + dt * k3)
         return zstate + (dt / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+
+    def doubled_step(zstate: np.ndarray, dt: float) -> tuple[np.ndarray, float]:
+        """Two half RK4 steps (propagated) + one full step (Richardson estimator)."""
+        z_full = rk4_step(zstate, dt)
+        z_half = rk4_step(rk4_step(zstate, 0.5 * dt), 0.5 * dt)
+        density = error_density(profile_of(z_full), profile_of(z_half), dt)
+        return z_half, density
 
     record(0.0, z)
     t = 0.0
     terminated = "t_max"
-    eps = 1e-3
     singular_streak = 0
     max_condition = 0.0
+    err_density = 0.0  # eq. 4.8'' -- C, carried over from the previous step
+    warmed = False
+    n_steps_taken = 0
 
     for step_index in range(max_steps):
         u = profile_of(z)
-        zdot_now, diag_now = rhs_of(z)
+        zdot_now = field(z)
 
-        if lock == "none":
-            # Gate T1: bit-for-bit shell.simulate_shell_model.
-            rate = float(np.max(k * np.abs(u)))
-            if viscosity > 0:
-                rate = max(rate, viscosity * float(np.max(k**2)))
-        else:
-            # Repaired eq. 4.8 -- smooth 2-norm blend, strictly tighter than
-            # the contract's max() form (see the docstring).
-            rate_sq = float(np.sum((k * u) ** 2))
-            n_params = 2 if lock in ("sym2", "veronese") else 3
-            for pidx in range(len(z) - n_params, len(z)):
-                pv, pd = float(z[pidx]), float(zdot_now[pidx])
-                rate_sq += pd * pd / (pv * pv + eps * eps)
-            if viscosity > 0:
-                rate_sq += (viscosity * float(np.max(k**2))) ** 2
-            rate = math.sqrt(rate_sq)
+        # eq. 4.8'/4.8''.  lock="none" keeps shell.py's rate bit-for-bit
+        # (gate T1) and a plain single RK4 step; a locked run uses the
+        # error-lifted rate and the doubled step.
+        rate = stability_rate(z, u, zdot_now, k, viscosity, lock=lock)
+        if lock != "none":
+            if not warmed:
+                # Startup probe: without it the very first step -- where the
+                # error density is largest on this seed -- would be the one
+                # step of the run that is not error-controlled.
+                dt_probe = cfl / rate if rate > 0 else 0.0
+                if dt_probe > 0:
+                    if t + dt_probe > t_max:
+                        dt_probe = t_max - t
+                    _z_probe, err_density = doubled_step(z, dt_probe)
+                warmed = True
+            rate = step_rate(rate, err_density)
 
         if rate <= 0 or not np.isfinite(rate):
             terminated = "degenerate" if rate <= 0 else "non_finite"
@@ -876,8 +1046,12 @@ def simulate_sym2_shell_model(
         if t + dt > t_max:
             dt = t_max - t
 
-        z = rk4_step(z, dt)
+        if lock == "none":
+            z = rk4_step(z, dt)
+        else:
+            z, err_density = doubled_step(z, dt)
         t += dt
+        n_steps_taken += 1
         u = profile_of(z)
 
         if not np.all(np.isfinite(z)) or not np.all(np.isfinite(u)):
@@ -943,6 +1117,7 @@ def simulate_sym2_shell_model(
         "rcond": rcond,
         "cond_ceiling": cond_ceiling,
         "max_jacobian_condition": max_condition,
+        "n_steps": n_steps_taken,
         "base": base,
     }
 

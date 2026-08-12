@@ -430,6 +430,104 @@ validated only by the dt-refinement control (§7.C1), not by argument.
 > termination guard, so a future degeneracy is *reported* rather than absorbed
 > into the energy budget.
 
+> **Erratum 2 (W1 round 2 phase 3, Tier C — numerical convention). (4.8′) is
+> smooth but blind, and smoothness was the wrong diagnosis.** The erratum above
+> is correct that (4.8) has kinks, and (4.8′) does remove them, but removing
+> them was not sufficient and — per FINDINGS §7.2 — not the binding problem.
+> Both (4.8) and (4.8′) are *stability* rates: they measure how fast the state
+> moves, not how large the local truncation error is. On the flagship
+> trajectory the two part company at **one specific passage**, and that is
+> enough to wreck the refinement table. Measured directly (FINDINGS §8.1), on
+> the trajectory the shipped rule actually follows at cfl $=0.05$: (4.8′)'s
+> rate has a local minimum of $2.115$ at $t=0.182$, while the relative
+> local-error density $C$ — the constant for which one RK4 step of length
+> $\Delta t$ has relative local error $C\,\Delta t^5$ — measured there by step
+> doubling is $C^{1/5}=4.05$. Accuracy binds; stability does not. (4.8′)
+> accordingly steps $\Delta t = 2.4\times10^{-2}$ through that passage, and
+> **that single step carries $105.3\%$ of the whole run's energy drift**
+> (round 1's §6.2 signature, unchanged). Refining cfl only moves where the
+> step lands, so drift becomes an erratic, sign-flipping function of cfl: a
+> 20-point log-spaced scan of the HEAD (4.8′) implementation at the flagship
+> configuration gives compensated-error spread $876\times$ with 3 sign flips
+> and one adjacent pair that is $167\times$ *worse* under refinement. No
+> amount of smoothing fixes a step that is placed on a passage it is too long
+> to resolve.
+>
+> *Not to be overstated:* the anti-correlation is **local**, not global. Over
+> a uniform-time sample of the whole window the Pearson correlation between
+> $\text{rate}_{4.8'}$ and $C^{1/5}$ is $+0.297$, and the median
+> $\text{rate}_{4.8''}/\text{rate}_{4.8'}$ over a whole run is $1.000$ — the
+> repair shortens a handful of steps (max factor $2.73$, at $t=0.182$) and
+> changes essentially nothing else.
+>
+> The implementation therefore keeps (4.8′) as a **floor** and lifts it by the
+> measured error density:
+>
+> $$\Delta t = \frac{\mathrm{cfl}}{\bigl(\;\text{rate}_{4.8'}^{\,5} \;+\; C\;\bigr)^{1/5}},
+> \tag{4.8$''$ — Tier C}$$
+>
+> where $C$ is obtained by **step doubling**: the step is taken as two half RK4
+> steps (that is the propagated solution) and the single full step of length
+> $\Delta t$ is retained only as the Richardson estimator, giving
+>
+> $$C \;=\; \frac{16}{15}\,\frac{\|\Phi(z_{\text{full}})-\Phi(z_{\text{half}})\|}
+> {\|\Phi(z_{\text{half}})\|\,\Delta t^{5}} ,$$
+>
+> carried over to size the next step. The fifth power is the natural blend:
+> local error scales as $\Delta t^5$, so the two competing step-length
+> constraints add in the units each is expressed in. Choosing
+> $\Delta t = \mathrm{cfl}/(\cdot)^{1/5}$ equidistributes relative local error
+> at $\approx\mathrm{cfl}^5$ per step wherever accuracy binds, and reduces to
+> (4.8′) wherever stability binds. This is a textbook step-doubling error
+> controller with (4.8′) retained as a stability floor; it is deliberately
+> *not* another closed-form rate formula, because both closed-form attempts —
+> (4.8) and (4.8′) — failed for the same reason: they cannot know in advance
+> where the trouble is.
+>
+> **Estimator noise floor (Tier B, not optional).** Below a Richardson gap of
+> $\approx 64$ ulps of $\|u\|$ the difference is arithmetic noise, and
+> $C\sim\varepsilon_{\text{mach}}/\Delta t^5$ then *diverges* as $\Delta t$
+> shrinks. Unfloored this is positive feedback: the fixed-point map is
+> $\Delta t\mapsto \mathrm{cfl}\,\Delta t/((16/15)\varepsilon)^{1/5}$, gain
+> $\approx1333\,\mathrm{cfl}$, so below $\mathrm{cfl}\approx7.5\times10^{-4}$
+> the step spirals to zero. Measured without the floor: clean at
+> $\mathrm{cfl}=5\times10^{-4}$, `dt_collapse` after 23 steps at
+> $2\times10^{-4}$. `error_density` returns $0$ when the estimator has no
+> signal, which falls back to (4.8′) — the self-correcting direction. With the
+> floor, $\mathrm{cfl}=10^{-4}$ runs to `t_max` normally.
+>
+> **Properties (all Tier B, checked).**
+> 1. $\text{rate}_{4.8''} \ge \text{rate}_{4.8'} \ge \text{rate}_{4.8}$
+>    pointwise, so (4.8$''$) is a strict tightening of both; the contract's
+>    stability convention is preserved, never relaxed. Gate T5 is *not*
+>    weakened by this change — it is met, not moved.
+> 2. `lock="none"` is untouched: same rate, same single RK4 step, so gate T1
+>    remains bit-for-bit ($\max|\Delta E| = \max|\Delta\Omega| = 0$, and also
+>    $\max|\Delta t| = \max|\Delta u_{\text{final}}| = 0$).
+> 3. Lemma 4.4 is a property of the projector, not of the stepper, and is
+>    unaffected; verified anyway ($\max\|Pu-u\|/\|u\| \le 1.3\times10^{-14}$
+>    over the flagship and both sweep-window runs).
+> 4. The step-doubling floor is **not** Tikhonov regularisation and does not
+>    touch $P$; it changes only *when* the field is sampled. Corollary 4 of
+>    Lemma 4.4 is not in play.
+>
+> **What (4.8$''$) does *not* buy (Tier B, disclosed).** The gate it clears is
+> the **energy-drift** gate — the project's integrator oracle. The *solution*
+> error $\|u(t_{\max})-u_{\text{ref}}\|$ under (4.8$''$) has measured effective
+> order $3.70$ between $\mathrm{cfl}=10^{-2}$ and $5\times10^{-3}$ and its
+> $\mathrm{cfl}^4$-compensated value is still rising, where a fixed-$\Delta t$
+> RK4 control on the same field reaches $3.90$–$4.09$ at comparable step
+> counts. (4.8$''$) is therefore "the step rule under which the energy oracle
+> converges at fourth order", not "a fourth-order method" in the solution
+> norm; see FINDINGS §8.6. At matched accuracy it is still far cheaper than
+> fixed $\Delta t$: 5571 steps for $\|u-u_{\text{ref}}\|=1.4\times10^{-12}$
+> against $1.3\times10^{-10}$ for a fixed-$\Delta t$ run of 8000 steps.
+>
+> **Cost.** Three RK4 steps per accepted step instead of one. Recovered by
+> factoring the bare field out of `locked_rhs` (`_locked_zdot`), so the RK
+> stages no longer pay for the per-step Euler-identity `lstsq` and the SVD.
+> Measured wall-clock and drift at matched cfl are in FINDINGS §8.5.
+
 ---
 
 ## 5. The enstrophy bridge: from the lock to the measured exponent

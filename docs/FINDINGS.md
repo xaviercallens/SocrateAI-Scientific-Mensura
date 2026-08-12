@@ -492,3 +492,387 @@ this correction, with an updated message — it was never pushed with the
 original, overclaiming message. Per standing rule 5, this section is the
 finding; the $3.948$ fitted order is not to be cited as an established
 result until the above is resolved.
+
+---
+
+## 8. W1 round 2, phase 3 — the step rule, repaired (eq. 4.8″)
+
+Answers §7.3 items 1–3. Item 4 (the $A<0$ excursion) is still open and is
+*not* addressed here. Every adaptive-rule number below was produced by the
+code as shipped in this commit: all scans were re-run from scratch after the
+last code change (the estimator noise floor of §8.2), not carried over. The
+fixed-$\Delta t$ control arm of §8.5 and §8.6.3 calls no part of the step
+rule and is unaffected by it; the (4.8′) arm is `git show HEAD:…` run
+verbatim.
+
+The chart fix and the `fit_lock_state` fix of §7.1 are untouched. What
+changed is only *how $\Delta t$ is chosen*.
+
+### 8.1 Diagnosis: (4.8′) is not blind everywhere, it is blind in one place
+
+§7.2.A established that the residual non-smoothness lives in the adaptive
+rule itself. Tracing the flagship trajectory ($N=24$, $\alpha'=10^{-6}$,
+$t_{\max}=0.8$) step by step at cfl $=0.05$ locates it exactly:
+
+- (4.8′)'s rate has a **local minimum of 2.115 at $t=0.182$**, and the
+  step-doubling error density measured at that state is $C^{1/5}=4.05$.
+  Accuracy binds there and stability does not, so (4.8′) steps
+  $\Delta t = 2.4\times10^{-2}$ straight through.
+- Under (4.8′) at that cfl the whole run's drift is $6.868\times10^{-8}$ and
+  **the single sampled interval $t\in[0.1739,0.2093]$ carries $105.3\%$ of
+  it** — §6.2's signature, and §7.2.D's, unchanged. Under (4.8″) the run's
+  drift is $1.931\times10^{-10}$ and the worst single step carries $17.3\%$.
+- **The anti-correlation is local, not global**, and the earlier draft of the
+  contract erratum overstated it. Over a uniform-time sample of the window
+  the Pearson correlation between $\text{rate}_{4.8'}$ and $C^{1/5}$ is
+  $+0.297$; the median $\text{rate}_{4.8''}/\text{rate}_{4.8'}$ over a whole
+  run is $1.000$ and its maximum is $2.728$ (at $t=0.182$). (4.8″) shortens a
+  handful of steps and changes nothing else. The contract's Erratum 2 has
+  been rewritten to these measured numbers; the figures it previously quoted
+  ($C^{1/5}\approx24$, rate bottoming at $1.41$, $\Delta t=3.5\times10^{-2}$,
+  fixed-$\Delta t$ needing $6.7\times10^{-4}$) could not be reproduced and
+  are withdrawn.
+
+**Why an error *estimator* succeeds where two closed-form rates failed.**
+The Richardson gap is not a closed-form density evaluated at a state; it is a
+measurement of what a step of *that length* actually does. At the flagship
+seed, $C^{1/5}$ measured at $\Delta t = 5\!\times\!10^{-3},2\!\times\!10^{-3},
+10^{-3},5\!\times\!10^{-4},2\!\times\!10^{-4},10^{-4},5\!\times\!10^{-5},
+2\!\times\!10^{-5},10^{-5}$ is $20.8,38.2,55.1,69.4,83.6,90.3,94.1,96.7,97.5$,
+with the gap's local slope in $\Delta t$ rising $1.68\to4.93$ — i.e. the
+estimator reports a *large* $C$ exactly when the step is too long to resolve
+the state, and settles to the asymptotic density only once it is not. That
+feedback is the property (4.8) and (4.8′) could not have: they evaluate a
+formula at a point and cannot know how long a step that point can take. The
+gap is essentially $N$-independent — $N=12$ and $N=24$ agree to 6 significant
+figures at every $\Delta t$ in that list, $N=8$ to 3 — so this is a property
+of the dynamics, not an artefact of truncation depth or of noise amplified
+through the reconstruction recurrence.
+
+### 8.2 What changed
+
+$$\Delta t = \frac{\mathrm{cfl}}{\bigl(\text{rate}_{4.8'}^{\,5}+C\bigr)^{1/5}},
+\qquad C=\frac{16}{15}\frac{\|\Phi(z_{\text{full}})-\Phi(z_{\text{half}})\|}
+{\|\Phi(z_{\text{half}})\|\,\Delta t^{5}}$$
+
+with the **two-half-step solution propagated** and the full step kept only as
+the estimator; $C$ is carried to the next step, and a one-off probe at $t=0$
+means no step of the run is uncontrolled. Contract §4.7, Erratum 2.
+
+Two supporting changes: `_locked_zdot` factors the bare field out of
+`locked_rhs` so the RK stages stop paying for the per-step diagnostics; and
+`error_density` returns $0$ below a **noise floor of 64 ulps** of $\|u\|$.
+The floor is not cosmetic — see §8.6.
+
+### 8.3 Dense-scan evidence at the flagship configuration
+
+$N=24$, $\alpha'=10^{-6}$, $t_{\max}=0.8$, `lock="sym2"`, Galerkin, inviscid,
+default seed. 20 log-spaced cfl, all terminating `t_max`. The gate is that
+$|{\rm drift}|/\mathrm{cfl}^4$ is **flat**, not that a fit returns $\approx4$.
+
+| cfl | 0.1 | 0.0729 | 0.0532 | 0.0388 | 0.0283 | 0.0207 | 0.0151 | 0.0110 | 0.00802 | 0.005 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| drift | $+3.56$e-9 | $+8.89$e-10 | $+2.55$e-10 | $+7.13$e-11 | $+2.01$e-11 | $+5.43$e-12 | $+1.50$e-12 | $+4.09$e-13 | $+1.04$e-13 | $+1.53$e-14 |
+| $/\mathrm{cfl}^4$ | 3.56e-5 | 3.14e-5 | 3.18e-5 | 3.14e-5 | 3.12e-5 | 2.98e-5 | 2.90e-5 | 2.79e-5 | 2.51e-5 | 2.45e-5 |
+
+(alternate rows shown; all 20 are in the same band). Over the full 20 points:
+**compensated spread $1.45\times$, zero sign flips** (every drift positive),
+worst adjacent pair equivalent to $13.8\times$ per halving, least-squares
+order 4.102, across 5.4 decades of drift.
+
+A second, wider scan (cfl $0.2\to0.01$, 20 points) gives compensated spread
+$1.64\times$, zero sign flips, LSQ order 4.010 — see §8.6 for its coarse end.
+
+Exact cfl halvings at the same configuration:
+
+| cfl | 0.16 | 0.08 | 0.04 | 0.02 | 0.01 | 0.005 |
+|---|---|---|---|---|---|---|
+| drift | $+1.989$e-8 | $+1.423$e-9 | $+8.160$e-11 | $+4.720$e-12 | $+2.771$e-13 | $+2.243$e-14 |
+| ratio | — | 13.98 | 17.44 | 17.29 | 17.03 | 12.36 |
+
+**Minimum halving ratio 12.36 against gate T5's $\ge 8$**, compensated spread
+$1.295\times$, zero sign flips. At $N=30$ on the same ladder: minimum 13.98,
+spread $1.340\times$, zero sign flips.
+
+### 8.4 Dense-scan evidence at the ACTUAL sweep window
+
+$N=30$, $t_{\max}=12$, 20 log-spaced cfl from 0.2 to 0.0125, all `t_max`.
+This is §7.2.E's configuration — the one the previous repair failed at.
+
+| | $\alpha'=10^{-2}$ | $\alpha'=3\times10^{-3}$ |
+|---|---|---|
+| drift at cfl 0.2 | $-8.223\times10^{-7}$ | $-1.180\times10^{-6}$ |
+| drift at cfl 0.0125 | $-1.267\times10^{-11}$ | $-1.894\times10^{-11}$ |
+| compensated spread over 20 pts | **1.03×** | **1.06×** |
+| sign flips | **0** | **0** |
+| worst adjacent pair | 15.0× / halving | 14.5× / halving |
+| LSQ order | 3.993 | 3.983 |
+| min **exact** halving ratio | **15.76** | **15.68** |
+
+Compensated $|{\rm drift}|/\mathrm{cfl}^4$ at $\alpha'=10^{-2}$ runs
+$5.139,5.034,5.105,5.112,5.156,5.115,5.103,5.142,5.147,5.133,5.161,5.161,
+5.162,5.167,5.175,5.173,5.186,5.191,5.194,5.190$ ($\times10^{-4}$) over the
+whole scan. That is the flatness the gate asks for, over 4.8 decades of
+drift, at the window the measurement actually uses.
+
+Only $\alpha'=10^{-2}$ and $3\times10^{-3}$ reach $t_{\max}$ at $N=30$;
+$10^{-3}$ and $10^{-4}$ stop at `rho_ceiling`, so a drift-refinement study
+there would be confounded by a moving stopping time. That is a *disclosed
+restriction on where this check can be run*, not a choice of where it passes:
+§7.3 item 2's `rho_ceiling` question is still open and is what limits it.
+
+### 8.5 Controls and contrast
+
+**Control (fixed $\Delta t$, plain RK4, identical field, no adaptive rule).**
+Compensated $|{\rm drift}|\cdot n_{\text{steps}}^4$ at the flagship window:
+$2.59{\rm e}1, 2.22{\rm e}2, \dots$ rising to a plateau of
+$4.36,4.48,4.43,4.27,4.09,3.92\ (\times10^3)$ for $n_{\text{steps}} =
+2206\ldots9894$ — flat to $1.14\times$ once $n_{\text{steps}}\gtrsim2000$,
+with one sign flip at $n_{\text{steps}}=200$. So the fixed-$\Delta t$ control
+has a pre-asymptotic regime of its own below $\sim2000$ steps; §7.2.A's
+"clean, monotone, 2.71× spread" holds only above it. (4.8″) is already
+compensated-flat by $\approx250$ accepted steps (cfl $\approx0.11$).
+
+**Contrast (the shipped eq. 4.8′, `git show HEAD:…/shell_sym2.py`, run
+verbatim on the same machine).** Same 20-point scan, same field, same seed:
+
+| | eq. 4.8′ (HEAD) | eq. 4.8″ |
+|---|---|---|
+| flagship, compensated spread | **876×** | **1.45×** |
+| flagship, sign flips | 3 | 0 |
+| flagship, worst adjacent pair | 167× **worse** under refinement | 13.8× better/halving |
+| sweep window $\alpha'=10^{-2}$, spread | 3.94× | 1.03× |
+| sweep window, worst adjacent pair | 0.81×/halving (i.e. worse) | 15.0×/halving |
+
+This reproduces §7.2 independently, and is the direct before/after.
+
+**Cost**, at matched cfl $=0.05$: flagship $6.10\,$s $\to10.26\,$s
+($1.68\times$) for $355.7\times$ less drift; sweep window $14.56\,$s
+$\to24.64\,$s ($1.69\times$) for $31.7\times$ less drift.
+
+### 8.6 Where (4.8″) is *not* clean — disclosed limits
+
+1. **Pre-asymptotic above cfl $\approx0.15$ at the flagship window.** In the
+   cfl $0.2\to0.01$ scan the first adjacent pair ($0.2\to0.171$) reduces
+   drift only $1.148\times$ (local order 0.88). The compensated band still
+   holds across that scan ($1.64\times$), and because a compensated spread
+   $S$ bounds every exact halving inside the scanned range below by $16/S$,
+   the scan certifies $\ge9.8\times$ per halving — consistent with the
+   measured $13.98\times$ at $0.16\to0.08$. But a *single* 17 % cfl step at
+   the coarse end is not a convergence test, and should not be quoted as one.
+2. **The energy oracle has a roundoff floor at $|{\rm drift}|\sim10^{-14}$.**
+   At the flagship window: 1248 ulps of $E(0)$ at cfl $0.01$, 101 at $0.005$,
+   26 at $0.0025$. Below $\approx10^{-13}$ the drift stops being a
+   measurement of the integrator. Every gate above is stated on data at or
+   above that floor except the last point of the cfl $\to0.005$ ladder, which
+   is flagged here rather than dropped.
+3. **The solution norm is *not* fourth order.** Against a fixed-$\Delta t$
+   64000-step reference, $\|u(t_{\max})-u_{\text{ref}}\|$ under (4.8″) has
+   local order $2.89, 3.40, 3.66, 3.70, 3.50$ over cfl $0.08\to0.0025$ and
+   its $\mathrm{cfl}^4$-compensated value is still rising, where the
+   fixed-$\Delta t$ control reaches $3.90$–$4.09$ at comparable step counts.
+   (4.8″) is therefore "the rule under which the **energy oracle** converges
+   at fourth order with flat compensation", **not** "a fourth-order method"
+   in the solution norm. It is nonetheless far more accurate per unit work:
+   $1.398\times10^{-12}$ in 5570 accepted steps ($=16{,}710$ RK4 steps, since
+   each accepted step costs three) against $1.280\times10^{-10}$ for
+   fixed-$\Delta t$ in 8000 RK4 steps — $91\times$ the accuracy for
+   $2.1\times$ the field evaluations. Why the energy functional is cleaner than the
+   solution it is computed from is **not explained here** and is a live
+   question, not a settled one.
+4. **The criterion fails on short windows — and so does a fixed-$\Delta t$
+   control, which is the point.** Applying the new regression test's own
+   criterion at other window lengths ($N=24$, $\alpha'=10^{-6}$, exact
+   halvings cfl $0.08/0.04/0.02$):
+
+   | $t_{\max}$ | min halving | sign flips | comp spread | verdict |
+   |---|---|---|---|---|
+   | 0.2 | 40.75× | 0 | **106.6×** | fails (floor) |
+   | 0.4 | 10.84× | **1** | **4.75×** | fails (zero crossing) |
+   | 0.8 | 17.29× | 0 | 1.178× | passes |
+   | 1.2 | 16.89× | 0 | 1.145× | passes |
+   | 1.6 | 16.51× | 0 | 1.106× | passes (`rho_ceiling`) |
+
+   §7.2.E listed $t_{\max}=0.2,0.4,1.2,1.6$ as failing under (4.8′). Two of
+   the four now pass cleanly; the other two fail for a reason that is **not
+   the step rule**. The leading $O(\mathrm{cfl}^4)$ coefficient of the signed
+   drift is $\approx5\times$ smaller at $t_{\max}=0.4$ than at $0.8$, so the
+   drift reaches the §8.6.2 roundoff floor by cfl $\approx0.02$ ($1.1\times
+   10^{-14}$, 50 ulps, at $t_{\max}=0.2$) and crosses zero. **Control:** a
+   fixed-$\Delta t$ plain RK4 with no adaptive rule whatsoever, same field,
+   2000–16000 steps, flips sign at $t_{\max}=0.2, 0.3, 0.4, 0.5$ and not at
+   $0.6, 0.8$ — the same windows, the same way. This is a property of the
+   energy functional on short windows, not of (4.8″), and short windows are
+   therefore *not discriminating configurations* for this gate. Stated here
+   rather than omitted, because "apply the test's own criterion elsewhere" is
+   precisely the attack that refuted §7.
+5. **Other seeds and locks** ($t_{\max}=0.8$ unless noted, same halvings).
+   Contract seed C7, roots $(0.3,-0.4)$ — where §7.2.E measured effective
+   order 3.23 and 3 of 6 failing halvings under (4.8′): now **16.58×** min
+   halving, spread $1.075\times$, zero flips; at $t_{\max}=1.6$, **16.45×**,
+   $1.065\times$, zero flips. `lock="veronese"`: 12.47×, spread $1.283\times$,
+   zero flips. `lock="order3"`: 11.67× and zero flips, but spread $27.7\times$
+   because its drift is $3.4\times10^{-12}\to6.7\times10^{-16}$ — 3 ulps, i.e.
+   entirely inside the §8.6.2 floor, so nothing is measured there. Both
+   non-sym2 locks terminate `rho_ceiling` on this window.
+6. **A latent collapse, found and fixed.** Without the 64-ulp noise floor the
+   estimator feeds back on its own roundoff: $C\sim\varepsilon/\Delta t^5$
+   diverges as $\Delta t\to0$, the fixed-point map has gain
+   $\approx1333\,\mathrm{cfl}$, and below cfl $\approx7.5\times10^{-4}$ the
+   step spirals to zero. Measured on the unfloored code: clean at
+   $5\times10^{-4}$, `dt_collapse` after 23 steps at $2\times10^{-4}$ and
+   after 10 at $10^{-4}$. With the floor, cfl $=10^{-4}$ runs to $t_{\max}$
+   in 11611 steps with drift $1.4\times10^{-14}$. The floor is placed where
+   the signal dies, not where it helps: at the flagship seed the gap reaches
+   clean $\Delta t^5$ scaling (slope 4.93) at $\Delta t=10^{-5}$, where it is
+   4–7 ulps.
+
+### 8.7 Gates re-verified under the new rule
+
+- **T1 bit-for-bit.** `lock="none"` vs `shell.py`, $\nu\in\{0,10^{-3}\}$,
+  $N\in\{12,24\}$: $\max|\Delta E| = \max|\Delta\Omega| = \max|\Delta t| =
+  \max|\Delta u_{\text{final}}| = 0$ exactly, same termination reason.
+- **Lemma 4.4.** Over the full window: $\max\|Pu-u\|/\|u\| =
+  8.71\times10^{-15}$ (flagship), $1.16\times10^{-14}$ ($\alpha'=10^{-2}$
+  sweep), $1.24\times10^{-14}$ ($3\times10^{-3}$ sweep); $\operatorname{cond}
+  J \le 5.30\times10^{3}$ throughout. On 400 random states,
+  $\max|\langle u,J\dot z\rangle|/(\|u\|\|J\dot z\|) = 2.71\times10^{-12}$
+  and $\max\|Pu-u\|/\|u\| = 2.45\times10^{-13}$.
+- **T5** at $N=24$ *and* $N=30$, flagship and sweep window: minimum measured
+  exact-halving ratios 12.36 / 13.98 / 15.76 / 15.68, all $\ge8$.
+
+### 8.8 The regression test, re-pinned honestly
+
+`test_full_window_energy_drift_converges_at_fourth_order` no longer pins
+$N=6$ on the dyadic ladder (§7.2.F: a different regime, and a placement where
+the test passed rather than where the claim lived). It is now parametrised
+over **$N=24$ and $N=30$ on the T-dual ladder at $\alpha'=10^{-6}$**, and it
+asserts compensated flatness (no sign flip; every halving $\ge8\times$;
+$|{\rm drift}|/\mathrm{cfl}^4$ spread $\le2$) instead of a fitted order —
+because §7.2.A–B is a worked example of a scan that fits to $\approx3.95$
+while individual halvings get worse and flip sign.
+
+Applying that same criterion across $N = 6, 8, 12, 16, 20, 24, 30$ on the
+T-dual ladder at $\alpha'=10^{-6}$ before shipping it: **passes at every one**
+(halving ratios 16.11–17.92, compensated spread 1.102–1.179, zero sign flips
+everywhere) — against §7.2.F, where the old rule's criterion failed at all of
+$N=7,10,12,16,20,24,30$.
+
+Two tests were added: `test_sweep_window_energy_drift_converges_at_fourth_order`
+(the $t_{\max}=12$, $N=30$, $\alpha'=10^{-2}$ gate — §7.3 item 3), and
+`test_step_doubling_estimator_does_not_feed_back_on_its_own_roundoff`
+(§8.6.6). `test_repaired_timestep_rule_is_never_looser_than_contract_eq_4_8`
+now exercises the shipped `stability_rate`/`step_rate` over 41 states and
+both viscosities instead of re-deriving the formula inline, so it cannot pass
+while the integrator uses something else.
+
+### 8.9 Status
+
+**The §7.2 defect is closed, subject to the same adversarial verification
+that closed §7.** The step rule now makes full-window energy drift a strictly
+monotone, sign-stable, compensated-flat function of cfl at the flagship
+configuration *and* at the actual sweep window, at both $N=24$ and $N=30$,
+with every exact halving clearing gate T5. $|{\rm drift}|$ is strictly
+decreasing at all 20 points of all four dense scans.
+
+**This section has not yet been through the independent-skeptic stage.** §7
+is the record of a report that reproduced digit-for-digit and was still wrong
+on its central claim, so nothing here should be promoted to the README, the
+paper, or a release tag until someone re-derives it from scratch. The three
+places to attack first, in order: (i) §8.6.3 — the solution norm converges at
+$\approx3.7$, not 4, and the *reason* the energy functional is cleaner is not
+established, so a demonstration that the energy flatness is coincidental
+would sink §8.9; (ii) §8.4's restriction to two $\alpha'$, which is forced by
+`rho_ceiling` and means the sweep-window check covers the mildest two of nine
+sweep points; (iii) the $\le2\times$ band in the new regression test, which
+has $1.7\times$ headroom at the configurations measured and would need
+re-pinning if that headroom is an artefact of the seed.
+
+Still open, and not touched by this section: §7.3 item 4 (the $A<0$
+excursion), the `rho_ceiling` question of §6.5 item 2 — which is what
+restricts §8.4 to two $\alpha'$ — the $N$-convergence failure of §6.3, and
+the missing `order3`/`none` controls of §6.5 item 4. **Nothing here is a
+result about Conjecture 5.2**; it removes the instrument defect that made the
+measurement uninterpretable, and no more.
+
+---
+
+## 9. §8 adversarially checked — the estimator is real, but seed-dependent
+
+Independent Opus skeptic, same discipline as §7: default to refuted unless
+the claim survives real re-derivation. **Verdict: refuted, on
+generalization** — narrower than §7's refutation, and on a point §8.9 named
+in advance as attack surface (iii).
+
+### 9.1 What reproduces (most of it)
+
+The flagship and sweep-window dense scans reproduce essentially exactly
+(19/20 flagship drift values match; all 20 sweep-window compensated values
+match). The five new/changed regression tests pass at $N=24$ and $N=30$; full
+suite green (72 passed); `ruff check src tests` clean; no gate, tolerance,
+window, or assertion weakened — the $N=6\to\{24,30\}$ re-pin is genuinely
+harder, not relocated to where it's easy. The cfl triple was checked against
+9 alternatives, none cherry-picked; the 64-ulp noise floor holds at 4–1024
+ulps; the estimator is load-bearing (forcing it off reproduces §7.2's
+$324.7\times$ spread with a sign flip). The chart fix, `fit_lock_state`,
+Lemma 4.4, and gate T1 are all independently reconfirmed intact. §8.6.3's
+disclosed "solution norm is only $\approx3.7$ order, not 4" is actually
+**pessimistic**: a Richardson-extrapolated reference gives local orders
+climbing $2.89\to3.80$ — pre-asymptotic approach to 4th order, not a deficit.
+
+### 9.2 What is refuted: seed-dependence not yet explained
+
+At two additional, **well-conditioned** seeds the repair agent did not test
+— roots $(0.2,-0.7)$ and $(0.1,-0.6)$, $\max\operatorname{cond}(J) = 68$ and
+$387$ respectively, i.e. nowhere near the branch-point pathology of §7 — a
+fixed-$\Delta t$ control on the identical field is clean (compensated flat to
+$1.03$–$1.05\times$, textbook halving ratios $\approx15.6$–$15.9\times$), but
+the **shipped eq. (4.8″)** is not: compensated spread $3.65\times$ and
+$24.7\times$ respectively, with the second failing the new regression test's
+own $\le2\times$-band criterion outright. This is exactly the seed-dependence
+§8.9 flagged in advance as the most likely thing to sink the claim, now
+confirmed present at 2 of 13 seeds tested — and *not* explained by the known
+$A<0$ excursion (§7.3 item 4): the failing seeds' excursions are smaller than
+the flagship's, which is clean.
+
+Two *other* failing seeds are correctly attributed elsewhere, not to (4.8″):
+$(0.6,0.1)$ has a genuinely singular field ($\operatorname{cond}J\to10^8$,
+terminates `lock_singular`; the fixed-$\Delta t$ control is far worse there
+too), and $(0.45,0.45)$ sits on the Veronese double-root boundary. Both are
+the known conditioning question (§7.3 item 4), not a new defect.
+
+A minor, separate finding: one cell of §8.3's headline table
+($+1.53\times10^{-14}$ at $\mathrm{cfl}=0.005$) does not reproduce against
+the deterministic value ($+2.2427\times10^{-14}$) and is inconsistent with
+that section's own exact-halvings table and ulp count. The section's
+$\le2\times$ gate conclusion survives on the corrected value (worst adjacent
+pair $3.70\times$, not the reported $13.8\times$), so this does not change
+§8's bottom line — but it is the same *shape* of error that started §7: a
+reported number in a "confirmed" table that a from-scratch rerun does not
+reproduce.
+
+### 9.3 Bottom line
+
+The step-doubling estimator (eq. 4.8″) is real, substantial progress and is
+kept: it measurably outperforms both the original rule and eq. (4.8′) at
+every configuration tested, including ones where it fails outright. But the
+claim **"(4.8″) makes full-window drift compensated-flat" is a property of
+the two seeds it was measured at, not of the rule** — at $\ge2$ of 13 tried,
+otherwise-clean seeds, it is not. Per standing rule 5, this is the finding:
+the estimator needs a seed sweep as part of its own validation (not a single
+seed at two shell counts, which §9's skeptic notes are "near-duplicates" —
+$N=24$ and $N=30$ agree to four significant figures because the drift is
+essentially $N$-independent above $N=12$, so testing both was never a
+generalization check). **Before this closes:**
+
+1. Diagnose the seed-dependence directly — the failing seeds are
+   well-conditioned, so this is a *different* mechanism from the §7 branch
+   point, not a recurrence of it.
+2. Re-pin the regression test's $\le2\times$ band against a seed sweep
+   (start from the 13 seeds already tried across both this section and §8),
+   not the single default seed.
+3. Everything still open from §7.3/§8.9 remains open: the $\rho_{\text{ceiling}}$
+   question, $N$-convergence, the `order3`/`none` controls, the $A<0$
+   excursion.
+
+As in §7: still nothing here counts for or against Conjecture 5.2.

@@ -20,11 +20,13 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
+from socrates.dualscale.geometry import effective_wavenumber
 from socrates.dualscale.shell import dyadic_wavenumbers, simulate_shell_model
 from socrates.dualscale.shell_sym2 import (
     Sym2ShellResult,
     certify_sym2_lock,
     elementary_symmetric,
+    error_density,
     fit_lock_state,
     half_ladder_a,
     is_symmetric_square,
@@ -35,6 +37,8 @@ from socrates.dualscale.shell_sym2 import (
     reconstruct_profile,
     seed_profile,
     simulate_sym2_shell_model,
+    stability_rate,
+    step_rate,
     sym2_coefficients,
     sym2_coefficients_asq,
     sym2_spectral_radius,
@@ -300,35 +304,144 @@ def test_simulate_sym2_shell_model_reports_terminated_reason() -> None:
 # -- (d) W1 round 2: the chart branch point must not silently return --------
 
 
+def _signed_drift(result) -> float:
+    """(E(t_end) - E(0)) / E(0).
+
+    `ShellResult.energy_drift` takes the absolute value, which hides sign
+    flips.  A sign flip under refinement is bug signature B2 and the thing
+    FINDINGS 7.2.B caught the previous repair on, so the convergence gates
+    below work with the signed quantity.
+    """
+    return float((result.energy[-1] - result.energy[0]) / result.energy[0])
+
+
+def _drift_scan(k: np.ndarray, cfls: tuple[float, ...], *, t_max: float) -> list[float]:
+    drifts = []
+    for cfl in cfls:
+        result = simulate_sym2_shell_model(k, lock="sym2", t_max=t_max, cfl=cfl, n_samples=8)
+        assert result.terminated == "t_max", f"cfl={cfl} stopped at {result.terminated}"
+        drifts.append(_signed_drift(result))
+    return drifts
+
+
+def _assert_compensated_flatness(
+    drifts: list[float], cfls: tuple[float, ...], *, order: int = 4, band: float = 2.0
+) -> None:
+    """The gate FINDINGS 7.2 says a convergence claim has to clear.
+
+    Three assertions, in increasing strength:
+
+    1. No sign flip in the signed drift (bug signature B2).
+    2. Every adjacent halving reduces |drift| by >= 8x (gate T5).
+    3. |drift| / cfl**order is FLAT to within `band` across the whole scan.
+
+    (3) is the one that matters.  A least-squares fitted order near 4 is not
+    evidence of convergence: FINDINGS 7.2.A-B exhibits a scan that fits to
+    order ~3.95 while individual halvings make the drift 1.2x-20x *worse* and
+    flip its sign.  Compensated flatness cannot be satisfied that way.
+
+    WHERE THIS CRITERION IS AND IS NOT DISCRIMINATING (FINDINGS 8.6.4).  It
+    fails at t_max = 0.2 and 0.4 -- but so does a fixed-dt plain RK4 control
+    with no adaptive rule at all, at exactly those windows (it flips sign at
+    t_max = 0.2, 0.3, 0.4, 0.5 and not at 0.6, 0.8).  On short windows the
+    leading O(cfl**4) coefficient of the signed drift is small enough that
+    the drift reaches the ~1e-14 roundoff floor of the energy sum inside the
+    scanned cfl range and crosses zero.  That is a property of the energy
+    functional, not of the stepper, so short windows must not be used for
+    this gate.  Callers should keep t_max >= 0.6 and |drift| >= ~1e-13.
+    """
+    signs = {math.copysign(1.0, d) for d in drifts}
+    assert len(signs) == 1, f"signed drift changes sign across the scan: {drifts}"
+
+    for coarse, fine, cfl in zip(drifts, drifts[1:], cfls[1:], strict=False):
+        ratio = abs(coarse) / abs(fine)
+        assert ratio >= 8.0, f"cfl {cfl}: drift fell {ratio:.2f}x, want >= 8x (gate T5)"
+
+    compensated = [abs(d) / c**order for d, c in zip(drifts, cfls, strict=False)]
+    spread = max(compensated) / min(compensated)
+    assert spread <= band, (
+        f"|drift|/cfl**{order} spread {spread:.2f}x over the scan, want <= {band}; "
+        f"compensated = {compensated}"
+    )
+
+
 @pytest.mark.slow
-def test_full_window_energy_drift_converges_at_fourth_order() -> None:
-    """Gate T5/B2 over the FULL window -- the check FINDINGS 6.2 failed.
+@pytest.mark.parametrize("n_shells", [24, 30])
+def test_full_window_energy_drift_converges_at_fourth_order(n_shells: int) -> None:
+    """Gate T5/B2 over the FULL window, AT THE CONFIGURATION THE CLAIM IS ABOUT.
 
     Round 1 measured, at t_max = 0.8, alpha' = 1e-6, N = 24, drift
     1.02e-5 / 9.33e-6 / 1.27e-5 / 6.77e-6 / 6.57e-6 / 6.27e-6 / 1.10e-5 /
-    2.43e-6 as cfl swept 0.2 -> 0.001: neither convergent nor monotone. With
-    the repaired chart the same configuration gives a fitted order of 3.95
-    and a net reduction of 2.1e6 over five halvings (16**5 = 1.05e6).
+    2.43e-6 as cfl swept 0.2 -> 0.001: neither convergent nor monotone.
 
-    This pins a cheap 6-shell version. It asserts the *net* reduction and the
-    fitted order rather than each individual ratio, because `energy_drift` is
-    |E(t_end) - E(0)|/E(0) -- a signed quantity that passes through zero as
-    the leading error term changes sign, so single ratios legitimately
-    fluctuate while the order does not.
+    W1 ROUND 2 PHASE 3 -- RE-PINNED, and this is the point.  The previous
+    version of this test pinned N = 6 on the plain dyadic ladder and asserted
+    a *fitted* order.  FINDINGS 7.2.F showed that placement was where the test
+    passed, not where the claim lived: its own pass criterion failed at
+    N = 7, 10, 12, 16, 20, 24, 30 and on the T-dual ladder at alpha' = 1e-6
+    for both N = 24 and N = 30 (first halving ratio 0.82 against the required
+    8.0), while N = 6 is a qualitatively different regime (fitted order 7.39
+    there).  A green gate confined to a regime that does not exercise the
+    claim is not a gate.
+
+    So this now pins the flagship configuration itself -- T-dual ladder,
+    alpha' = 1e-6, full window t_max = 0.8 -- at BOTH N = 24 and N = 30, and
+    asserts compensated-error flatness rather than a fitted order.  See
+    `_assert_compensated_flatness` for why.
+
+    Measured under eq. 4.8'' with a 20-point log-spaced scan (cfl 0.1 ->
+    0.005) at N = 24: compensated spread 1.45x, zero sign flips, worst
+    adjacent pair equivalent to 13.8x per halving, over 5.4 decades of drift.
+    Exact halvings 0.16 -> 0.005 give 13.98/17.44/17.29/17.03/12.36x.  This
+    criterion was applied at N = 6, 8, 12, 16, 20, 24, 30 before shipping it
+    and passes at every one (FINDINGS 8.8).
     """
-    k = dyadic_wavenumbers(6)
-    cfls = (0.1, 0.05, 0.025)
-    drifts = []
-    for cfl in cfls:
-        result = simulate_sym2_shell_model(k, lock="sym2", t_max=0.8, cfl=cfl, n_samples=20)
-        assert result.terminated == "t_max", f"cfl={cfl} stopped at {result.terminated}"
-        drifts.append(result.energy_drift)
+    k = effective_wavenumber(1e-6, dyadic_wavenumbers(n_shells))
+    cfls = (0.08, 0.04, 0.02)
+    _assert_compensated_flatness(_drift_scan(k, cfls, t_max=0.8), cfls)
 
-    for coarse, fine, cfl in zip(drifts, drifts[1:], cfls[1:], strict=False):
-        assert coarse / fine >= 8.0, f"cfl {cfl}: drift fell {coarse / fine:.2f}x, want >= 8x"
-    assert drifts[0] / drifts[-1] >= 100.0  # two halvings of order 4: 16**2 = 256
-    order = float(np.polyfit(np.log(cfls), np.log(drifts), 1)[0])
-    assert order >= 3.5, f"fitted convergence order {order:.2f} < 3.5"
+
+@pytest.mark.slow
+def test_sweep_window_energy_drift_converges_at_fourth_order() -> None:
+    """The same gate at the ACTUAL sweep window, which is where it bites.
+
+    FINDINGS 7.2.E: the single run in the whole programme that currently
+    reaches the workflow's gate is t_max = 12, N = 30, alpha' = 1e-2, and
+    under eq. 4.8' one halving there gave only 5.26x against gate T5's 8x.
+    A convergence claim checked only on a 0.8-long diagnostic window does not
+    cover the measurement, so the sweep window gets its own gate.
+
+    Measured under eq. 4.8'' with a 20-point log-spaced scan (cfl 0.2 ->
+    0.0125): compensated spread 1.03x, zero sign flips, worst adjacent pair
+    equivalent to 15.0x per halving, over 4.8 decades of drift; exact
+    halvings give 16.17/15.76/15.95/15.96x.  The same scan on the HEAD
+    eq. 4.8' implementation: spread 3.94x with one pair 0.81x per halving.
+    """
+    k = effective_wavenumber(1e-2, dyadic_wavenumbers(30))
+    cfls = (0.1, 0.05, 0.025)
+    _assert_compensated_flatness(_drift_scan(k, cfls, t_max=12.0), cfls)
+
+
+def test_step_doubling_estimator_does_not_feed_back_on_its_own_roundoff() -> None:
+    """eq. 4.8'''s error estimator must report no signal below its noise floor.
+
+    Once the Richardson gap ||u_full - u_half|| is at roundoff,
+    C = (16/15)*gap/(||u|| dt**5) measures machine epsilon divided by dt**5 and
+    *diverges* as dt shrinks.  Unfloored that is positive feedback: the
+    fixed-point map is dt -> cfl*dt/((16/15)*eps)**(1/5), gain ~1333*cfl, so
+    below cfl ~ 7.5e-4 the step spirals to zero.  Measured on the unfloored
+    code: clean at cfl = 5e-4, terminated "dt_collapse" after 23 steps at
+    cfl = 2e-4 and after 10 at 1e-4.  This pins both halves of the fix.
+    """
+    u = np.ones(8)
+    assert error_density(u, u * (1 + 1e-16), 1e-3) == 0.0  # roundoff-level gap
+    assert error_density(u, u * (1 + 1e-6), 1e-3) > 0.0  # real gap
+
+    k = effective_wavenumber(1e-6, dyadic_wavenumbers(12))
+    for cfl in (2e-4, 1e-4):
+        result = simulate_sym2_shell_model(k, lock="sym2", t_max=0.02, cfl=cfl, n_samples=4)
+        assert result.terminated == "t_max", f"cfl={cfl} stopped at {result.terminated}"
+        assert result.energy_drift < 1e-12
 
 
 def test_sym2_jacobian_has_no_branch_point_at_the_gauge_fold() -> None:
@@ -414,21 +527,40 @@ def test_lemma_4_4_invariants_hold_pointwise_over_the_full_window() -> None:
 
 
 def test_repaired_timestep_rule_is_never_looser_than_contract_eq_4_8() -> None:
-    """The repaired rate is a 2-norm blend of eq. 4.8's terms, so it never
-    permits a longer step than eq. 4.8's max() form -- a tightening."""
+    """eq. 4.8'' >= eq. 4.8' >= eq. 4.8 pointwise -- a tightening, never a
+    loosening, of the contract's stability convention.
+
+    Exercises the shipped `stability_rate`/`step_rate` rather than an inline
+    re-derivation, so the test cannot pass while the integrator uses something
+    else.  eq. 4.8' is the 2-norm blend of eq. 4.8's terms (the 2-norm
+    dominates the max, and 1/sqrt(t**2+eps**2) >= 1/(|t|+eps)); eq. 4.8''
+    adds a non-negative error density under a fifth root, so it can only
+    shorten the step further.
+    """
     k = dyadic_wavenumbers(12)
-    z, _ = fit_lock_state(seed_profile(12, lock="sym2"), lock="sym2")
-    zdot, _diag = locked_rhs(z, k, 0.0, lock="sym2")
-    u = reconstruct_profile(z, 12, lock="sym2")
     eps = 1e-3
-    legacy = max(
-        float(np.max(k * np.abs(u))),
-        abs(zdot[3]) / (abs(z[3]) + eps),
-        abs(zdot[4]) / (abs(z[4]) + eps),
+    rng = np.random.default_rng(3)
+    states = [fit_lock_state(seed_profile(12, lock="sym2"), lock="sym2")[0]]
+    states += [
+        np.array([*rng.uniform(-1.0, 1.0, size=3), rng.uniform(-0.5, 1.0), rng.uniform(-0.4, 0.3)])
+        for _ in range(40)
+    ]
+    for z in states:
+        for nu in (0.0, 1e-3):
+            zdot, _diag = locked_rhs(z, k, nu, lock="sym2")
+            u = reconstruct_profile(z, 12, lock="sym2")
+            legacy = max(
+                float(np.max(k * np.abs(u))),
+                abs(zdot[3]) / (abs(z[3]) + eps),
+                abs(zdot[4]) / (abs(z[4]) + eps),
+                nu * float(np.max(k**2)),
+            )
+            blend = stability_rate(z, u, zdot, k, nu, lock="sym2")
+            assert blend >= legacy, f"eq. 4.8' looser than eq. 4.8 at z={z}, nu={nu}"
+            for density in (0.0, 1.0, 1e6):
+                assert step_rate(blend, density) >= blend
+    # lock="none" is bit-for-bit shell.py's rate -- that is what gate T1 pins.
+    u_none = seed_profile(12, lock="sym2")
+    assert stability_rate(u_none, u_none, u_none, k, 0.0, lock="none") == float(
+        np.max(k * np.abs(u_none))
     )
-    repaired = math.sqrt(
-        float(np.sum((k * u) ** 2))
-        + zdot[3] ** 2 / (z[3] ** 2 + eps**2)
-        + zdot[4] ** 2 / (z[4] ** 2 + eps**2)
-    )
-    assert repaired >= legacy
