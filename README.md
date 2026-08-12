@@ -74,6 +74,40 @@ and falsifiable in either direction.
 
 ---
 
+## The solver and the validation ladder
+
+`socrates.solvers` provides symplectic (leapfrog/KDK) integration in two modes:
+float (with conservation oracles) and **exact rational** (the EIU mode — the
+integrator map applied in `Fraction` arithmetic, where time-reversal recovers
+the initial state as *exact equality*, not epsilon). `socrates.eiu` models the
+HaloAlg Exact Inference Unit: RNS parallel arithmetic with CRT reconstruction,
+overflow discipline, and the honest form of the state-collapse error bound.
+
+`scripts/solver_ladder.py` climbs problems of increasing complexity, each
+gated on an independent oracle before the next unlocks:
+
+| Rung | Problem | Oracle | Result |
+|---|---|---|---|
+| 1 | Harmonic oscillator | analytic cos(t); measured order 2.000 | ✅ err 2.6e-6 |
+| 2 | Nonlinear pendulum | exact elliptic period 4K(m) | ✅ err 2.0e-8 |
+| 3 | Kepler two-body (e=0.6) | E, L conservation + Kepler III | ✅ L drift 2e-14 |
+| 4 | **Mars vs JPL Horizons** | real open ephemeris, 182 days | ✅ RMS 3.6e-5 |
+| 5 | Dyadic cascade | Stage 1 controls + Thm 4.2 ceiling | ✅ |
+
+Two more spec claims were corrected by gates failing (see
+[paper/REVIEW_haloalg.md](paper/REVIEW_haloalg.md)): the HaloAlg Diophantine
+bound ε < 1/(q·D_max) is false (measured violation ×2; the correct
+Farey-neighbour bound 1/(q·(N+1−q)) is implemented and property-tested), and
+"GCD reduction bounds bit-width" is not a theorem — exact-mode bit-width grows
+without bound (134→799 bits in 60 steps) unless a *lossy* collapse is admitted.
+
+The smooth HoloAlg metric R + α'/R is implemented alongside the max-form, with
+a **no-go lemma**: exact T-duality plus exact inertial invisibility force the
+non-smooth max-form uniquely, so any smooth metric must trade exact
+invisibility for asymptotic (deviation α'/R). Certified exactly.
+
+---
+
 ## Methodological warning (please read before citing Stage 1)
 
 **A fixed-timestep explicit integration cannot support the blow-up claim.** With

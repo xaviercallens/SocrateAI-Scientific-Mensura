@@ -73,7 +73,7 @@ def hypothesis_u_scaling(
     print(f"\n  fit: peak enstrophy ~ alpha'^({slope:.4f})")
     print("  Kolmogorov K41 prediction with cutoff k_max = 1/sqrt(alpha'):")
     print("    E(k) ~ k^(-5/3)  =>  enstrophy ~ k_max^(4/3) ~ alpha'^(-2/3) = alpha'^(-0.6667)")
-    print(f"  Theorem 4.2 ceiling exponent: -1.0 (not attained; bound is not tight)")
+    print("  Theorem 4.2 ceiling exponent: -1.0 (not attained; bound is not tight)")
     return alphas, peaks_arr, slope
 
 
@@ -102,7 +102,9 @@ def make_figure(alphas: np.ndarray, peaks: np.ndarray, slope: float) -> Path:
 
     ax1.set_xlabel("time")
     ax1.set_ylabel("enstrophy  $\\sum k^2 u_n^2$")
-    ax1.set_title("Cascade: classical diverges, T-dual saturates\n(dotted = Thm 4.2 ceiling $2E/\\alpha'$)")
+    ax1.set_title(
+        "Cascade: classical diverges, T-dual saturates\n(dotted = Thm 4.2 ceiling $2E/\\alpha'$)"
+    )
     ax1.legend(fontsize=8)
     ax1.grid(alpha=0.3, which="both")
 
@@ -115,7 +117,9 @@ def make_figure(alphas: np.ndarray, peaks: np.ndarray, slope: float) -> Path:
                lw=2, label="Thm 4.2 ceiling slope $\\alpha'^{-1}$")
     ax2.set_xlabel(r"$\alpha'$")
     ax2.set_ylabel("peak enstrophy")
-    ax2.set_title(f"Hypothesis U test: fitted exponent {slope:.3f}\n(bounded would require slope 0)")
+    ax2.set_title(
+        f"Hypothesis U test: fitted exponent {slope:.3f}\n(bounded would require slope 0)"
+    )
     ax2.invert_xaxis()
     ax2.legend(fontsize=8)
     ax2.grid(alpha=0.3, which="both")

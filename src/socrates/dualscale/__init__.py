@@ -2,9 +2,12 @@
 
 from .geometry import (
     certify_geometry,
+    certify_smooth_geometry,
     effective_radius,
     effective_radius_exact,
+    effective_radius_smooth,
     effective_wavenumber,
+    effective_wavenumber_smooth,
     maximal_wavenumber,
     minimal_scale,
 )
@@ -20,12 +23,15 @@ from .shell import (
 __all__ = [
     "ShellResult",
     "certify_geometry",
+    "certify_smooth_geometry",
     "compare_regularization",
     "convergence_study",
     "dyadic_wavenumbers",
     "effective_radius",
     "effective_radius_exact",
+    "effective_radius_smooth",
     "effective_wavenumber",
+    "effective_wavenumber_smooth",
     "enstrophy_bound",
     "maximal_wavenumber",
     "minimal_scale",
