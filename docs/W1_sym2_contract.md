@@ -103,6 +103,31 @@ gauge freedom: $(a,b)$ and $(-a,b)$ give the same $L_3$ (only $a^2$ appears in
 fixed in the implementation** (convention: $a \ge 0$), otherwise the constrained
 state has a null direction that pollutes the Jacobian's conditioning.
 
+> **Erratum (W1 round 2, Tier B — measured).** The $a \ge 0$ convention is
+> **not sufficient**, and this paragraph's own reasoning shows why: a 2:1 map
+> has a *branch locus*, here $a = 0$, and restricting to a sheet does not remove
+> it. Since (1.2) depends on $a$ only through $a^2$,
+> $\partial\Phi/\partial a = 2a\,\partial\Phi/\partial(a^2)$ vanishes
+> **identically** at $a=0$, so $J$ drops to rank 4 there and $\dot z = J^{+}F$
+> of (4.5) diverges like $1/a$. Measured: the Sym²-locked Galerkin flow from the
+> §8.4 seed drives $a \to 0$ in finite time — $t=0.1386$ at
+> $\alpha'=10^{-6}$ and $10^{-8}$, $t=0.2610$ at $\alpha'=10^{-4}$, identically
+> for $N=24$ and $N=30$ — with $\sigma_{\min}(J) \le 1.4\times10^{-10}$ and
+> $\|\dot z\| \ge 6\times10^{7}$ at the fold. This is the cause of the
+> non-convergent drift table of `FINDINGS.md` §6.2; no timestep rule can repair
+> it, because refining cfl only changes *where* the steps straddle the branch
+> point.
+>
+> **Remedy (implemented):** use $A := a^2$ as the state coordinate, i.e.
+> $z = (u_0,u_1,u_2,A,b)$ with
+> $(c_0,c_1,c_2) = (-b^3,\,b(A+b),\,A+b)$ and
+> $\partial(c_0,c_1,c_2)/\partial A = (0,\,b,\,1)$, which is nowhere zero. This
+> is the honest 1:1 gauge fixing; the fold becomes a regular interior point and
+> the constraint set is unchanged. $A<0$ (no *real* order-2 preimage, since
+> (1.5)'s existence condition $e_1+e_3^{1/3}\ge0$ is exactly $A \ge 0$) is still
+> on the Sym² locus (1.4) — Proposition A is stated over $\mathbb{C}$ — so the
+> $A$-chart also covers part of $\mathcal{M}$ that the $a$-chart cannot reach.
+
 ### Spectral radius, root-free (Tier B)
 
 Let $\rho_3(a,b)$ be the spectral radius of $L_3$, i.e.
@@ -377,6 +402,33 @@ $$\Delta t = \frac{\mathrm{cfl}}{\max\Bigl(\max_n k_n|u_n|,\;
 With `lock="none"` this must reduce **exactly** to `shell.py`'s formula (the
 parameter terms are absent), which is the basis of gate T1. The convention is
 validated only by the dt-refinement control (§7.C1), not by argument.
+
+> **Erratum (W1 round 2, Tier C — numerical convention).** (4.8)'s $\max$ of
+> $|\cdot|$-quotients is not differentiable in $z$: it has kinks wherever the
+> argmax switches or a lock parameter crosses zero. A kinked step-size map makes
+> the global error a non-smooth function of cfl, which is enough to stop a
+> refinement table from showing a clean $16\times$ even when the integrator is
+> fourth-order. For locked runs the implementation therefore uses the 2-norm
+> blend
+>
+> $$\Delta t = \frac{\mathrm{cfl}}{\sqrt{\;\sum_n (k_nu_n)^2
+> \;+\; \sum_{\theta}\dfrac{\dot\theta^{\,2}}{\theta^2+\varepsilon^2}
+> \;+\; \bigl(\nu\max_nk_n^2\bigr)^2\;}},\qquad \varepsilon = 10^{-3},
+> \tag{4.8$'$ — Tier C}$$
+>
+> which is smooth in $z$ and is a strict **tightening** of (4.8): the 2-norm
+> dominates the max, $\|k\odot u\|_2 \ge \max_n k_n|u_n|$, and
+> $(\theta^2+\varepsilon^2)^{-1/2} \ge (|\theta|+\varepsilon)^{-1}$, so no step
+> is ever longer than (4.8) would have permitted. `lock="none"` keeps
+> `shell.py`'s formula bit-for-bit, so gate T1 is untouched. Round 1's
+> recommendation to add $\sigma_{\min}/\sigma_{\max}$ or $|\dot\rho_3|/\rho_3$
+> to the *rate* was tested and rejected: with the branch point present it forces
+> $\Delta t \to 0$ at the fold (the run stalls rather than converging), and with
+> the $A$-chart of §1's erratum it is unnecessary — measured
+> $\operatorname{cond}(J) \le 7.7\times10^{3}$ over the whole window at every
+> $\alpha'$ tested. Conditioning is instead carried by a new `cond_ceiling`
+> termination guard, so a future degeneracy is *reported* rather than absorbed
+> into the energy budget.
 
 ---
 

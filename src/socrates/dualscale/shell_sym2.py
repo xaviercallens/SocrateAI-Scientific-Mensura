@@ -28,6 +28,42 @@ Tier C caveat (contract section 2): Sym^2(V) is *not* closed under the
 Katz-Pavlovic nonlinearity (Observation 2.1/2.2). The Galerkin projection
 below is therefore a modelling *choice*, not a consequence of the algebra --
 see Lemma 4.4 and section 4.3 of the contract for what is and is not proven.
+
+W1 round 2 -- chart repair (READ THIS BEFORE TOUCHING THE sym2 STATE VECTOR)
+--------------------------------------------------------------------------
+The sym2 state is ``z = (u0, u1, u2, A, b)`` with ``A = a**2``, NOT
+``(u0, u1, u2, a, b)``.  This is the repair of the defect adjudicated in
+FINDINGS section 6.2.
+
+Contract eq. 1.2 gives ``(c0, c1, c2) = (-b**3, b(a**2+b), a**2+b)``: the
+half-ladder coefficient ``a`` enters *only* through ``a**2``.  The map
+``(a, b) -> L_3`` is therefore a 2:1 branched cover of the Sym^2 locus with
+branch locus ``a = 0``, and
+
+    dPhi/da = 2a * dPhi/d(a**2)
+
+vanishes identically at ``a = 0``.  The contract's section 1 gauge fix
+``a >= 0`` removes the *sign* ambiguity but leaves the branch point.  The
+Sym2-locked Galerkin flow drives ``a`` to zero in finite time (measured:
+t = 0.1386 at alpha' = 1e-6 and 1e-8, t = 0.2610 at alpha' = 1e-4, N = 24
+and N = 30 alike), so ``sigma_min(J) -> 0``, ``zdot = J^+ F`` diverges like
+1/a, and RK4 in the ``a``-chart cannot converge across the fold no matter
+how small the step -- refining cfl only changes *where* the steps straddle
+the branch point.  That, not the timestep rule alone, is what produced the
+non-convergent drift table of FINDINGS 6.2.
+
+Using ``A = a**2`` is the honest 1:1 gauge fixing: ``dc/dA = (0, b, 1)`` is
+nowhere zero, the fold becomes a regular interior point, and ``A < 0``
+(complex half-ladder roots, no *real* order-2 preimage by eq. 1.5) is still
+inside the Sym^2 locus (1.4) -- Proposition A is stated over C.  The
+constraint set is unchanged; only its parametrisation is.
+
+Consequences for callers: ``reconstruct_profile``/``reconstruct_jacobian``/
+``fit_lock_state``/``initial_state`` and ``Sym2ShellResult.lock_parameters``
+all carry ``A``, not ``a``.  ``half_ladder_a(A)`` recovers ``a`` where a real
+half-ladder exists.  The exact-algebra surface (``sym2_coefficients``,
+``is_symmetric_square``, ``certify_sym2_lock``, ``sym2_spectral_radius``)
+still speaks in ``(a, b)`` and is unchanged.
 """
 
 from __future__ import annotations
@@ -125,6 +161,45 @@ def sym2_spectral_radius(a: float, b: float) -> float:
     return abs(b)
 
 
+# --- repaired sym2 chart: A = a**2 (see module docstring) ------------------
+
+
+def sym2_coefficients_asq(asq, b):
+    """(c0, c1, c2) in the repaired chart coordinate A = a**2. [eq. 1.1]
+
+    Identical to ``sym2_coefficients(a, b)`` whenever ``asq == a*a``; this is
+    just eq. 1.1 written in the coordinate that eq. 1.2 actually depends on.
+    """
+    return (-(b**3), b * (asq + b), asq + b)
+
+
+def half_ladder_a(asq: float) -> float:
+    """Recover the gauge-fixed half-ladder coefficient a = +sqrt(A). [eq. 1.5]
+
+    Returns NaN when A < 0, i.e. when the Sym^2 operator has no *real* order-2
+    preimage (eq. 1.5's existence condition e1 + e3**(1/3) >= 0 is exactly
+    A >= 0).  Such points are still on the Sym^2 locus (1.4).
+    """
+    return math.sqrt(asq) if asq >= 0 else float("nan")
+
+
+def sym2_spectral_radius_asq(asq: float, b: float) -> float:
+    """rho_3 in the repaired chart, root-free and valid for A of either sign.
+
+    The three roots of L_3 are in geometric progression with middle root
+    ``-b`` (eq. 1.4 / Proposition A), so writing them ``(-b/s, -b, -b s)``
+    and matching e1 = A + b gives ``s + 1/s = -(A + 2b)/b``.  Hence
+    rho_3 = |b| * (|S| + sqrt(S**2 - 4))/2 when |S| >= 2 and |b| otherwise.
+    Agrees with eq. 1.6 wherever both are defined.
+    """
+    if b == 0.0:
+        return abs(asq)
+    s_sum = -(asq + 2.0 * b) / b
+    if abs(s_sum) >= 2.0:
+        return abs(b) * (abs(s_sum) + math.sqrt(s_sum * s_sum - 4.0)) / 2.0
+    return abs(b)
+
+
 def predicted_enstrophy_exponent(rho3: float, *, base: float = 2.0) -> float:
     """p = 0 if rho3 <= 1/base else -1 - log(rho3)/log(base). [eq. 5.3]"""
     if rho3 <= 1.0 / base:
@@ -170,9 +245,9 @@ def reconstruct_profile(z: np.ndarray, n_shells: int, *, lock: str) -> np.ndarra
 
     if lock == "sym2":
         if z.shape[0] != LOCK_DIM["sym2"]:
-            raise ValueError("sym2 lock expects z=(u0,u1,u2,a,b)")
-        u0, u1, u2, a, b = z
-        c0, c1, c2 = sym2_coefficients(a, b)
+            raise ValueError("sym2 lock expects z=(u0,u1,u2,A,b) with A = a**2")
+        u0, u1, u2, asq, b = z
+        c0, c1, c2 = sym2_coefficients_asq(asq, b)
     elif lock == "order3":
         if z.shape[0] != LOCK_DIM["order3"]:
             raise ValueError("order3 lock expects z=(u0,u1,u2,c0,c1,c2)")
@@ -227,9 +302,12 @@ def reconstruct_jacobian(z: np.ndarray, n_shells: int, *, lock: str) -> np.ndarr
         return jac
 
     if lock == "sym2":
-        _u0, _u1, _u2, a, b = z
-        c0, c1, c2 = sym2_coefficients(a, b)
-        param_derivs = [(0.0, 2 * a * b, 2 * a), (-3 * b * b, a * a + 2 * b, 1.0)]
+        _u0, _u1, _u2, asq, b = z
+        c0, c1, c2 = sym2_coefficients_asq(asq, b)
+        # d(c0,c1,c2)/dA = (0, b, 1) -- eq. 4.4 rewritten in A = a**2.  The
+        # legacy a-chart's column was 2a*(0, b, 1), which vanishes at a = 0;
+        # that branch point is the round-2 defect (see module docstring).
+        param_derivs = [(0.0, b, 1.0), (-3 * b * b, asq + 2 * b, 1.0)]
     elif lock == "order3":
         _u0, _u1, _u2, c0, c1, c2 = z
         param_derivs = [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)]
@@ -270,7 +348,9 @@ def reconstruct_jacobian(z: np.ndarray, n_shells: int, *, lock: str) -> np.ndarr
 
 
 def _spectral_radius_for(z: np.ndarray, lock: str) -> float:
-    if lock in ("sym2", "veronese"):
+    if lock == "sym2":
+        return sym2_spectral_radius_asq(float(z[-2]), float(z[-1]))
+    if lock == "veronese":
         a, b = float(z[-2]), float(z[-1])
         return sym2_spectral_radius(a, b)
     if lock == "order3":
@@ -368,19 +448,64 @@ def locked_rhs(
     return zdot, diagnostics
 
 
-def _default_z0(u_target: np.ndarray, lock: str) -> np.ndarray:
+def _order3_coefficients_from_profile(u_target: np.ndarray) -> tuple[float, float, float] | None:
+    """Least-squares (c0, c1, c2) with u_m ~ c2 u_{m-1} + c1 u_{m-2} + c0 u_{m-3}.
+
+    An *algebraic* starting point for `fit_lock_state`.  Without it the
+    Levenberg-Marquardt fit of a geometric profile routinely converges to a
+    spurious local minimum: on the default `seed_profile` (which lies on the
+    Sym^2 locus exactly, residual 2.8e-18 at a = 0.75, b = -0.125) the old
+    fixed start (a, b) = (0.5, 0.1) returned a = 0.708, b = -0.104 with
+    relative residual 5.9e-7 -- the V4/T12 failure recorded in FINDINGS 6.4,
+    which silently moved the initial condition of every sym2 run.
+    """
+    n = u_target.size
+    if n < 6:
+        return None
+    design = np.column_stack([u_target[0:-3], u_target[1:-2], u_target[2:-1]])
+    rhs_vec = u_target[3:]
+    if not np.any(np.abs(design) > 0):
+        return None
+    coeffs, *_ = np.linalg.lstsq(design, rhs_vec, rcond=None)
+    c0, c1, c2 = (float(coeffs[0]), float(coeffs[1]), float(coeffs[2]))
+    if not all(math.isfinite(c) for c in (c0, c1, c2)):
+        return None
+    return (c0, c1, c2)
+
+
+def _z0_candidates(u_target: np.ndarray, lock: str) -> list[np.ndarray]:
+    """Starting points for `fit_lock_state`, algebraic ones first."""
     n = u_target.size
     head = list(u_target[: min(3, n)]) + [0.0] * max(0, 3 - n)
+    fitted = _order3_coefficients_from_profile(u_target)
+    candidates: list[np.ndarray] = []
+
     if lock == "sym2":
-        return np.array([*head, 0.5, 0.1])
-    if lock == "order3":
-        c0, c1, c2 = sym2_coefficients(0.5, 0.1)
-        return np.array([*head, c0, c1, c2])
-    if lock == "veronese":
+        if fitted is not None:
+            c0, c1, c2 = fitted
+            # eq. 1.5 in the repaired chart: b = -cbrt(e3), A = e1 + cbrt(e3).
+            cbrt_e3 = _real_cbrt(c0)
+            candidates.append(np.array([*head, c2 + cbrt_e3, -cbrt_e3]))
+        candidates += [np.array([*head, 0.25, 0.1]), np.array([*head, 1.0, -0.25])]
+    elif lock == "order3":
+        if fitted is not None:
+            candidates.append(np.array([*head, *fitted]))
+        candidates.append(np.array([*head, *sym2_coefficients(0.5, 0.1)]))
+    elif lock == "veronese":
         v0 = math.copysign(math.sqrt(abs(u_target[0])), 1.0) if n > 0 else 0.1
         v1 = math.copysign(math.sqrt(abs(u_target[1])), 1.0) if n > 1 else 0.1
-        return np.array([v0, v1, 0.5, 0.1])
-    raise ValueError(f"fit_lock_state is not defined for lock={lock!r}")
+        if fitted is not None:
+            inv = order3_to_sym2_params(*fitted)
+            if inv is not None:
+                candidates.append(np.array([v0, v1, inv[0], inv[1]]))
+        candidates.append(np.array([v0, v1, 0.5, 0.1]))
+    else:
+        raise ValueError(f"fit_lock_state is not defined for lock={lock!r}")
+    return candidates
+
+
+def _default_z0(u_target: np.ndarray, lock: str) -> np.ndarray:
+    return _z0_candidates(u_target, lock)[0]
 
 
 def fit_lock_state(
@@ -393,15 +518,22 @@ def fit_lock_state(
     """Nonlinear least-squares projection of `u_target` onto the constraint set.
 
     Uses scipy.optimize.least_squares with the analytic Jacobian from
-    `reconstruct_jacobian`. Returns (z, relative_residual).
+    `reconstruct_jacobian`, started from the *algebraic* order-3 fit of the
+    profile (`_order3_coefficients_from_profile`) and refined from the
+    remaining candidates if that leaves a residual above 1e-12.  Returns
+    (z, relative_residual); the best candidate wins.
+
+    The multi-start is not decoration: gate T12/V4 requires the seed's fit
+    residual to be < 1e-10, and the previous single fixed start missed it by
+    four orders of magnitude on the module's own `seed_profile` (see
+    `_order3_coefficients_from_profile`).
     """
     if lock == "none":
         raise ValueError("fit_lock_state is not defined for lock='none'")
     _check_lock(lock)
     u_target = np.asarray(u_target, dtype=float)
     n_shells = u_target.size
-    if z0 is None:
-        z0 = _default_z0(u_target, lock)
+    starts = [np.asarray(z0, dtype=float)] if z0 is not None else _z0_candidates(u_target, lock)
 
     def residual(z: np.ndarray) -> np.ndarray:
         return reconstruct_profile(z, n_shells, lock=lock) - u_target
@@ -409,14 +541,23 @@ def fit_lock_state(
     def jac(z: np.ndarray) -> np.ndarray:
         return reconstruct_jacobian(z, n_shells, lock=lock)
 
-    result = least_squares(residual, z0, jac=jac, max_nfev=max_iter)
-    z = result.x
-    u_fit = reconstruct_profile(z, n_shells, lock=lock)
     denom = float(np.linalg.norm(u_target))
-    rel_residual = float(np.linalg.norm(u_fit - u_target) / denom) if denom > 0 else float(
-        np.linalg.norm(u_fit - u_target)
-    )
-    return z, rel_residual
+    best_z: np.ndarray | None = None
+    best_res = float("inf")
+    for start in starts:
+        try:
+            result = least_squares(residual, start, jac=jac, max_nfev=max_iter)
+        except (ValueError, np.linalg.LinAlgError):  # pragma: no cover - defensive
+            continue
+        u_fit = reconstruct_profile(result.x, n_shells, lock=lock)
+        res = float(np.linalg.norm(u_fit - u_target))
+        if res < best_res:
+            best_res, best_z = res, result.x
+        if denom > 0 and best_res <= 1e-12 * denom:
+            break
+    if best_z is None:  # pragma: no cover - defensive
+        best_z, best_res = starts[0], float(np.linalg.norm(residual(starts[0])))
+    return best_z, (best_res / denom if denom > 0 else best_res)
 
 
 # ---------------------------------------------------------------------------
@@ -594,16 +735,41 @@ def simulate_sym2_shell_model(
     min_dt: float = 1e-12,
     n_samples: int = 2000,
     rcond: float = 1e-10,
+    cond_ceiling: float = 1e8,
     base: float = 2.0,
     label: str = "",
 ) -> Sym2ShellResult:
     """Adaptive RK4 on z (eq. 4.5), reconstructing u = Phi(z) at each sample.
 
-    Mirrors simulate_shell_model's contract: same adaptive-step philosophy
-    (eq. 4.8), same explicit termination reporting, same energy-conservation
-    oracle, which Lemma 4.4 shows remains a pure integrator diagnostic under
-    closure="galerkin". With lock="none" this reduces exactly to
-    simulate_shell_model (gate T1/B4).
+    Mirrors simulate_shell_model's contract: same explicit termination
+    reporting, same energy-conservation oracle, which Lemma 4.4 shows remains
+    a pure integrator diagnostic under closure="galerkin". With lock="none"
+    this reduces exactly to simulate_shell_model (gate T1/B4).
+
+    Timestep rule (repaired eq. 4.8, W1 round 2).  For lock="none" the rate is
+    bit-for-bit `shell.py`'s ``max(max_n k_n|u_n|, nu max_n k_n**2)`` -- that is
+    what gate T1 pins.  For a locked run the contract's ``max(...)`` of eq. 4.8
+    is replaced by the 2-norm blend
+
+        rate**2 = sum_n (k_n u_n)**2
+                  + sum_theta thetadot**2 / (theta**2 + eps**2)
+                  + (nu max_n k_n**2)**2,          eps = 1e-3
+
+    which is smooth in z, where eq. 4.8's ``max`` of ``abs``-quotients has
+    kinks wherever the argmax switches or a parameter crosses zero.  Smoothness
+    matters because a kinked step-size map makes the global error a
+    non-smooth function of cfl, which is exactly what stops a refinement table
+    from showing a clean 16x.  The blend is a strict *tightening*: the 2-norm
+    dominates the max, ``||k*u||_2 >= max_n k_n|u_n|``, and
+    ``1/sqrt(theta**2+eps**2) >= 1/(|theta|+eps)``, so every step is at most as
+    long as eq. 4.8 would have allowed.
+
+    `cond_ceiling` terminates the run "lock_singular" if cond(J) exceeds it for
+    20 consecutive steps.  This is a *new, tighter* guard than the previous
+    ``sigma_min < rcond*sigma_max`` test (which at rcond=1e-10 could not see a
+    degeneracy until the Jacobian was numerically rank-deficient to machine
+    precision).  It is what turns a silent, dt-insensitive energy injection
+    into a reported termination.
     """
     _check_lock(lock)
     k = np.asarray(wavenumbers, dtype=float)
@@ -675,20 +841,28 @@ def simulate_sym2_shell_model(
     terminated = "t_max"
     eps = 1e-3
     singular_streak = 0
+    max_condition = 0.0
 
     for step_index in range(max_steps):
         u = profile_of(z)
         zdot_now, diag_now = rhs_of(z)
 
-        rate_terms = [float(np.max(k * np.abs(u)))]
-        if lock != "none":
+        if lock == "none":
+            # Gate T1: bit-for-bit shell.simulate_shell_model.
+            rate = float(np.max(k * np.abs(u)))
+            if viscosity > 0:
+                rate = max(rate, viscosity * float(np.max(k**2)))
+        else:
+            # Repaired eq. 4.8 -- smooth 2-norm blend, strictly tighter than
+            # the contract's max() form (see the docstring).
+            rate_sq = float(np.sum((k * u) ** 2))
             n_params = 2 if lock in ("sym2", "veronese") else 3
             for pidx in range(len(z) - n_params, len(z)):
-                pv, pd = z[pidx], zdot_now[pidx]
-                rate_terms.append(abs(pd) / (abs(pv) + eps))
-        if viscosity > 0:
-            rate_terms.append(viscosity * float(np.max(k**2)))
-        rate = max(rate_terms)
+                pv, pd = float(z[pidx]), float(zdot_now[pidx])
+                rate_sq += pd * pd / (pv * pv + eps * eps)
+            if viscosity > 0:
+                rate_sq += (viscosity * float(np.max(k**2))) ** 2
+            rate = math.sqrt(rate_sq)
 
         if rate <= 0 or not np.isfinite(rate):
             terminated = "degenerate" if rate <= 0 else "non_finite"
@@ -731,7 +905,16 @@ def simulate_sym2_shell_model(
                 record(t, z)
                 terminated = "off_manifold"
                 break
-            if diag_post["sigma_min"] < rcond * diag_post["sigma_max"]:
+            # Conditioning guard.  The rcond test alone only fires once J is
+            # rank-deficient to machine precision; cond_ceiling catches the
+            # approach, so a degenerate passage is *reported* rather than
+            # silently absorbed into the energy budget (FINDINGS 6.2).
+            s_min, s_max = diag_post["sigma_min"], diag_post["sigma_max"]
+            if s_min > 0:
+                max_condition = max(max_condition, s_max / s_min)
+            rank_deficient = s_min < rcond * s_max
+            over_conditioned = cond_ceiling > 0 and s_min * cond_ceiling < s_max
+            if rank_deficient or over_conditioned:
                 singular_streak += 1
             else:
                 singular_streak = 0
@@ -758,6 +941,8 @@ def simulate_sym2_shell_model(
         "lock": lock,
         "closure": closure,
         "rcond": rcond,
+        "cond_ceiling": cond_ceiling,
+        "max_jacobian_condition": max_condition,
         "base": base,
     }
 

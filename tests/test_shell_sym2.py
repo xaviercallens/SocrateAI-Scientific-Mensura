@@ -12,6 +12,7 @@ cases (rank-deficient Jacobian, minimal shell count).
 
 from __future__ import annotations
 
+import math
 from fractions import Fraction
 
 import numpy as np
@@ -24,15 +25,20 @@ from socrates.dualscale.shell_sym2 import (
     Sym2ShellResult,
     certify_sym2_lock,
     elementary_symmetric,
+    fit_lock_state,
+    half_ladder_a,
     is_symmetric_square,
     locked_rhs,
     order3_to_sym2_params,
     predicted_enstrophy_exponent,
     reconstruct_jacobian,
     reconstruct_profile,
+    seed_profile,
     simulate_sym2_shell_model,
     sym2_coefficients,
+    sym2_coefficients_asq,
     sym2_spectral_radius,
+    sym2_spectral_radius_asq,
 )
 from socrates.operators.recurrence import (
     RecurrenceOperator,
@@ -62,19 +68,31 @@ def test_sym2_inviscid_energy_conservation() -> None:
     short window shows a textbook ~16x drift reduction per halving, and the
     single-step local error at t=0 already scales as dt^5 as expected.
     A short window keeps this test inside that clean regime; it is not
-    loosening the <1e-6 gate, only choosing where in the sweep to check it."""
+    loosening the <1e-6 gate, only choosing where in the sweep to check it.
+
+    W1 ROUND 2: the window is now the contract's full t_max = 0.8, TIGHTENED
+    from 0.05. The confinement above misdiagnosed the cause. The legacy sym2
+    chart (u0,u1,u2,a,b) has a *branch point* at a = 0: eq. 1.2 makes
+    (c0,c1,c2) depend on `a` only through a**2, so dPhi/da = 2a dPhi/d(a**2)
+    vanishes identically there and J drops to rank 4. The Sym2-locked flow
+    drives a to zero in finite time, so no timestep rule could rescue the
+    long window. The chart is now (u0,u1,u2,A,b) with A = a**2, the fold is
+    a regular point, and the full window is inside the clean regime."""
     k = dyadic_wavenumbers(8)
-    result = simulate_sym2_shell_model(k, lock="sym2", t_max=0.05, cfl=0.05, n_samples=20)
+    result = simulate_sym2_shell_model(k, lock="sym2", t_max=0.8, cfl=0.05, n_samples=20)
+    assert result.terminated == "t_max"
     assert result.energy_drift < 1e-6
 
 
 def test_sym2_energy_drift_shrinks_under_refinement() -> None:
     """Guards against reporting an integrator artifact as physics -- the same
     control shell.py applies (test_timestep_refinement_improves_energy_conservation).
-    See the note on t_max above."""
+    Window tightened to the full t_max = 0.8; see the note above."""
     k = dyadic_wavenumbers(8)
-    coarse = simulate_sym2_shell_model(k, lock="sym2", t_max=0.05, cfl=0.1, n_samples=20)
-    fine = simulate_sym2_shell_model(k, lock="sym2", t_max=0.05, cfl=0.025, n_samples=20)
+    coarse = simulate_sym2_shell_model(k, lock="sym2", t_max=0.8, cfl=0.1, n_samples=20)
+    fine = simulate_sym2_shell_model(k, lock="sym2", t_max=0.8, cfl=0.025, n_samples=20)
+    assert coarse.terminated == "t_max"
+    assert fine.terminated == "t_max"
     assert fine.energy_drift < coarse.energy_drift
     assert fine.energy_drift < 1e-6
 
@@ -277,3 +295,140 @@ def test_simulate_sym2_shell_model_reports_terminated_reason() -> None:
     summary = result.summary()
     assert summary["lock"] == "sym2"
     assert "void" in summary
+
+
+# -- (d) W1 round 2: the chart branch point must not silently return --------
+
+
+@pytest.mark.slow
+def test_full_window_energy_drift_converges_at_fourth_order() -> None:
+    """Gate T5/B2 over the FULL window -- the check FINDINGS 6.2 failed.
+
+    Round 1 measured, at t_max = 0.8, alpha' = 1e-6, N = 24, drift
+    1.02e-5 / 9.33e-6 / 1.27e-5 / 6.77e-6 / 6.57e-6 / 6.27e-6 / 1.10e-5 /
+    2.43e-6 as cfl swept 0.2 -> 0.001: neither convergent nor monotone. With
+    the repaired chart the same configuration gives a fitted order of 3.95
+    and a net reduction of 2.1e6 over five halvings (16**5 = 1.05e6).
+
+    This pins a cheap 6-shell version. It asserts the *net* reduction and the
+    fitted order rather than each individual ratio, because `energy_drift` is
+    |E(t_end) - E(0)|/E(0) -- a signed quantity that passes through zero as
+    the leading error term changes sign, so single ratios legitimately
+    fluctuate while the order does not.
+    """
+    k = dyadic_wavenumbers(6)
+    cfls = (0.1, 0.05, 0.025)
+    drifts = []
+    for cfl in cfls:
+        result = simulate_sym2_shell_model(k, lock="sym2", t_max=0.8, cfl=cfl, n_samples=20)
+        assert result.terminated == "t_max", f"cfl={cfl} stopped at {result.terminated}"
+        drifts.append(result.energy_drift)
+
+    for coarse, fine, cfl in zip(drifts, drifts[1:], cfls[1:], strict=False):
+        assert coarse / fine >= 8.0, f"cfl {cfl}: drift fell {coarse / fine:.2f}x, want >= 8x"
+    assert drifts[0] / drifts[-1] >= 100.0  # two halvings of order 4: 16**2 = 256
+    order = float(np.polyfit(np.log(cfls), np.log(drifts), 1)[0])
+    assert order >= 3.5, f"fitted convergence order {order:.2f} < 3.5"
+
+
+def test_sym2_jacobian_has_no_branch_point_at_the_gauge_fold() -> None:
+    """The round-2 defect, pinned directly.
+
+    In the legacy chart z = (u0,u1,u2,a,b), dPhi/da = 2a * dPhi/d(a**2) is
+    identically zero at a = 0, so J drops to rank 4 and zdot = J^+ F diverges
+    like 1/a. In the repaired chart z = (u0,u1,u2,A,b) that point is regular.
+    If this ever fails, the branch point is back.
+    """
+    for b in (-0.3, -0.1, 0.05, 0.2):
+        z = np.array([1.0, 0.5, 0.25, 0.0, b])  # A = 0, i.e. the fold a = 0
+        jac = reconstruct_jacobian(z, 24, lock="sym2")
+        svals = np.linalg.svd(jac, compute_uv=False)
+        assert svals[-1] / svals[0] > 1e-3, f"J degenerate at the fold for b={b}"
+
+
+def test_repaired_chart_reproduces_the_legacy_algebra() -> None:
+    """A = a**2 changes the coordinate, not the constraint set (eqs. 1.1, 1.6)."""
+    for a, b in ((0.75, -0.125), (0.6, -0.05), (0.3, -0.2), (1.2, 0.1)):
+        assert sym2_coefficients_asq(a * a, b) == pytest.approx(sym2_coefficients(a, b), rel=1e-13)
+        assert sym2_spectral_radius_asq(a * a, b) == pytest.approx(
+            sym2_spectral_radius(a, b), rel=1e-12
+        )
+        assert half_ladder_a(a * a) == pytest.approx(a, rel=1e-12)
+        c0, c1, c2 = sym2_coefficients(a, b)
+        expected = RecurrenceOperator.of(c0, c1, c2).iterate([1.0, 0.4, 0.1], 12)
+        np.testing.assert_allclose(
+            reconstruct_profile(np.array([1.0, 0.4, 0.1, a * a, b]), 12, lock="sym2"),
+            np.asarray(expected, dtype=float),
+            rtol=1e-12,
+        )
+    # A < 0 is still on the Sym2 locus (1.4) -- Proposition A is stated over C.
+    assert is_symmetric_square(*sym2_coefficients_asq(-0.4, -0.1))
+    assert math.isnan(half_ladder_a(-0.4))
+
+
+def test_fit_lock_state_is_exact_on_the_module_seed() -> None:
+    """Gate T12 / vacuity guard V4, which FINDINGS 6.4 recorded as failing.
+
+    `seed_profile` lies on every lock's constraint set by construction, so the
+    fit residual must be at machine level. Round 1 measured 5.9e-7 for sym2:
+    the least-squares fit converged to a spurious local minimum (a = 0.708
+    instead of 0.75), silently displacing the initial condition of every sym2
+    run in the sweep.
+    """
+    for lock in ("sym2", "order3", "veronese"):
+        u = seed_profile(24, lock=lock)
+        z, residual = fit_lock_state(u, lock=lock)
+        assert residual < 1e-10, f"{lock}: V4 fit residual {residual:.3e}"
+        np.testing.assert_allclose(reconstruct_profile(z, 24, lock=lock), u, atol=1e-12)
+    # sym2 must recover the seed's own half-ladder: roots (0.5, 0.25) give
+    # a = 0.75, b = -0.125, hence A = 0.5625.
+    z, _ = fit_lock_state(seed_profile(24, lock="sym2"), lock="sym2")
+    assert z[3] == pytest.approx(0.5625, abs=1e-9)
+    assert z[4] == pytest.approx(-0.125, abs=1e-9)
+
+
+def test_lemma_4_4_invariants_hold_pointwise_over_the_full_window() -> None:
+    """Lemma 4.4's pointwise invariants across the repaired full window.
+
+    <u, J zdot> = <u, P F> = <u, F> = 0 for the inviscid model, and
+    ||Pu - u|| / ||u|| < 1e-10 (gate B3). A step-control fix that broke
+    either would not be a fix.
+    """
+    k = dyadic_wavenumbers(10)
+    result = simulate_sym2_shell_model(k, lock="sym2", t_max=0.8, cfl=0.05, n_samples=40)
+    assert result.terminated == "t_max"
+    assert float(np.max(result.euler_residual)) < 1e-10
+    assert float(result.metadata["max_jacobian_condition"]) < 1e6
+
+    rng = np.random.default_rng(0)
+    for _ in range(25):
+        z = np.array(
+            [*rng.uniform(-1.0, 1.0, size=3), rng.uniform(-0.5, 1.0), rng.uniform(-0.4, 0.3)]
+        )
+        zdot, diag = locked_rhs(z, k, 0.0, lock="sym2")
+        u = reconstruct_profile(z, k.size, lock="sym2")
+        jac = reconstruct_jacobian(z, k.size, lock="sym2")
+        scale = float(np.linalg.norm(u)) * float(np.linalg.norm(jac @ zdot)) + 1e-300
+        assert abs(float(u @ (jac @ zdot))) / scale < 1e-10
+        assert diag["euler_residual"] < 1e-10
+
+
+def test_repaired_timestep_rule_is_never_looser_than_contract_eq_4_8() -> None:
+    """The repaired rate is a 2-norm blend of eq. 4.8's terms, so it never
+    permits a longer step than eq. 4.8's max() form -- a tightening."""
+    k = dyadic_wavenumbers(12)
+    z, _ = fit_lock_state(seed_profile(12, lock="sym2"), lock="sym2")
+    zdot, _diag = locked_rhs(z, k, 0.0, lock="sym2")
+    u = reconstruct_profile(z, 12, lock="sym2")
+    eps = 1e-3
+    legacy = max(
+        float(np.max(k * np.abs(u))),
+        abs(zdot[3]) / (abs(z[3]) + eps),
+        abs(zdot[4]) / (abs(z[4]) + eps),
+    )
+    repaired = math.sqrt(
+        float(np.sum((k * u) ** 2))
+        + zdot[3] ** 2 / (z[3] ** 2 + eps**2)
+        + zdot[4] ** 2 / (z[4] ** 2 + eps**2)
+    )
+    assert repaired >= legacy
