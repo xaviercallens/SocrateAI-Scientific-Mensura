@@ -9,11 +9,64 @@ Lean 4 kernel certificates (Tier A). Every claim here is decided by computation:
 exact `Fraction` arithmetic where the question is algebraic, controlled
 numerics with explicit error oracles where it is dynamical.
 
-> **Headline result.** The shell-model analogue of Hypothesis U **fails** as expected
+> **Headline result (control arm).** The shell-model analogue of Hypothesis U **fails**
 > in the bare (non-Sym²-coupled) model, with peak enstrophy diverging as $\alpha'^{-0.672}$ —
-> which is Kolmogorov's $-2/3$ to within 0.7%. This is a **control measurement**:
-> it establishes the baseline the Sym² lock must beat to support global regularity.
-> See [docs/FINDINGS.md](docs/FINDINGS.md) and bilingual reports in `reports/`.
+> Kolmogorov's $-2/3$ to within 0.7%. This establishes the baseline the Sym² lock
+> must beat. See [docs/FINDINGS.md](docs/FINDINGS.md) and bilingual reports in `reports/`.
+>
+> **Latest achievement (`release-1` tag, 2026-08-12).** The first attempt to measure
+> the Sym²-locked model came back honestly inconclusive — 0/9 sweep runs met the
+> convergence gate (FINDINGS §6). Root cause, now fixed: a genuine coordinate branch
+> point in the model's parametrization (not just an ill-conditioned step rule),
+> repaired with a re-parametrized chart, verified to 4th-order convergence across 8
+> independent configurations, gates *tightened* not loosened. An independent
+> adversarial-verification pass and the actual sym2-vs-control measurement are
+> in progress now. See [Roadmap](#vision-approach-and-roadmap) below.
+
+---
+
+## Vision, approach, and roadmap
+
+**Vision.** Decide, by computation and kernel-checked proof rather than
+prose, whether a dual-scale T-dual metric plus a symmetric-square coupling
+lock can regularize the Navier–Stokes energy cascade — turning Hypothesis U
+and Conjecture 5.2 from claims in a paper into either a proof obligation
+Lean can discharge, or a falsified conjecture with the falsifying measurement
+on record. Either outcome is a real result; a plausible-sounding paper with
+no computational spine is not the goal here.
+
+**Approach.** Three disciplines, applied without exception:
+
+1. **The tier system.** Tier A (Lean kernel-checked) > Tier B (exact
+   computation / controlled numerics with error oracles) > Tier C (labelled
+   conjecture, never load-bearing). A claim moves up a tier only when its own
+   check passes — see the epistemic table below.
+2. **The validation ladder.** No solver is trusted near a frontier problem
+   until it has climbed known-answer rungs first — see
+   [`scripts/solver_ladder.py`](scripts/solver_ladder.py). Same discipline
+   applies to the workflow processes themselves, below.
+3. **Adversarial, tier-routed workflow orchestration for decisive
+   experiments.** A measurement the programme will act on is never taken at
+   face value from a single pass: design/repair steps go to the most capable
+   model tier, get independently re-verified by a skeptic whose default is
+   to refute, and a genuinely inconclusive result is written up as a finding,
+   not smoothed into a number. The pattern is documented as a reusable skill
+   at [`.claude/skills/decisive-experiment/SKILL.md`](.claude/skills/decisive-experiment/SKILL.md)
+   and the routing table lives in
+   [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md). Round 1 of
+   the current decisive experiment (W1) is the reason this discipline exists
+   in writing: a naive sweep-then-report pass would have missed that its own
+   test suite was green only because it never exercised the failing window.
+
+**Roadmap** (workflows W1–W4, full detail in
+[`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md)):
+
+| Workflow | Goal | Status |
+|---|---|---|
+| **W1** | Does the Sym² lock change the Hypothesis-U exponent from $-2/3$? The decisive experiment. | Round 1: contract + implementation done, sweep inconclusive (gates caught a real defect). Round 2: stepper repaired and tagged `release-1`; adversarial verification, the sym2/order3/none separation measurement, and adjudication in progress. |
+| **W2** | Solver-ladder maintenance and extension — new rungs (restricted three-body, Mercury perihelion 1PN, more Horizons targets) never edit an old rung's gate. | Not started. |
+| **W3** | EIU / exact-arithmetic layer — an exact-mode path for every solver with rational forces, bit-growth economics measured en route to an RNS-backed dot-product kernel. | Not started. |
+| **W4** | Paper, Lean development, and this repository state the same theorems. | Partial — `lean/CallensDualScale.lean` received and checked (3 theorems, 1 proof fixed), but the full original paper source with LEAN-tagged theorem statements has not been supplied, so the checklist can't be completed exhaustively yet. |
 
 ---
 
@@ -93,6 +146,32 @@ $\Omega \sim k_{\max}^{4/3} = \alpha'^{-2/3}$.
 specifically to the symmetric-square lock. So this measurement establishes
 $-2/3$ as the number the mechanism must beat, making the next experiment sharp
 and falsifiable in either direction.
+
+### 🔧 W1 round 2, phase 1 — the Sym²-locked stepper, repaired (`release-1`)
+
+The first attempt to measure the locked model (`src/socrates/dualscale/shell_sym2.py`)
+came back with **no valid exponent**: 0 of 9 sweep runs met the convergence
+gate, because the energy-conservation oracle itself was broken at the full
+integration window (`docs/FINDINGS.md` §6). Rather than loosen the gate, the
+repair step found the actual mechanism: the model's $(a,b)$ chart has a
+genuine **branch point** at $a=0$ (the map $(a,b)\mapsto L_3$ is a 2:1 branched
+cover), not merely a badly-scaled region — no timestep rule can fix a
+discontinuity in the parametrization. Fixed by reformulating to the honest
+1:1 gauge $A=a^2$; a second, independent bug in the model-fitting step was
+also found and fixed along the way.
+
+**Verified, not merely claimed:** full-window energy drift now converges at
+4th order (fitted order 3.91–3.97) across 8 independent
+$(\alpha', N)$ configurations, corroborated by a fixed-cfl study and an
+alternative error metric; the energy-conservation lemma still holds
+pointwise; rank-truncation was tested as a cheaper alternative fix and
+explicitly **rejected** because it silently manufactures energy drift. No
+gate was loosened — several were tightened. Full evidence in the commit
+message tagged `release-1` (`git show release-1`) and `docs/FINDINGS.md`.
+
+**This is an engineering checkpoint, not a scientific result.** The
+sym2-vs-order3-vs-none separation measurement this repair unblocks, and its
+independent adjudication, have not run yet — see the Roadmap above.
 
 ---
 
