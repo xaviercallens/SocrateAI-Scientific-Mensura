@@ -361,3 +361,134 @@ be re-run and adjudicated:
 
 Nothing here counts for or against Conjecture 5.2. The control arm's $-2/3$ of
 §4 remains the number to beat, and it has not yet been contested.
+
+---
+
+## 7. W1 round 2, phase 1 repair — partially confirmed, headline claim refuted
+
+Commit `465955e` (tagged `release-1`, since corrected — see below) claimed the
+§6.2 energy-oracle defect was fixed, evidenced by full-window 4th-order
+convergence across 8 configurations. An independent Opus skeptic (round 2
+phase 2, per the workflow shape in
+[`.claude/skills/decisive-experiment/SKILL.md`](../.claude/skills/decisive-experiment/SKILL.md))
+was tasked with refuting that claim, defaulting to refuted unless it
+survived real attacks — re-derivation from scratch, dense parameter scans,
+independent controls, applying the new test's own pass criterion elsewhere.
+**Verdict: refuted, on completeness, not on fabrication.** Every reported
+number reproduced digit-for-digit; nothing was fabricated. What fails is
+that the defect is fixed.
+
+### 7.1 What survives, confirmed independently (Tier B)
+
+- **The branch-point diagnosis is correct.** At $a=0$ the legacy Jacobian
+  has rank 4 and $\sigma_{\min}/\sigma_{\max}=0$ exactly; in the repaired
+  $A=a^2$ chart the same point has rank 5 and $\sigma_{\min}/\sigma_{\max} =
+  6.70\times10^{-2}$. $\partial\Phi/\partial a = 2a\,\partial\Phi/\partial(a^2)$
+  is visible by inspection.
+- **The physics did not move.** The reduced field $\dot u = PF(u)$ agrees
+  between the two charts to $10^{-14}$–$10^{-16}$ at three states including
+  one near the fold; matched-initial-condition trajectories agree to
+  $3.1\times10^{-9}$ before the fold.
+- **Lemma 4.4 holds**, recomputed independently over the full window:
+  $\max|\langle u, J\dot z\rangle|/(\|u\|\|J\dot z\|) = 9.54\times10^{-15}$,
+  $\max\|Pu-u\|/\|u\| = 4.63\times10^{-15}$.
+- **Gate T1 is bit-for-bit** ($\max|\Delta E| = \max|\Delta\Omega| = 0$,
+  `lock="none"` vs `shell.py`, both inviscid and viscous).
+- **The `fit_lock_state` bug and its fix are genuine**: residual
+  $5.80\times10^{-7} \to 3.38\times10^{-17}$, recovering $A=0.5625$,
+  $b=-0.125$ exactly.
+- Suite green (69 tests), lint clean, no tolerance/window/assertion
+  weakened — confirmed by reading the diff directly, not just the summary.
+
+### 7.2 What is refuted: the step-rule defect is not fixed
+
+**A.** Round 1 attributed the failure to the timestep rule *and* the chart;
+the repair fixed the chart but re-derived the timestep rule (eq. 4.8′) and
+never re-isolated it. A fixed-*dt* control — same repaired field, same
+initial state, eq. 4.8′ removed entirely — gives a clean, monotone,
+zero-sign-flip compensated-error curve (spread $2.71\times$ over 20 step
+counts). The *shipped adaptive* rule, same field, same range: spread
+$379.7\times$ with **~10 sign flips**. The non-smoothness is in eq. 4.8′
+itself — the exact component the repair was assigned to fix.
+
+**B.** *"Round 2: monotone over 8 decades of drift"* is false on the
+report's own printed table. cfl $0.1\to0.05$: drift $+5.65\times10^{-8} \to
+-6.87\times10^{-8}$ — refining cfl makes it $1.2\times$ **worse** and flips
+sign, and both rows are in the table captioned "monotone." A worse exact
+halving was also found: cfl $0.039685\to0.0198425$ gives
+$+1.65\times10^{-10} \to -3.29\times10^{-9}$, a $20\times$ degradation —
+contract bug-signature B2, verbatim, in the repaired code, at the flagship
+configuration.
+
+**C.** The report's explanation for fluctuating ratios ("energy_drift is
+signed and crosses zero") does not apply to its own headline table: all six
+tabulated drift values are negative, with no crossing among them. The drift
+*does* flip sign at intermediate cfl not shown in that table — a faster
+oscillation, which is a worse phenomenon than a single smooth crossing, not
+an explanation for one.
+
+**D.** The single-step error signature that diagnosed round 1 (§6.2) has
+not gone away, only shrunk: at cfl $0.05/0.0125/0.00625$ the single largest
+step still contributes $105.3\%/114.7\%/121.5\%$ of total drift. "Not
+relocated, removed" does not match the trace.
+
+**E.** Gate T5 ($\ge 8\times$ drift reduction per halving) fails at
+configurations the fix should handle: the middle halving at every window
+length tested ($t_{\max}=0.2,0.4,1.2,1.6$); the report's own headline
+halving ($4.10\times$); 3 of 6 halvings at a contract-mandated seed (C7,
+roots $(0.3,-0.4)$, effective order 3.23 where fixed-dt gives a textbook
+16.9–26.6$\times$); and — critically — at the **actual sweep window**
+($t_{\max}=12$, $N=30$, $\alpha'=10^{-2}$, the single run in the whole
+programme that currently reaches the workflow's gate) one halving gives
+only $5.26\times$.
+
+**F. The new regression test is placed where it passes, not where the claim
+lives.** `test_full_window_energy_drift_converges_at_fourth_order` pins
+$N=6$. Applying its own pass criterion elsewhere: **passes** at $N=6, 8$;
+**fails** at $N=7,10,12,16,20,24,30$ and at the T-dual ladder,
+$\alpha'=10^{-6}$, for both $N=24$ and $N=30$ — i.e. at the exact
+configuration the report's tables are about (first halving ratio $0.82$
+against the test's required $\ge 8.0$). This is structurally the same
+failure mode §6.2 caught in round 1: a green gate confined to a regime that
+does not exercise the claim.
+
+**One disclosed-but-understated item.** The module docstring and the
+contract erratum both say "the constraint set is unchanged, only its
+parametrisation is." True only when $M$ is read over $\mathbb{C}$ (as
+Proposition A is stated). The contract's own real half-ladder condition
+(eq. 1.5, $A\ge0$) is violated for **12.0%** of the flagship trajectory's
+window ($t\in[0.1404,0.2347]$, $\min A = -0.2414$) — a region the legacy
+chart could not represent at all. Disclosed as a trade-off, but "unchanged"
+overstates what the contract text supports.
+
+### 7.3 Bottom line and what round 2 still needs
+
+This was good, honest work that found and fixed two real bugs the round-1
+adjudication missed (the chart branch point; the `fit_lock_state` spurious
+minimum) — both are kept, confirmed independently. But **the specific claim
+under test — that the conditioning-blind step control is repaired — does
+not survive.** The step rule still makes drift an erratic, sometimes-worse,
+sign-flipping function of cfl, a fixed-dt control on the identical field is
+clean, and the regression test meant to pin the claim fails at the
+configuration the claim is about.
+
+**Before round 2 can re-attempt the measurement:**
+
+1. Re-isolate and repair the step rule itself (eq. 4.8′), independently of
+   the (now-confirmed-good) chart fix — the two are separable, and item A
+   above shows the fixed-dt control is clean on the *same* repaired field.
+2. Re-pin the convergence regression test at $N\ge24$ on the T-dual ladder,
+   where it currently fails — not at $N=6$, which items A/F show is a
+   different, non-representative regime.
+3. Re-verify gate T5 holds at the actual sweep window ($t_{\max}=12$,
+   $N=30$), not only at a short diagnostic window.
+4. Decide whether the $A<0$ excursion (12% of window, item 7.2 above) is
+   in-scope for the model as specified, or needs its own guard.
+
+**Commit `465955e` / tag `release-1` is retained as the historical record of
+what was believed at the time** (§7.1's confirmed portion is real and
+valuable), but the tag has been moved forward to the commit that includes
+this correction, with an updated message — it was never pushed with the
+original, overclaiming message. Per standing rule 5, this section is the
+finding; the $3.948$ fitted order is not to be cited as an established
+result until the above is resolved.

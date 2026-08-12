@@ -14,14 +14,20 @@ numerics with explicit error oracles where it is dynamical.
 > Kolmogorov's $-2/3$ to within 0.7%. This establishes the baseline the Sym² lock
 > must beat. See [docs/FINDINGS.md](docs/FINDINGS.md) and bilingual reports in `reports/`.
 >
-> **Latest achievement (`release-1` tag, 2026-08-12).** The first attempt to measure
-> the Sym²-locked model came back honestly inconclusive — 0/9 sweep runs met the
-> convergence gate (FINDINGS §6). Root cause, now fixed: a genuine coordinate branch
-> point in the model's parametrization (not just an ill-conditioned step rule),
-> repaired with a re-parametrized chart, verified to 4th-order convergence across 8
-> independent configurations, gates *tightened* not loosened. An independent
-> adversarial-verification pass and the actual sym2-vs-control measurement are
-> in progress now. See [Roadmap](#vision-approach-and-roadmap) below.
+> **Latest achievement (`release-1` tag, 2026-08-12) — partial repair, adversarially checked.**
+> The first attempt to measure the Sym²-locked model came back honestly
+> inconclusive — 0/9 sweep runs met the convergence gate (FINDINGS §6). The repair
+> attempt found and fixed two real bugs — a genuine coordinate branch point in the
+> model's chart, and a spurious local minimum in the model-fitting step — both
+> **confirmed independently**. But its headline claim ("4th-order convergence, fully
+> repaired") was **refuted** by the very next adversarial-verification step: the
+> timestep rule itself still makes drift an erratic, sign-flipping function of cfl
+> at the flagship configuration, and the pinning test only passed because it
+> exercised a smaller, non-representative case. See
+> [FINDINGS §7](docs/FINDINGS.md) for the full, honest account — this is exactly
+> what the adversarial-verification stage exists to catch, and it worked. Round 2
+> continues once the step rule is genuinely fixed. See
+> [Roadmap](#vision-approach-and-roadmap) below.
 
 ---
 
@@ -63,7 +69,7 @@ no computational spine is not the goal here.
 
 | Workflow | Goal | Status |
 |---|---|---|
-| **W1** | Does the Sym² lock change the Hypothesis-U exponent from $-2/3$? The decisive experiment. | Round 1: contract + implementation done, sweep inconclusive (gates caught a real defect). Round 2: stepper repaired and tagged `release-1`; adversarial verification, the sym2/order3/none separation measurement, and adjudication in progress. |
+| **W1** | Does the Sym² lock change the Hypothesis-U exponent from $-2/3$? The decisive experiment. | Round 1: contract + implementation done, sweep inconclusive (gates caught a real defect). Round 2 phase 1: chart branch-point fixed and confirmed; step-rule fix refuted by adversarial verification (FINDINGS §7) — real work remains before the separation measurement can run. |
 | **W2** | Solver-ladder maintenance and extension — new rungs (restricted three-body, Mercury perihelion 1PN, more Horizons targets) never edit an old rung's gate. | Not started. |
 | **W3** | EIU / exact-arithmetic layer — an exact-mode path for every solver with rational forces, bit-growth economics measured en route to an RNS-backed dot-product kernel. | Not started. |
 | **W4** | Paper, Lean development, and this repository state the same theorems. | Partial — `lean/CallensDualScale.lean` received and checked (3 theorems, 1 proof fixed), but the full original paper source with LEAN-tagged theorem statements has not been supplied, so the checklist can't be completed exhaustively yet. |
@@ -147,31 +153,37 @@ specifically to the symmetric-square lock. So this measurement establishes
 $-2/3$ as the number the mechanism must beat, making the next experiment sharp
 and falsifiable in either direction.
 
-### 🔧 W1 round 2, phase 1 — the Sym²-locked stepper, repaired (`release-1`)
+### 🔧 W1 round 2, phase 1 — the Sym²-locked stepper: partial repair, adversarially refuted
 
 The first attempt to measure the locked model (`src/socrates/dualscale/shell_sym2.py`)
 came back with **no valid exponent**: 0 of 9 sweep runs met the convergence
 gate, because the energy-conservation oracle itself was broken at the full
-integration window (`docs/FINDINGS.md` §6). Rather than loosen the gate, the
-repair step found the actual mechanism: the model's $(a,b)$ chart has a
-genuine **branch point** at $a=0$ (the map $(a,b)\mapsto L_3$ is a 2:1 branched
-cover), not merely a badly-scaled region — no timestep rule can fix a
-discontinuity in the parametrization. Fixed by reformulating to the honest
-1:1 gauge $A=a^2$; a second, independent bug in the model-fitting step was
-also found and fixed along the way.
+integration window (`docs/FINDINGS.md` §6). The repair step found a genuine
+**branch point** at $a=0$ in the model's $(a,b)$ chart (the map
+$(a,b)\mapsto L_3$ is a 2:1 branched cover) and fixed it by reformulating to
+the honest 1:1 gauge $A=a^2$ — **confirmed independently**: the reduced
+field is unchanged between charts to $10^{-14}$–$10^{-16}$, and a second,
+unrelated bug (a spurious local minimum in the model-fitting step) was also
+found and fixed, confirmed to residual $3.4\times10^{-17}$.
 
-**Verified, not merely claimed:** full-window energy drift now converges at
-4th order (fitted order 3.91–3.97) across 8 independent
-$(\alpha', N)$ configurations, corroborated by a fixed-cfl study and an
-alternative error metric; the energy-conservation lemma still holds
-pointwise; rank-truncation was tested as a cheaper alternative fix and
-explicitly **rejected** because it silently manufactures energy drift. No
-gate was loosened — several were tightened. Full evidence in the commit
-message tagged `release-1` (`git show release-1`) and `docs/FINDINGS.md`.
+**But the headline claim — full-window 4th-order convergence, gates never
+loosened — was refuted** by the next step in the pipeline: an independent
+skeptic tasked explicitly with trying to break it. A fixed-timestep control
+on the *identical* repaired field is clean and monotone; the *shipped*
+adaptive rule on the same field is not — spread $379.7\times$ with ~10 sign
+flips over the same range, including one halving *printed in the original
+report's own table* that makes drift $1.2\times$ **worse**. The pinning
+regression test passes only because it exercises $N=6$, not the $N=24$
+configuration the claim is about — applying the test's own criterion at
+$N=24$ fails. Full account, including everything that *did* survive
+independent re-verification, in [FINDINGS §7](docs/FINDINGS.md).
 
-**This is an engineering checkpoint, not a scientific result.** The
-sym2-vs-order3-vs-none separation measurement this repair unblocks, and its
-independent adjudication, have not run yet — see the Roadmap above.
+**This is exactly what the adversarial-verification stage
+(`.claude/skills/decisive-experiment/SKILL.md`) exists to catch, and it
+worked** — a plausible, well-evidenced, honestly-written single-agent
+report still needed independent re-derivation from scratch before being
+trusted. Round 2 continues once the step rule itself (separable from the
+now-confirmed chart fix) is genuinely repaired. See the Roadmap above.
 
 ---
 
