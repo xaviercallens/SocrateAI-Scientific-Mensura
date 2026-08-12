@@ -9,9 +9,11 @@ Lean 4 kernel certificates (Tier A). Every claim here is decided by computation:
 exact `Fraction` arithmetic where the question is algebraic, controlled
 numerics with explicit error oracles where it is dynamical.
 
-> **Headline result.** The shell-model analogue of Hypothesis U **fails**, with
-> peak enstrophy diverging as $\alpha'^{-0.672}$ — which is Kolmogorov's
-> $-2/3$ to within 0.7%. See [docs/FINDINGS.md](docs/FINDINGS.md).
+> **Headline result.** The shell-model analogue of Hypothesis U **fails** as expected
+> in the bare (non-Sym²-coupled) model, with peak enstrophy diverging as $\alpha'^{-0.672}$ —
+> which is Kolmogorov's $-2/3$ to within 0.7%. This is a **control measurement**:
+> it establishes the baseline the Sym² lock must beat to support global regularity.
+> See [docs/FINDINGS.md](docs/FINDINGS.md) and bilingual reports in `reports/`.
 
 ---
 
