@@ -1,0 +1,439 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{\textbf{SOCRATES Phase 2, Stage 2:} \\
+\large Poly-Algebraic Calculus --- Hypergraph Dimension Estimation, \\
+a Ten-Problem Physics Benchmark, and Comparison to Classical Methods}
+\author{Xavier Callens \\ Socrate AI Lab}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This report documents Phase 2 (Stage 2) of the Socrate AI Lab programme:
+the construction and rigorous benchmarking of a computational
+``Poly-Algebraic Calculus'' toolkit for hypergraph-based physics, following
+Wolfram's proposal that space, time, and known physics may emerge from
+discrete rewriting of a pre-geometric hypergraph. Of four brainstormed
+formalization concepts, two were selected for implementation on tractability
+grounds: a higher-arity rule-search calculus (\emph{Poly-Algebraic
+Calculus} proper) and an emergent-dimension estimator (\emph{Pre-Geometric
+Dimension Variables}). The dimension estimator was applied to ten known
+physics problems with independently verifiable dimension targets --- exact
+results for closed orbits and rigorous theorems, and literature values
+(Grassberger--Procaccia, 1983) for two classical chaotic attractors. The
+initial benchmark run produced a headline of ``10/10 passed'' that a
+subsequent audit showed to be substantially misleading: six of the ten
+passes came from a mathematically degenerate regime, and neither chaotic
+result was converged in point count. Two independent, real software defects
+were found in the process and are corrected here, with regression tests and
+measured before/after evidence, including a $\sim$27$\times$ performance
+improvement. A genuine classical baseline (the Grassberger--Procaccia
+correlation-sum method) and an apples-to-apples comparison harness were then
+built so that ``better than the traditional approach'' could be a checkable
+claim rather than an assertion. A systematic re-comparison across all ten
+problems, targeting a majority win rate against this baseline, was in
+progress at the time of writing and is reported as a preliminary status,
+not a final result --- consistent with this programme's standing rule that
+an unconverged or incomplete measurement must be labelled as such, never
+smoothed into a premature conclusion.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction and Motivation}
+
+Stephen Wolfram's Physics Project proposes that space, time, and the known
+laws of physics are not fundamental, but emerge from the discrete,
+repeated application of local rewriting rules to a pre-geometric
+hypergraph. Formalizing this hypothesis computationally requires new
+mathematical and software tooling, analogous to how historical paradigm
+shifts in physics required new mathematical syntax (algebra for the
+unknown quantity, calculus for instantaneous change, complex numbers for
+solutions ``off the real line'').
+
+Four concepts were brainstormed as candidate formal tools for this
+programme:
+
+\begin{enumerate}
+\item \textbf{Poly-Algebraic Calculus} (higher-arity algebra): extending
+  algebra's ``solve for an unknown quantity'' to ``solve for an unknown
+  higher-arity relation or rewrite rule.''
+\item \textbf{Branchial Cohomology}: a topological invariant of the
+  multiway (branching) graph of all possible rewrite histories, proposed
+  as the discrete analogue of quantum interference.
+\item \textbf{Rulial Operators}: discrete derivatives measuring the rate
+  of topological deformation per rewrite step, proposed as a discrete
+  analogue of energy/mass density.
+\item \textbf{Pre-Geometric Dimension Variables}: treating the dimension
+  of emergent space as a fluid, locally-varying quantity inferred from how
+  the hypergraph's ball volume scales with radius.
+\end{enumerate}
+
+\subsection{Selection rationale}
+
+Concepts \#1 and \#4 were selected for implementation. Concept \#4
+(dimension estimation via volume-growth scaling) is a well-established
+technique already used in causal set theory and in Wolfram's own work ---
+implementable immediately with no new mathematics required. Concept \#1
+(a rule-search calculus) is the substrate every other concept implicitly
+depends on: one cannot measure a dimension, a rulial derivative, or a
+branchial invariant without first having a rigorous language for
+hypergraphs, patterns, and rewrites. Concepts \#2 and \#3 were assessed as
+the least tractable: \emph{Branchial Cohomology} in particular has no
+working mathematical definition yet beyond an evocative name --- no chain
+complex, no boundary operator has been specified for it anywhere in the
+literature this programme is aware of, and implementing it would have
+required inventing the mathematics from scratch rather than assembling
+existing tools, in tension with this programme's discipline of not
+asserting more than a computation actually proves.
+
+\section{Methods}
+
+\subsection{Hypergraph representation and rewriting}
+
+A hypergraph is represented as an immutable multiset of ordered hyperedges
+over an implicit node set (nodes exist only by virtue of participating in
+a relation, following the Wolfram Model convention). Rewrite rules are
+specified as a left-hand-side pattern (a tuple of pattern edges over
+pattern variables) and a right-hand-side replacement; matching is
+performed by backtracking search over consistent pattern-variable
+assignments (subhypergraph pattern matching). Two evolution modes are
+implemented: a single-history mode that applies all non-overlapping
+matches per generation (the standard Wolfram Model update rule), and a
+multiway mode that branches over every individual single-match update,
+producing the full branching-state graph of the abstract rewriting system.
+
+\subsection{Emergent dimension estimation}
+
+For a hypergraph flattened into its adjacency graph (each hyperedge
+becomes a clique on its constituent nodes), the ball of radius $r$ around
+a node is the set of nodes reachable within $r$ hops. If the graph behaves
+like a $d$-dimensional lattice at some scale, ball volume grows as
+$|B(r)| \sim r^d$. The estimator fits \emph{shell size}
+($dV(r) = |B(r)| - |B(r-1)|$), not cumulative volume, against radius in
+log-log space: cumulative volume on a lattice is affine rather than
+homogeneous (a one-dimensional path has $|B(r)| = 2r+1$ from an interior
+point, not $r^1$), which biases a naive fit on volume itself well below
+the true dimension at any computationally tractable radius. Shell size has
+no such additive offset (a path's shell is the exact constant 2; a 2D
+grid's shell is exactly $4r$), so the corrected estimator returns
+\emph{exactly} 1.0 and 2.0 on these known lattices, not merely
+approximately.
+
+\subsection{From continuous trajectories to hypergraphs}
+
+A continuous physical trajectory (a set of points in phase space) is
+converted to a hypergraph via a $k$-nearest-neighbour proximity graph: each
+point becomes a node, and an edge connects each point to its $k$ nearest
+neighbours (symmetrized). Graph distance on a sufficiently dense $k$-NN
+graph approximates geodesic distance on the underlying manifold, the
+standard justification for this class of dimension estimator
+(Grassberger \& Procaccia, 1983; the same construction underlies
+Isomap-style manifold learning).
+
+\subsection{The traditional baseline}
+
+To make ``better than the traditional approach'' a checkable claim, the
+classical Grassberger--Procaccia correlation integral was implemented as
+an explicit reference method:
+\[
+C(r) = \frac{2}{N(N-1)} \#\{(i,j) : i<j,\ |x_i - x_j| < r\}, \qquad
+D_2 = \frac{d \log C(r)}{d \log r}
+\]
+Both this baseline and the shell-growth estimator are built on the same
+underlying primitive (\texttt{scipy.spatial.cKDTree}), so that any
+compute-cost comparison isolates the \emph{algorithmic} difference (global
+pairwise scaling versus local graph growth) rather than an
+implementation-quality difference between a carefully optimized new method
+and a deliberately weak baseline.
+
+\subsection{Comparison methodology}
+
+For a given point cloud and known target dimension, each method's minimum
+point count for \emph{stable} convergence is determined: the smallest
+$n$ in a tested grid at which the estimate is within tolerance of the
+target \emph{and remains} within tolerance at every larger $n$ tested ---
+guarding against a single lucky crossing of a still-moving estimate, the
+exact failure mode discovered in the initial chaotic-attractor results
+(Section~\ref{sec:findings}). A ``win'' requires both methods to
+demonstrably converge; a method that never converges cannot be credited
+with needing ``fewer'' points, since that would reward failure to
+converge as though it were efficiency.
+
+\section{Initial Benchmark: Ten Known Physics Problems}
+\label{sec:findings}
+
+The dimension estimator was applied to ten problems spanning exact
+analytic targets, a rigorous probabilistic theorem, and two literature
+values from classical chaos theory.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\# & Problem & Known dimension & Source \\
+\midrule
+1 & Harmonic oscillator & 1 (exact) & closed phase-space curve \\
+2 & Nonlinear pendulum (large amplitude) & 1 (exact) & closed periodic orbit \\
+3 & Kepler two-body orbit ($e=0.6$) & 1 (exact) & closed ellipse \\
+4 & Mars vs.\ real JPL Horizons data & 1 (exact) & smooth arc, real ephemeris \\
+5 & Quasi-periodic 2-torus (Lissajous) & 2 (exact) & standard KAM-type result \\
+6 & Planar Brownian motion & 2 (exact) & Taylor (1953) theorem \\
+7 & Restricted 3-body periodic orbit & 1 (exact, if closure verified) & limit-cycle definition \\
+8 & Lorenz attractor & $\approx 2.05$ & Grassberger \& Procaccia (1983) \\
+9 & R\"ossler attractor & $\approx 2.01$ & Grassberger \& Procaccia (1983) \\
+10 & Driven damped pendulum (mode-locked) & 1 (exact, if non-chaotic) & limit-cycle definition \\
+\bottomrule
+\end{tabular}
+\caption{The ten benchmark problems and their independently-sourced target dimensions.}
+\end{table}
+
+\subsection{Headline result and why it is misleading}
+
+All ten problems passed their stated tolerance. An audit pass, followed by
+an independent verification of that audit (Section~\ref{sec:audit-chain}),
+established that this headline substantially overstates what was actually
+demonstrated:
+
+\begin{itemize}
+\item \textbf{Six of ten ``passes'' are structurally degenerate.} A $k$-NN
+  graph built on any smooth closed curve is an exact circulant ring
+  lattice, with a perfectly constant shell size at every radius. The
+  estimator is mathematically incapable of returning anything other than
+  dimension 1 with $r^2=1.0$ on such an input --- the reported perfect fit
+  is a sentinel meaning ``the input had no variation to fit,'' not
+  evidence that the method measured anything accurately. This affected
+  problems 1, 2, 3, 4, 7, and 10.
+\item \textbf{Neither chaotic-attractor result was converged in point
+  count.} A convergence sweep (varying the number of sampled points, all
+  else held fixed) showed both the Lorenz and R\"ossler dimension
+  estimates rising monotonically \emph{through} their literature values
+  and past them, still climbing at the largest point count tested. The
+  reported ``passing'' errors (0.064 for Lorenz, 0.014 for R\"ossler)
+  described where a still-moving quantity happened to be sampled, not a
+  converged measurement.
+\item \textbf{The two remaining results (Lissajous torus, Brownian
+  motion)} were the least-degenerate in the set, but a later correction
+  found they had not been checked with the same convergence/sampling-grid
+  discipline applied to the chaotic cases, and both showed comparable
+  sensitivity to sampling-grid choice once checked.
+\end{itemize}
+
+\subsection{Multi-level review chain}
+\label{sec:audit-chain}
+
+Ten independent agents each solved one problem and self-reported a result;
+all ten self-reports were later confirmed numerically correct. An
+independent audit reviewed all ten and correctly identified the structural
+problems above. A \emph{second}, independent review was then applied
+specifically to the audit's own written analysis --- and found three
+genuine errors in it: an over-generalized claim about the scope of a
+software defect (Section~\ref{sec:defects}), a speculative reattribution
+that incorrectly overturned a separately-correct finding, and a factually
+incorrect claim about which sub-results had received a particular check,
+which had propped up one of the audit's two headline ``success'' verdicts
+without the same scrutiny applied elsewhere. All three errors are
+documented and corrected in the underlying benchmark record. This
+multi-level structure --- workers, auditor, and an independent check on
+the auditor itself --- is now standing practice for any result in this
+programme intended to be cited.
+
+\section{Software Defects Found and Corrected}
+\label{sec:defects}
+
+Two independent, genuine defects in the estimator's own implementation
+were found as a direct consequence of running it against real problems
+rather than only the synthetic lattices used in its original unit tests.
+
+\subsection{R\texorpdfstring{$^2$}{²} catastrophic cancellation}
+
+For a perfectly constant shell sequence, the total sum of squares in the
+$R^2$ computation should be exactly zero. Floating-point rounding in the
+intermediate mean computation left it at approximately $10^{-31}$ for
+specific fit lengths and shell values instead of exactly zero, causing the
+implementation's exact-zero comparison to take the general-case branch and
+divide by that residual --- collapsing the reported $R^2$ to approximately
+zero by pure numerical noise, even though the underlying dimension
+estimate remained correct. This meant the estimator's own documented
+default settings returned an undefined result (\texttt{NaN}) for several
+ordinary lattices, including the exact configuration four of the ten
+benchmark problems used. The fix replaces the exact-zero comparison with a
+relative-scale tolerance; verified against every shell value found to
+trigger the defect (6, 17, 18 at the affected fit length) plus negative
+controls that were already correct, with two regression tests added.
+
+\subsection{Adjacency-reconstruction performance defect}
+
+A separate, unrelated performance defect was found while building the
+comparison harness: the hypergraph's adjacency structure was rebuilt from
+scratch, at $O(\text{edges})$ cost, on every single distance query, and
+the dimension estimator queried it once per radius per sampled node ---
+compounding into thousands of redundant reconstructions for a realistic
+convergence sweep. A representative 3200-point sweep took 136 seconds
+before correction. The fix caches the adjacency structure per (immutable)
+hypergraph instance and restructures the dimension estimator to perform a
+single incremental breadth-first search collecting all radii's volumes in
+one pass, rather than recomputing from the source at every radius. The
+identical 3200-point sweep completed in 5.0 seconds after the fix --- a
+$\sim$27$\times$ improvement --- with numerically \emph{identical} results
+before and after, confirming the fix traded no correctness for speed. This
+performance improvement is the specific enabling condition for the
+systematic re-comparison reported as in-progress in
+Section~\ref{sec:current-status}: the convergence sweeps it requires were
+not practically tractable before this fix.
+
+\subsection{Duplicate-point detection}
+
+A third improvement, not a bug fix but a robustness addition: sampling
+multiple periods of a closed orbit produces near-exact duplicate point
+clusters (separated by $\sim 10^{-9}$ in the cases observed), which
+silently corrupted three of the ten original benchmark results with
+severity ranging from a degraded fit quality to a complete failure to
+converge. The $k$-NN construction now detects duplicate \emph{clusters}
+(not merely pairs, since a three-period orbit produces clusters of three)
+via a connected-components analysis on the within-threshold pair graph,
+calibrated against the point cloud's bounding-box diagonal rather than its
+local nearest-neighbour spacing --- an initial attempt using the latter
+failed silently, because a duplicated point's nearest neighbour \emph{is}
+its own duplicate, corrupting the very statistic meant to detect it.
+Verified on the exact reproduction of the original defect (300 points,
+each period-tripled at $\sim 10^{-9}$ offset): the corrected implementation
+raises an explicit error naming all 300 size-three clusters, and an
+automatic-cleaning option recovers exactly the original 300 points and the
+correct dimension of exactly 1.0.
+
+\section{Current Status of the Comparison to Traditional Methods}
+\label{sec:current-status}
+
+With the defects above corrected and a genuine traditional-method baseline
+implemented (Section 2.4), a systematic re-comparison across all ten
+benchmark problems was launched, targeting the programme's stated goal: a
+majority (at least eight of ten) of the problems demonstrating an
+advantage over the traditional correlation-sum method, defined by two
+explicit, checkable criteria rather than a single vague notion of
+``better'':
+
+\begin{enumerate}
+\item \textbf{Compute savings}: more than 10\% fewer sample points needed
+  for equivalent, \emph{stably converged} accuracy against the same
+  tolerance.
+\item \textbf{Density-robustness} (the concrete, checkable form of
+  ``singularity avoidance''): physical trajectories with a close approach
+  or a slow/fast turning point (a near-primary passage in the restricted
+  three-body problem, perihelion passage in an eccentric Kepler orbit, a
+  pendulum's turning point) are sampled far more densely in time near that
+  feature than elsewhere, even though the underlying curve is uniformly
+  one-dimensional throughout. A \emph{global} method that pools all
+  pairwise distances into one statistic (the traditional correlation sum)
+  can be measurably biased by such a density cluster; a \emph{local}
+  method that only ever examines each point's nearest neighbours (the
+  shell-growth estimator) is not, by construction. This is tested
+  directly by comparing each method's error against the known target on
+  the natural, non-uniformly-sampled data.
+\end{enumerate}
+
+\textbf{This comparison was in progress at the time of writing.} One
+illustrative, manually-verified data point is available: on a filled
+two-dimensional square (target dimension 2, tolerance 0.15), the
+traditional correlation-sum method reached stable convergence at 100
+points while the shell-growth method required 400, a result favouring the
+traditional method on this particular case ($-300\%$ relative point
+count, i.e.\ the opposite of a poly-algebraic win). This single spot check
+is reported for transparency, not as evidence of the systematic outcome
+across all ten problems --- consistent with this programme's standing
+rule that a claim resting on a single configuration, rather than a swept
+and converged comparison, is not yet a result (Section 2.5). The full,
+audited, and independently-verified ten-problem comparison will be
+reported in a subsequent revision of this document once complete.
+
+\section{Limitations}
+
+\begin{itemize}
+\item \textbf{The estimator has no freedom to be inaccurate in the
+  degenerate regime.} Any smooth, densely and evenly sampled closed curve
+  will read as dimension 1 with a perfect (but uninformative) fit quality,
+  regardless of the method's actual accuracy. A \texttt{degenerate} flag
+  now distinguishes this case explicitly in the software, but any result
+  drawn from problems 1, 2, 3, 4, 7, or 10 of the original benchmark
+  should be read as confirming the pipeline is correctly wired, not as
+  evidence of measurement accuracy.
+\item \textbf{Fractal (non-integer) dimension targets require a
+  convergence sweep, not a single measurement}, and even the corrected
+  pipeline's convergence behaviour on the two chaotic attractors in this
+  benchmark has not yet been re-established after the defects above were
+  fixed --- this is part of the in-progress work of Section~\ref{sec:current-status}.
+\item \textbf{The $k$-nearest-neighbour construction remains an
+  approximation}: graph distance approximates but does not equal geodesic
+  distance on the underlying manifold, and this approximation degrades
+  near a manifold's boundary (documented and pinned by a regression test
+  showing measurable underestimation at the corner of a sampled cube) and
+  is sensitive to the choice of $k$ and to local sample density.
+\item \textbf{This work does not validate Wolfram's physical hypothesis.}
+  Everything reported here is a statement about the behaviour of a
+  specific graph-theoretic algorithm on specific finite point clouds ---
+  Tier B by this programme's epistemic convention. No claim is made or
+  implied about whether hypergraph rewriting is a correct fundamental
+  description of physical spacetime; that remains Tier C (labelled
+  conjecture, never load-bearing) throughout.
+\end{itemize}
+
+\section{Discussion}
+
+The most consequential finding of this stage is procedural rather than
+purely technical: a benchmark against real, independently-sourced targets
+found real defects (Section~\ref{sec:defects}) that the estimator's own
+unit tests, exercised only against synthetic lattices designed to be easy,
+could not have found. Equally consequential is that the \emph{review of
+the benchmark} itself required its own independent check before its
+conclusions could be trusted --- an audit that correctly identified real
+problems in the original work was not, on that basis alone, exempt from
+containing real problems of its own. Both observations are recorded as
+general lessons for this programme (see the accompanying lessons-learned
+document) and are now built into the standing workflow pattern used for
+any result in this repository intended to be cited: measurement, audit,
+and an independent check on the audit, in that order, with none of the
+three treated as sufficient on its own.
+
+\section{Conclusion and Next Steps}
+
+Phase 2, Stage 2 of this programme has produced: (i) a working, tested
+implementation of two of the four brainstormed hypergraph-physics
+formalization concepts; (ii) a ten-problem benchmark against
+independently-sourced physics targets, whose headline result required
+substantial correction under audit but whose underlying software defects
+were genuinely found and genuinely fixed; (iii) a real classical baseline
+and comparison methodology, replacing what would otherwise be an
+unfalsifiable claim of superiority with two specific, checkable criteria.
+The systematic comparison against that baseline, across all ten problems,
+is the immediate next step and was in progress at the time of writing. Its
+completion, independently audited and verified to the same standard as
+every other result in this document, will be reported as an addendum or
+revision rather than assumed in advance.
+
+\section*{References}
+
+\begin{itemize}
+\item[] Wolfram, S. (2020). \emph{A Project to Find the Fundamental Theory of Physics.}
+\item[] Grassberger, P. \& Procaccia, I. (1983). Measuring the strangeness of
+  strange attractors. \emph{Physica D}, 9, 189--208.
+\item[] Taylor, S. J. (1953). The Hausdorff $\alpha$-dimensional measure of
+  Brownian paths in $n$-space. \emph{Proc. Camb. Phil. Soc.}, 49.
+\item[] R\"ossler, O. (1976). An equation for continuous chaos.
+  \emph{Phys. Lett. A}, 57.
+\item[] Internal references: \texttt{docs/HYPERGRAPH\_NOTES.md},
+  \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, \texttt{docs/LL.md},
+  \texttt{src/socrates/hypergraph/}.
+\end{itemize}
+
+\end{document}

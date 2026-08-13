@@ -1,0 +1,483 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{\textbf{SOCRATES Phase 2, Étape 2 :} \\
+\large Calcul Poly-Algébrique --- Estimation de Dimension par Hypergraphes, \\
+un Banc d'Essai de Dix Problèmes Physiques, et Comparaison aux Méthodes Classiques}
+\author{Xavier Callens \\ Socrate AI Lab}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Ce rapport documente la Phase 2 (Étape 2) du programme Socrate AI Lab : la
+construction et l'évaluation rigoureuse d'une boîte à outils computationnelle
+de « Calcul Poly-Algébrique » pour la physique fondée sur les hypergraphes,
+suivant la proposition de Wolfram selon laquelle l'espace, le temps et la
+physique connue pourraient émerger de la réécriture discrète d'un
+hypergraphe pré-géométrique. Parmi quatre concepts de formalisation
+envisagés, deux ont été retenus pour implémentation sur des critères de
+faisabilité~: un calcul de recherche de règles d'arité supérieure (le
+\emph{Calcul Poly-Algébrique} proprement dit) et un estimateur de dimension
+émergente (les \emph{Variables de Dimension Pré-Géométrique}). L'estimateur
+de dimension a été appliqué à dix problèmes physiques connus dont la
+dimension cible est vérifiable indépendamment --- résultats exacts pour des
+orbites fermées et un théorème rigoureux, et valeurs de référence issues de
+la littérature (Grassberger--Procaccia, 1983) pour deux attracteurs
+chaotiques classiques. Le premier banc d'essai a produit un résultat
+affiché de « 10/10 réussis » qu'un audit ultérieur a montré être largement
+trompeur~: six des dix réussites provenaient d'un régime mathématiquement
+dégénéré, et aucun des deux résultats chaotiques n'était convergé en nombre
+de points. Deux défauts logiciels réels et indépendants ont été identifiés
+au cours du processus et sont corrigés ici, avec tests de non-régression et
+mesures avant/après, incluant une amélioration de performance d'environ
+27$\times$. Une véritable méthode de référence classique (la méthode de
+somme de corrélation de Grassberger--Procaccia) ainsi qu'un dispositif de
+comparaison équitable ont ensuite été construits afin que l'affirmation
+« meilleur que l'approche traditionnelle » devienne une assertion
+vérifiable plutôt qu'une simple déclaration. Une nouvelle comparaison
+systématique sur les dix problèmes, visant un taux de réussite majoritaire
+face à cette référence, était en cours au moment de la rédaction et est
+rapportée ici comme un état intermédiaire, non comme un résultat final ---
+conformément à la règle permanente de ce programme selon laquelle une
+mesure non convergée ou incomplète doit être signalée comme telle, jamais
+lissée en une conclusion prématurée.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction et Motivation}
+
+Le projet de physique de Stephen Wolfram propose que l'espace, le temps et
+les lois connues de la physique ne sont pas fondamentaux, mais émergent de
+l'application discrète et répétée de règles de réécriture locales sur un
+hypergraphe pré-géométrique. Formaliser cette hypothèse de façon
+computationnelle nécessite de nouveaux outils mathématiques et logiciels,
+de manière analogue aux ruptures paradigmatiques historiques en physique
+qui ont nécessité une nouvelle syntaxe mathématique (l'algèbre pour la
+quantité inconnue, le calcul infinitésimal pour le changement instantané,
+les nombres complexes pour les solutions « hors de la droite réelle »).
+
+Quatre concepts ont été envisagés comme outils formels candidats pour ce
+programme~:
+
+\begin{enumerate}
+\item \textbf{Calcul Poly-Algébrique} (algèbre d'arité supérieure) :
+  étendre le « résoudre pour une quantité inconnue » de l'algèbre classique
+  à « résoudre pour une relation ou une règle de réécriture inconnue
+  d'arité supérieure ».
+\item \textbf{Cohomologie Branchiale} : un invariant topologique du graphe
+  multivoie (branchant) de tous les historiques de réécriture possibles,
+  proposé comme l'analogue discret de l'interférence quantique.
+\item \textbf{Opérateurs Ruliaux} : des dérivées discrètes mesurant le taux
+  de déformation topologique par étape de réécriture, proposées comme
+  analogue discret de la densité d'énergie/masse.
+\item \textbf{Variables de Dimension Pré-Géométrique} : traiter la
+  dimension de l'espace émergent comme une quantité fluide et localement
+  variable, déduite de la façon dont le volume de boule de l'hypergraphe
+  croît avec le rayon.
+\end{enumerate}
+
+\subsection{Justification de la sélection}
+
+Les concepts \#1 et \#4 ont été retenus pour implémentation. Le concept
+\#4 (estimation de dimension par croissance de volume) est une technique
+bien établie déjà utilisée en théorie des ensembles causaux et dans les
+travaux de Wolfram lui-même --- immédiatement implémentable sans
+mathématiques nouvelles. Le concept \#1 (un calcul de recherche de règles)
+est le substrat dont dépend implicitement tout autre concept~: on ne peut
+mesurer une dimension, une dérivée rulialle ou un invariant branchial sans
+disposer au préalable d'un langage rigoureux pour les hypergraphes, les
+motifs et les réécritures. Les concepts \#2 et \#3 ont été jugés les moins
+réalisables~: la \emph{Cohomologie Branchiale} en particulier n'a, à ce
+jour, aucune définition mathématique opérationnelle au-delà d'un nom
+évocateur --- aucun complexe de chaînes, aucun opérateur de bord n'a été
+spécifié nulle part dans la littérature connue de ce programme, et son
+implémentation aurait nécessité d'inventer les mathématiques ex nihilo
+plutôt que d'assembler des outils existants, en tension avec la discipline
+de ce programme qui consiste à ne jamais affirmer plus qu'un calcul ne le
+prouve réellement.
+
+\section{Méthodes}
+
+\subsection{Représentation et réécriture d'hypergraphes}
+
+Un hypergraphe est représenté comme un multi-ensemble immuable
+d'hyperarêtes ordonnées sur un ensemble de nœuds implicite (les nœuds
+n'existent qu'en vertu de leur participation à une relation, suivant la
+convention du Modèle de Wolfram). Les règles de réécriture sont spécifiées
+par un motif de partie gauche (un tuple d'arêtes-motifs sur des variables
+de motif) et un remplacement de partie droite~; la correspondance est
+effectuée par recherche avec retour arrière sur les affectations cohérentes
+des variables de motif (filtrage de sous-hypergraphe). Deux modes
+d'évolution sont implémentés~: un mode à historique unique qui applique
+toutes les correspondances non chevauchantes à chaque génération (la règle
+de mise à jour standard du Modèle de Wolfram), et un mode multivoie qui se
+ramifie sur chaque mise à jour à correspondance unique individuelle,
+produisant le graphe d'états branchant complet du système de réécriture
+abstrait.
+
+\subsection{Estimation de dimension émergente}
+
+Pour un hypergraphe aplati en son graphe d'adjacence (chaque hyperarête
+devient une clique sur ses nœuds constitutifs), la boule de rayon $r$
+autour d'un nœud est l'ensemble des nœuds atteignables en $r$ sauts. Si le
+graphe se comporte comme un réseau de dimension $d$ à une certaine échelle,
+le volume de boule croît comme $|B(r)| \sim r^d$. L'estimateur ajuste la
+\emph{taille de coquille} ($dV(r) = |B(r)| - |B(r-1)|$), et non le volume
+cumulé, en espace log-log~: le volume cumulé sur un réseau est affine et
+non homogène (un chemin unidimensionnel a $|B(r)| = 2r+1$ depuis un point
+intérieur, et non $r^1$), ce qui biaise un ajustement naïf sur le volume
+lui-même bien en dessous de la dimension réelle à tout rayon
+computationnellement praticable. La taille de coquille n'a pas ce décalage
+additif (la coquille d'un chemin est la constante exacte 2~; celle d'une
+grille 2D est exactement $4r$), de sorte que l'estimateur corrigé retourne
+\emph{exactement} 1,0 et 2,0 sur ces réseaux connus, non pas seulement
+approximativement.
+
+\subsection{Des trajectoires continues aux hypergraphes}
+
+Une trajectoire physique continue (un ensemble de points dans l'espace des
+phases) est convertie en hypergraphe via un graphe de proximité des $k$
+plus proches voisins~: chaque point devient un nœud, et une arête relie
+chaque point à ses $k$ plus proches voisins (symétrisé). La distance de
+graphe sur un graphe de $k$-PPV suffisamment dense approxime la distance
+géodésique sur la variété sous-jacente, la justification standard de cette
+classe d'estimateur de dimension (Grassberger \& Procaccia, 1983~; la même
+construction sous-tend l'apprentissage de variétés de type Isomap).
+
+\subsection{La méthode de référence traditionnelle}
+
+Afin que « meilleur que l'approche traditionnelle » devienne une
+affirmation vérifiable, l'intégrale de corrélation classique de
+Grassberger--Procaccia a été implémentée comme méthode de référence
+explicite~:
+\[
+C(r) = \frac{2}{N(N-1)} \#\{(i,j) : i<j,\ |x_i - x_j| < r\}, \qquad
+D_2 = \frac{d \log C(r)}{d \log r}
+\]
+Cette référence et l'estimateur par croissance de coquilles reposent tous
+deux sur le même primitif sous-jacent (\texttt{scipy.spatial.cKDTree}),
+afin que toute comparaison de coût computationnel isole la différence
+\emph{algorithmique} (mise à l'échelle globale par paires contre
+croissance locale de graphe) plutôt qu'une différence de qualité
+d'implémentation entre une nouvelle méthode soigneusement optimisée et une
+référence délibérément faible.
+
+\subsection{Méthodologie de comparaison}
+
+Pour un nuage de points et une dimension cible connue donnés, le nombre
+minimal de points nécessaire à chaque méthode pour une convergence
+\emph{stable} est déterminé~: le plus petit $n$ dans une grille testée pour
+lequel l'estimation reste dans la tolérance de la cible \emph{et y reste}
+pour tout $n$ supérieur testé --- se prémunissant contre un unique
+franchissement fortuit d'une estimation encore mouvante, le mode d'échec
+exact découvert dans les résultats initiaux sur les attracteurs chaotiques
+(Section~\ref{sec:resultats}). Une « victoire » exige que les deux
+méthodes convergent démontrablement~; une méthode qui ne converge jamais
+ne peut se voir créditer d'avoir besoin de « moins » de points, ce qui
+récompenserait l'échec de convergence comme s'il s'agissait d'efficacité.
+
+\section{Banc d'Essai Initial : Dix Problèmes Physiques Connus}
+\label{sec:resultats}
+
+L'estimateur de dimension a été appliqué à dix problèmes couvrant des
+cibles analytiques exactes, un théorème probabiliste rigoureux, et deux
+valeurs de référence issues de la théorie du chaos classique.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\# & Problème & Dimension connue & Source \\
+\midrule
+1 & Oscillateur harmonique & 1 (exact) & courbe fermée dans l'espace des phases \\
+2 & Pendule non linéaire (grande amplitude) & 1 (exact) & orbite périodique fermée \\
+3 & Orbite de Kepler à deux corps ($e=0,6$) & 1 (exact) & ellipse fermée \\
+4 & Mars vs.\ données réelles JPL Horizons & 1 (exact) & arc lisse, éphéméride réelle \\
+5 & Tore 2D quasi-périodique (Lissajous) & 2 (exact) & résultat standard de type KAM \\
+6 & Mouvement brownien plan & 2 (exact) & théorème de Taylor (1953) \\
+7 & Orbite périodique du problème restreint à 3 corps & 1 (exact, si fermeture vérifiée) & définition de cycle limite \\
+8 & Attracteur de Lorenz & $\approx 2,05$ & Grassberger \& Procaccia (1983) \\
+9 & Attracteur de R\"ossler & $\approx 2,01$ & Grassberger \& Procaccia (1983) \\
+10 & Pendule amorti forcé (accroché en phase) & 1 (exact, si non chaotique) & définition de cycle limite \\
+\bottomrule
+\end{tabular}
+\caption{Les dix problèmes du banc d'essai et leurs dimensions cibles issues de sources indépendantes.}
+\end{table}
+
+\subsection{Résultat affiché et pourquoi il est trompeur}
+
+Les dix problèmes ont réussi leur tolérance déclarée. Un audit, suivi d'une
+vérification indépendante de cet audit
+(Section~\ref{sec:chaine-audit}), a établi que ce résultat affiché
+surestime substantiellement ce qui a réellement été démontré~:
+
+\begin{itemize}
+\item \textbf{Six des dix « réussites » sont structurellement dégénérées.}
+  Un graphe de $k$-PPV construit sur toute courbe fermée lisse est un
+  réseau circulant en anneau exact, avec une taille de coquille
+  parfaitement constante à chaque rayon. L'estimateur est
+  mathématiquement incapable de retourner autre chose que la dimension 1
+  avec $r^2=1,0$ sur une telle entrée --- l'ajustement parfait rapporté
+  est une sentinelle signifiant « l'entrée n'avait aucune variation à
+  ajuster », non une preuve que la méthode a mesuré quoi que ce soit avec
+  précision. Cela affecte les problèmes 1, 2, 3, 4, 7 et 10.
+\item \textbf{Aucun des deux résultats sur les attracteurs chaotiques
+  n'était convergé en nombre de points.} Un balayage de convergence (en
+  faisant varier le nombre de points échantillonnés, tout le reste étant
+  fixé) a montré que les estimations de dimension de Lorenz et de
+  R\"ossler augmentaient de façon monotone \emph{à travers} leurs valeurs
+  de référence puis au-delà, continuant de croître au plus grand nombre
+  de points testé. Les erreurs « réussies » rapportées (0,064 pour
+  Lorenz, 0,014 pour R\"ossler) décrivaient où une quantité encore
+  mouvante se trouvait échantillonnée, non une mesure convergée.
+\item \textbf{Les deux résultats restants (tore de Lissajous, mouvement
+  brownien)} étaient les moins dégénérés de l'ensemble, mais une
+  correction ultérieure a montré qu'ils n'avaient pas été soumis à la
+  même discipline de convergence/sensibilité à la grille
+  d'échantillonnage appliquée aux cas chaotiques, et tous deux ont montré
+  une sensibilité comparable au choix de la grille une fois vérifiés.
+\end{itemize}
+
+\subsection{Chaîne de relecture à plusieurs niveaux}
+\label{sec:chaine-audit}
+
+Dix agents indépendants ont chacun résolu un problème et rapporté un
+résultat~; les dix auto-rapports se sont ensuite révélés numériquement
+corrects. Un audit indépendant a examiné les dix résultats et a
+correctement identifié les problèmes structurels ci-dessus. Une
+\emph{seconde} relecture indépendante a alors été appliquée
+spécifiquement à l'analyse écrite de l'audit lui-même --- et y a trouvé
+trois erreurs réelles~: une généralisation excessive concernant la portée
+d'un défaut logiciel (Section~\ref{sec:defauts}), une réattribution
+spéculative ayant incorrectement infirmé une conclusion par ailleurs
+correcte, et une affirmation factuellement inexacte quant aux
+sous-résultats ayant reçu une vérification particulière, laquelle avait
+étayé l'un des deux verdicts de « succès » phares de l'audit sans la même
+rigueur appliquée ailleurs. Les trois erreurs sont documentées et
+corrigées dans le registre du banc d'essai sous-jacent. Cette structure à
+plusieurs niveaux --- exécutants, auditeur, et vérification indépendante
+de l'auditeur lui-même --- constitue désormais la pratique permanente pour
+tout résultat de ce programme destiné à être cité.
+
+\section{Défauts Logiciels Identifiés et Corrigés}
+\label{sec:defauts}
+
+Deux défauts réels et indépendants dans l'implémentation même de
+l'estimateur ont été trouvés comme conséquence directe de son application
+à des problèmes réels plutôt qu'aux seuls réseaux synthétiques utilisés
+dans ses tests unitaires d'origine.
+
+\subsection{Annulation catastrophique du \texorpdfstring{$R^2$}{R2}}
+
+Pour une séquence de coquilles parfaitement constante, la somme totale des
+carrés dans le calcul du $R^2$ devrait être exactement nulle. Un
+arrondi en virgule flottante dans le calcul intermédiaire de la moyenne la
+laissait à environ $10^{-31}$ pour certaines longueurs d'ajustement et
+valeurs de coquille au lieu d'exactement zéro, ce qui faisait prendre à la
+comparaison à zéro exact de l'implémentation la branche du cas général et
+diviser par ce résidu --- effondrant le $R^2$ rapporté à environ zéro par
+pur bruit numérique, alors que l'estimation de dimension sous-jacente
+restait correcte. Cela signifiait que les réglages par défaut documentés
+de l'estimateur retournaient un résultat indéfini (\texttt{NaN}) pour
+plusieurs réseaux ordinaires, y compris la configuration exacte utilisée
+par quatre des dix problèmes du banc d'essai. La correction remplace la
+comparaison à zéro exact par une tolérance relative à l'échelle~; vérifiée
+sur chaque valeur de coquille trouvée déclenchant le défaut (6, 17, 18 à
+la longueur d'ajustement concernée) ainsi que sur des contrôles négatifs
+déjà corrects, avec deux tests de non-régression ajoutés.
+
+\subsection{Défaut de performance dans la reconstruction d'adjacence}
+
+Un défaut de performance distinct et sans rapport a été trouvé lors de la
+construction du dispositif de comparaison~: la structure d'adjacence de
+l'hypergraphe était reconstruite intégralement, à coût $O(\text{arêtes})$,
+à chaque requête de distance, et l'estimateur de dimension l'interrogeait
+une fois par rayon et par nœud échantillonné --- s'accumulant en milliers
+de reconstructions redondantes pour un balayage de convergence réaliste.
+Un balayage représentatif de 3200 points prenait 136 secondes avant
+correction. La correction met en cache la structure d'adjacence par
+instance d'hypergraphe (immuable) et restructure l'estimateur de dimension
+pour effectuer une unique recherche en largeur incrémentale collectant les
+volumes de tous les rayons en un seul passage, plutôt que de recalculer
+depuis la source à chaque rayon. Le même balayage de 3200 points s'est
+achevé en 5,0 secondes après correction --- une amélioration d'environ
+27$\times$ --- avec des résultats numériquement \emph{identiques} avant et
+après, confirmant que la correction n'a sacrifié aucune exactitude à la
+vitesse. Cette amélioration de performance est la condition habilitante
+spécifique de la nouvelle comparaison systématique rapportée comme en
+cours à la Section~\ref{sec:etat-actuel}~: les balayages de convergence
+qu'elle requiert n'étaient pas praticables avant cette correction.
+
+\subsection{Détection des points dupliqués}
+
+Une troisième amélioration, non pas une correction de bogue mais un ajout
+de robustesse~: l'échantillonnage de plusieurs périodes d'une orbite
+fermée produit des grappes de points quasi-identiques (séparés
+d'environ $10^{-9}$ dans les cas observés), ce qui a silencieusement
+corrompu trois des dix résultats initiaux du banc d'essai, avec une
+sévérité allant d'une dégradation de la qualité d'ajustement jusqu'à un
+échec complet de convergence. La construction $k$-PPV détecte désormais
+les \emph{grappes} de doublons (et non de simples paires, puisqu'une
+orbite à trois périodes produit des grappes de trois) via une analyse des
+composantes connexes du graphe des paires en deçà du seuil, calibrée par
+rapport à la diagonale de la boîte englobante du nuage de points plutôt
+que par rapport à l'espacement local aux plus proches voisins --- une
+première tentative utilisant ce dernier a échoué silencieusement, car le
+plus proche voisin d'un point dupliqué \emph{est} son propre doublon,
+corrompant la statistique même censée le détecter. Vérifiée sur la
+reproduction exacte du défaut d'origine (300 points, chacun triplé par
+période avec un décalage d'environ $10^{-9}$)~: l'implémentation corrigée
+soulève une erreur explicite nommant les 300 grappes de taille trois, et
+une option de nettoyage automatique récupère exactement les 300 points
+d'origine et la dimension correcte de exactement 1,0.
+
+\section{État Actuel de la Comparaison aux Méthodes Traditionnelles}
+\label{sec:etat-actuel}
+
+Une fois les défauts ci-dessus corrigés et une véritable référence de
+méthode traditionnelle implémentée (Section 2.4), une nouvelle comparaison
+systématique sur les dix problèmes du banc d'essai a été lancée, visant
+l'objectif déclaré du programme~: une majorité (au moins huit sur dix) des
+problèmes démontrant un avantage par rapport à la méthode de somme de
+corrélation traditionnelle, défini par deux critères explicites et
+vérifiables plutôt que par une notion vague unique de « meilleur »~:
+
+\begin{enumerate}
+\item \textbf{Économie de calcul}~: plus de 10\,\% de points
+  d'échantillonnage en moins nécessaires pour une précision équivalente et
+  \emph{stablement convergée}, contre la même tolérance.
+\item \textbf{Robustesse à la densité} (la forme concrète et vérifiable de
+  « l'évitement de singularité »)~: les trajectoires physiques présentant
+  une approche rapprochée ou un point de rebroussement lent/rapide (un
+  passage proche d'un primaire dans le problème restreint à trois corps,
+  le passage au périhélie d'une orbite de Kepler excentrique, le point de
+  rebroussement d'un pendule) sont échantillonnées bien plus densément
+  dans le temps près de cette caractéristique qu'ailleurs, alors même que
+  la courbe sous-jacente est uniformément unidimensionnelle partout. Une
+  méthode \emph{globale} qui regroupe toutes les distances par paires en
+  une seule statistique (la somme de corrélation traditionnelle) peut être
+  mesurablement biaisée par une telle concentration de densité~; une
+  méthode \emph{locale} qui n'examine jamais que les plus proches voisins
+  de chaque point (l'estimateur par croissance de coquilles) ne l'est pas,
+  par construction. Ceci est testé directement en comparant l'erreur de
+  chaque méthode par rapport à la cible connue sur les données naturelles,
+  non uniformément échantillonnées.
+\end{enumerate}
+
+\textbf{Cette comparaison était en cours au moment de la rédaction.} Un
+point de données illustratif, vérifié manuellement, est disponible~: sur
+un carré plein bidimensionnel (dimension cible 2, tolérance 0,15), la
+méthode de somme de corrélation traditionnelle a atteint une convergence
+stable à 100 points tandis que la méthode par croissance de coquilles en
+a nécessité 400, un résultat favorisant la méthode traditionnelle sur ce
+cas particulier ($-300\,\%$ en nombre de points relatif, c'est-à-dire
+l'inverse d'une victoire poly-algébrique). Cette vérification ponctuelle
+unique est rapportée par souci de transparence, non comme preuve du
+résultat systématique sur l'ensemble des dix problèmes --- conformément à
+la règle permanente de ce programme selon laquelle une affirmation reposant
+sur une configuration unique, plutôt que sur une comparaison balayée et
+convergée, n'est pas encore un résultat (Section 2.5). La comparaison
+complète sur les dix problèmes, auditée et vérifiée indépendamment, sera
+rapportée dans une révision ultérieure de ce document une fois achevée.
+
+\section{Limitations}
+
+\begin{itemize}
+\item \textbf{L'estimateur n'a aucune liberté d'être inexact dans le
+  régime dégénéré.} Toute courbe fermée lisse, échantillonnée densément
+  et uniformément, sera lue comme de dimension 1 avec une qualité
+  d'ajustement parfaite (mais non informative), indépendamment de la
+  précision réelle de la méthode. Un indicateur \texttt{degenerate}
+  distingue désormais explicitement ce cas dans le logiciel, mais tout
+  résultat tiré des problèmes 1, 2, 3, 4, 7 ou 10 du banc d'essai initial
+  doit être lu comme confirmant que le pipeline est correctement câblé,
+  non comme une preuve de précision de mesure.
+\item \textbf{Les cibles de dimension fractale (non entière) nécessitent
+  un balayage de convergence, non une mesure unique}, et même le
+  comportement de convergence du pipeline corrigé sur les deux
+  attracteurs chaotiques de ce banc d'essai n'a pas encore été réétabli
+  après la correction des défauts ci-dessus --- ceci fait partie du
+  travail en cours de la Section~\ref{sec:etat-actuel}.
+\item \textbf{La construction par $k$ plus proches voisins demeure une
+  approximation}~: la distance de graphe approxime, sans lui être égale,
+  la distance géodésique sur la variété sous-jacente, et cette
+  approximation se dégrade près du bord d'une variété (documenté et fixé
+  par un test de non-régression montrant une sous-estimation mesurable au
+  coin d'un cube échantillonné) et est sensible au choix de $k$ et à la
+  densité d'échantillonnage locale.
+\item \textbf{Ce travail ne valide pas l'hypothèse physique de Wolfram.}
+  Tout ce qui est rapporté ici est un énoncé sur le comportement d'un
+  algorithme spécifique de théorie des graphes sur des nuages de points
+  finis spécifiques --- Niveau B selon la convention épistémique de ce
+  programme. Aucune affirmation n'est faite ni impliquée quant à savoir si
+  la réécriture d'hypergraphes est une description fondamentale correcte
+  de l'espace-temps physique~; cela demeure Niveau C (conjecture étiquetée,
+  jamais structurante) tout au long de ce document.
+\end{itemize}
+
+\section{Discussion}
+
+Le résultat le plus lourd de conséquences de cette étape est procédural
+plutôt que purement technique~: un banc d'essai contre des cibles réelles
+et indépendamment sourcées a trouvé de véritables défauts
+(Section~\ref{sec:defauts}) que les tests unitaires propres de
+l'estimateur, exercés uniquement contre des réseaux synthétiques conçus
+pour être faciles, n'auraient pas pu trouver. Tout aussi lourd de
+conséquences~: la \emph{relecture du banc d'essai} elle-même a nécessité
+sa propre vérification indépendante avant que ses conclusions puissent
+être considérées comme fiables --- un audit ayant correctement identifié
+de véritables problèmes dans le travail initial n'était pas, sur cette
+seule base, exempté de contenir lui-même de véritables problèmes. Ces
+deux observations sont consignées comme leçons générales pour ce
+programme (voir le document d'enseignements tirés associé) et sont
+désormais intégrées au schéma de travail permanent utilisé pour tout
+résultat de ce dépôt destiné à être cité~: mesure, audit, puis
+vérification indépendante de l'audit, dans cet ordre, aucun des trois
+n'étant considéré comme suffisant à lui seul.
+
+\section{Conclusion et Prochaines Étapes}
+
+La Phase 2, Étape 2 de ce programme a produit~: (i) une implémentation
+fonctionnelle et testée de deux des quatre concepts de formalisation
+envisagés pour la physique par hypergraphes~; (ii) un banc d'essai de dix
+problèmes contre des cibles physiques indépendamment sourcées, dont le
+résultat affiché a nécessité une correction substantielle sous audit mais
+dont les défauts logiciels sous-jacents ont été véritablement trouvés et
+véritablement corrigés~; (iii) une véritable référence classique et une
+méthodologie de comparaison, remplaçant ce qui aurait autrement été une
+affirmation de supériorité non falsifiable par deux critères spécifiques
+et vérifiables. La comparaison systématique contre cette référence, sur
+l'ensemble des dix problèmes, est la prochaine étape immédiate et était en
+cours au moment de la rédaction. Son achèvement, audité et vérifié
+indépendamment selon le même standard que tout autre résultat de ce
+document, sera rapporté en addendum ou en révision plutôt que présumé à
+l'avance.
+
+\section*{Références}
+
+\begin{itemize}
+\item[] Wolfram, S. (2020). \emph{A Project to Find the Fundamental Theory of Physics.}
+\item[] Grassberger, P. \& Procaccia, I. (1983). Measuring the strangeness of
+  strange attractors. \emph{Physica D}, 9, 189--208.
+\item[] Taylor, S. J. (1953). The Hausdorff $\alpha$-dimensional measure of
+  Brownian paths in $n$-space. \emph{Proc. Camb. Phil. Soc.}, 49.
+\item[] R\"ossler, O. (1976). An equation for continuous chaos.
+  \emph{Phys. Lett. A}, 57.
+\item[] Références internes~: \texttt{docs/HYPERGRAPH\_NOTES.md},
+  \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, \texttt{docs/LL.md},
+  \texttt{src/socrates/hypergraph/}.
+\end{itemize}
+
+\end{document}
