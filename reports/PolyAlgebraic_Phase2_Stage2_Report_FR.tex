@@ -540,6 +540,81 @@ détour, comme l'exige la méthodologie permanente de ce programme~: un
 résultat négatif ou partiel honnête est traité comme un travail achevé,
 non comme une étape en attente d'un meilleur chiffre.
 
+\textbf{Lu comme une première étape plutôt qu'une réponse finale, 4/10 est
+un véritable résultat, non un résultat nul.} Deux cycles de ce banc
+d'essai ont désormais produit un harnais de mesure fonctionnel, une
+véritable référence classique, une méthodologie de comparaison vérifiable,
+une chaîne de relecture adversariale à trois niveaux ayant déjà détecté à
+deux reprises de véritables erreurs dans sa propre production, et une base
+d'enseignements documentée (\texttt{docs/LL.md}) sur laquelle chaque cycle
+s'est démontrablement appuyé. C'est cette infrastructure, et non le seul
+décompte de victoires, qui fait qu'un troisième cycle consiste à appliquer
+de nouvelles idées plutôt qu'à reconstruire la capacité de les tester.
+
+\section{Cycle 3~: une boucle d'amélioration fondée sur la littérature (en cours)}
+\label{sec:cycle3}
+
+Un troisième cycle a été lancé immédiatement après cette correction, avec
+deux changements de nature plutôt que de degré. Premièrement, l'objectif
+du programme est révisé à la baisse et précisé~: \textbf{six problèmes sur
+dix, via le critère d'économie de calcul existant ou un nouveau critère de
+précision désormais formalisé}, plutôt que huit sur dix par la seule
+économie de calcul --- un objectif choisi pour être atteignable par de
+véritables nouveaux mécanismes plutôt qu'en assouplissant ce qui compte
+comme une victoire. Deuxièmement, les étapes de conception, de réparation
+et d'arbitrage de ce cycle utilisent un modèle de niveau supérieur tout au
+long du processus, et la recherche de nouvelles idées suit une brève revue
+de littérature plutôt que de partir uniquement des modes de défaillance déjà
+connus de l'estimateur~:
+
+\begin{itemize}
+\item \textbf{Une exclusion par fenêtre de Theiler} (Theiler, 1986) pour
+  la référence traditionnelle par somme de corrélation~: les points
+  temporellement adjacents sur une trajectoire chaotique sont exclus du
+  comptage par paires, la correction standard dans la littérature des
+  systèmes dynamiques non linéaires pour le biais d'autocorrélation, que
+  la référence de ce programme n'a pas implémentée. Il s'agit d'une
+  correction d'équité apportée au comparateur, dans l'esprit de la règle
+  permanente de ce rapport selon laquelle seule une véritable référence,
+  non un épouvantail, peut servir à tester une affirmation de supériorité
+  --- elle peut rendre les problèmes plus difficiles à gagner, non plus
+  faciles, et est poursuivie quoi qu'il en soit.
+\item \textbf{Une seconde stratégie d'estimation de dimension locale}
+  inspirée de l'estimateur de dimension intrinsèque par maximum de
+  vraisemblance de Levina et Bickel (2004) et des méthodes de voisinage à
+  rayon adaptatif à la variété (Farahmand, Szepesv\'ari et Audibert, 2007),
+  ciblée spécifiquement sur les deux problèmes où l'estimateur actuel
+  nécessite 2 à 4 fois \emph{plus} de points que la référence (Lorenz,
+  R\"ossler) --- poursuivie comme une boucle rapide proposer-mesurer-garder
+  (un changement de code à la fois, testé immédiatement, conservé
+  uniquement s'il améliore mesurablement la convergence, écarté sinon)
+  plutôt qu'une refonte unique et majeure décidée à l'avance.
+\item \textbf{Formaliser le critère de précision que les résultats de ce
+  rapport ne pouvaient pas noter.} La Section~\ref{sec:etat-actuel} a
+  trouvé la preuve la plus solide d'un véritable avantage de l'estimateur
+  sur deux cibles non dégénérées où la méthode traditionnelle ne converge
+  jamais, et a noté que le critère de victoire par nombre de points
+  nécessaires à la convergence est structurellement incapable de le
+  créditer. Le cycle 3 encode un second type de victoire explicite et
+  vérifiable dans le dispositif de comparaison --- la précision à une
+  taille d'échantillon fixe, grande et convergée --- afin que ce type
+  d'avantage soit mesuré par du code, non affirmé en prose.
+\end{itemize}
+
+Chaque changement est soumis à la même discipline qui a produit la
+correction rapportée ci-dessus~: une vérification indépendante de chaque
+réparation avant qu'un changement ne soit considéré fiable, une nouvelle
+mesure complète sur les dix problèmes plutôt que sur les seuls problèmes
+qu'un changement cible (car un changement de référence peut déplacer les
+chiffres de tous les problèmes, comme l'illustre l'historique de
+correction de la Section~\ref{sec:etat-actuel}), et une passe d'audit de
+l'audit adversariale chargée spécifiquement de vérifier si une correction
+méthodologique validée a été appliquée partout où elle aurait dû
+logiquement l'être --- exactement le défaut que la correction de la
+Section~\ref{sec:etat-actuel} de ce rapport a dû détecter. Les résultats
+seront rapportés en addendum une fois vérifiés indépendamment, quels
+qu'ils soient.
+
 \section*{Références}
 
 \begin{itemize}
@@ -550,6 +625,15 @@ non comme une étape en attente d'un meilleur chiffre.
   Brownian paths in $n$-space. \emph{Proc. Camb. Phil. Soc.}, 49.
 \item[] R\"ossler, O. (1976). An equation for continuous chaos.
   \emph{Phys. Lett. A}, 57.
+\item[] Theiler, J. (1986). Spurious dimension from correlation algorithms
+  applied to limited time-series data. \emph{Physical Review A}, 34(3),
+  2427--2432.
+\item[] Levina, E. \& Bickel, P. J. (2004). Maximum likelihood estimation
+  of intrinsic dimension. \emph{Advances in Neural Information Processing
+  Systems (NeurIPS)}, 17.
+\item[] Farahmand, A., Szepesv\'ari, C., \& Audibert, J.-Y. (2007).
+  Manifold-adaptive dimension estimation. \emph{Proceedings of the 24th
+  International Conference on Machine Learning (ICML)}.
 \item[] Références internes~: \texttt{docs/HYPERGRAPH\_NOTES.md},
   \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, \texttt{docs/LL.md},
   \texttt{src/socrates/hypergraph/}.

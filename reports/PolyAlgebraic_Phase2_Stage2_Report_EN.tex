@@ -485,6 +485,71 @@ programme's standing methodology requires: an honest negative or partial
 result is treated as a completed piece of work, not as a phase awaiting a
 better number.
 
+\textbf{Read as a first step rather than a final answer, 4/10 is a genuine
+result, not a null one.} Two rounds of this benchmark have now produced a
+working measurement harness, a real classical baseline, a checkable
+comparison methodology, a three-level adversarial review chain that has
+caught real errors in its own output twice, and a documented lesson base
+(\texttt{docs/LL.md}) that each round has demonstrably drawn on. That
+infrastructure, not the win count alone, is what makes a third round a
+matter of applying new ideas rather than rebuilding the ability to test
+them.
+
+\section{Round 3: A Literature-Grounded Improvement Loop (in progress)}
+\label{sec:round3}
+
+A third round was launched immediately following this correction, with two
+changes in kind rather than degree. First, the programme's goal is revised
+downward and sharpened: \textbf{six of ten problems, via either the
+existing compute-savings criterion or a newly-formalized accuracy
+criterion}, rather than eight of ten via compute savings alone --- a target
+chosen to be reachable by genuinely new mechanisms rather than by relaxing
+what counts as a win. Second, design, repair, and adjudication steps in
+this round use a higher-tier model throughout, and the search for new
+ideas follows a short literature review rather than starting from the
+existing estimator's known failure modes alone:
+
+\begin{itemize}
+\item \textbf{A Theiler-window exclusion} (Theiler, 1986) for the
+  traditional correlation-sum baseline: temporally-adjacent points on a
+  chaotic trajectory are excluded from the pairwise count, the standard
+  correction in the nonlinear-dynamics literature for autocorrelation bias
+  that this programme's baseline has not implemented. This is a fairness
+  correction to the comparator, in the spirit of this report's standing
+  rule that a real baseline, not a strawman, is the only kind of baseline
+  a superiority claim can be tested against --- it may make problems
+  harder to win, not easier, and is being pursued regardless.
+\item \textbf{A second local-dimension estimation strategy} informed by
+  the maximum-likelihood intrinsic-dimension estimator of Levina \& Bickel
+  (2004) and by manifold-adaptive neighborhood-size methods (Farahmand,
+  Szepesv\'ari \& Audibert, 2007), targeted specifically at the two problems
+  where the current estimator needs 2--4$\times$ \emph{more} points than
+  the baseline (Lorenz, R\"ossler) --- pursued as a fast propose-measure-keep
+  loop (one code change at a time, tested immediately, kept only if it
+  measurably improves convergence, discarded otherwise) rather than a
+  single large redesign committed in advance.
+\item \textbf{Formalizing the accuracy criterion this report's own results
+  could not score.} Section~\ref{sec:current-status} found the estimator's
+  strongest evidence of genuine advantage on two non-degenerate targets
+  where the traditional method never converges, and noted that the
+  points-to-converge win criterion is structurally unable to credit it.
+  Round 3 encodes a second, explicit, checkable win type in the comparison
+  harness --- accuracy at a fixed, large, converged sample size --- so that
+  this kind of advantage is measured by code, not asserted in prose.
+\end{itemize}
+
+Every change is subject to the same discipline that produced the
+correction reported above: an independent repair-verification gate before
+any change is trusted, a full ten-problem re-measurement rather than only
+the problems a change targets (since a baseline change can move every
+problem's numbers, as Section~\ref{sec:current-status}'s own correction
+history illustrates), and an adversarial audit-of-the-audit
+pass instructed specifically to check whether any endorsed methodology fix
+was applied everywhere it logically should have been --- the precise
+failure this report's own Section~\ref{sec:current-status} correction was
+needed to catch. Results will be reported as an addendum once independently
+verified, whatever they show.
+
 \section*{References}
 
 \begin{itemize}
@@ -495,6 +560,15 @@ better number.
   Brownian paths in $n$-space. \emph{Proc. Camb. Phil. Soc.}, 49.
 \item[] R\"ossler, O. (1976). An equation for continuous chaos.
   \emph{Phys. Lett. A}, 57.
+\item[] Theiler, J. (1986). Spurious dimension from correlation algorithms
+  applied to limited time-series data. \emph{Physical Review A}, 34(3),
+  2427--2432.
+\item[] Levina, E. \& Bickel, P. J. (2004). Maximum likelihood estimation
+  of intrinsic dimension. \emph{Advances in Neural Information Processing
+  Systems (NeurIPS)}, 17.
+\item[] Farahmand, A., Szepesv\'ari, C., \& Audibert, J.-Y. (2007).
+  Manifold-adaptive dimension estimation. \emph{Proceedings of the 24th
+  International Conference on Machine Learning (ICML)}.
 \item[] Internal references: \texttt{docs/HYPERGRAPH\_NOTES.md},
   \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, \texttt{docs/LL.md},
   \texttt{src/socrates/hypergraph/}.
