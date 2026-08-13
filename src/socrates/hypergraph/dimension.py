@@ -61,7 +61,15 @@ def _log_log_fit(xs: list[float], ys: list[float]) -> tuple[float, float]:
     intercept = mean_y - slope * mean_x
     ss_tot = sum((y - mean_y) ** 2 for y in log_y)
     ss_res = sum((y - (slope * x + intercept)) ** 2 for x, y in zip(log_x, log_y, strict=True))
-    r_squared = 1.0 - ss_res / ss_tot if ss_tot > 0 else 1.0
+    # ss_tot is exactly 0 for a perfectly constant y-sequence in exact arithmetic,
+    # but floating-point rounding in mean_y (sum(log_y) / n) can leave a tiny
+    # nonzero residual -- observed as small as ~1e-31 for some fit lengths/values
+    # -- that makes a literal `ss_tot > 0` check take the general branch and
+    # divide by that residual, collapsing r_squared to ~0 by pure numerical noise
+    # even though the underlying fit is exact. A relative-scale tolerance avoids
+    # treating that noise as a real residual.
+    scale = max(1.0, sum(y * y for y in log_y))
+    r_squared = 1.0 if ss_tot <= 1e-24 * scale else 1.0 - ss_res / ss_tot
     return slope, r_squared
 
 

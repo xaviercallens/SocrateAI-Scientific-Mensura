@@ -214,6 +214,48 @@ def test_dimension_of_disconnected_singleton_edge_is_poorly_fit():
     assert not est.is_well_fit()  # ball saturates after radius 1; not enough data
 
 
+def test_log_log_fit_r_squared_does_not_collapse_on_constant_shells():
+    # Regression test for a bug found by the 10-problem physics benchmark
+    # (docs/POLY_ALGEBRAIC_BENCHMARK.md, finding F2): for a perfectly constant
+    # shell sequence, ss_tot should be exactly 0, but floating-point rounding
+    # in mean_y = sum(log_y)/n can leave it at ~1e-31 instead, taking the
+    # `ss_tot > 0` general branch and collapsing r_squared to ~0 by pure
+    # numerical noise -- even though the fitted slope stays correct. This hit
+    # shell values 6, 17, and 18 at fit-length 6, which is local_dimension's
+    # default max_radius, i.e. it broke mean_dimension's default settings for
+    # several ordinary lattices (a 400-point circle at k=6 among them).
+    #
+    # Every value here reproduces a case the benchmark found broken before
+    # the fix (verified directly against the pre-fix code, not assumed).
+    from socrates.hypergraph.dimension import _log_log_fit
+
+    for shell in (2, 4, 5, 6, 7, 8, 10, 17, 18):
+        for n in (3, 6):
+            xs = [float(x) for x in range(1, n + 1)]
+            ys = [float(shell)] * n
+            slope, r_squared = _log_log_fit(xs, ys)
+            assert slope == pytest.approx(0.0, abs=1e-9)
+            assert r_squared == pytest.approx(1.0, abs=1e-9), (
+                f"shell={shell} n={n}: r_squared collapsed to {r_squared}"
+            )
+
+
+def test_circle_at_k6_is_well_fit_at_the_default_max_radius():
+    # The concrete end-to-end case the benchmark hit: a 400-point circle at
+    # k=6 (a circulant ring lattice, constant shell size 6) must be well-fit
+    # at local_dimension's own default max_radius=6, not only at max_radius=5.
+    import math
+
+    from socrates.hypergraph.pointcloud import knn_hypergraph
+
+    points = [(math.cos(t), math.sin(t)) for t in (2 * math.pi * i / 400 for i in range(400))]
+    hg = knn_hypergraph(points, k=6)
+    est = local_dimension(hg, source=0, max_radius=6)
+    assert est.is_well_fit()
+    assert est.dimension == pytest.approx(1.0, abs=1e-6)
+    assert est.r_squared == pytest.approx(1.0, abs=1e-9)
+
+
 # ---------------------------------------------------------------- polyalgebra.py
 
 
