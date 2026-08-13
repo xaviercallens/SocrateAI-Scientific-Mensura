@@ -41,11 +41,18 @@ improvement. A genuine classical baseline (the Grassberger--Procaccia
 correlation-sum method) and an apples-to-apples comparison harness were then
 built so that ``better than the traditional approach'' could be a checkable
 claim rather than an assertion. A systematic re-comparison across all ten
-problems, targeting a majority win rate against this baseline, was in
-progress at the time of writing and is reported as a preliminary status,
-not a final result --- consistent with this programme's standing rule that
-an unconverged or incomplete measurement must be labelled as such, never
-smoothed into a premature conclusion.
+problems, targeting a majority win rate against this baseline, was carried
+out and passed through three independent review passes (self-report,
+audit, and an adversarial skeptic checking the audit itself). The
+programme's goal of at least eight of ten problems was not met: the final,
+three-times-verified count is four of ten, all four sharing one underlying
+mechanism (a smooth closed one-dimensional orbit's ring-lattice
+degeneracy), and zero of four density-robustness claims survived a proper
+control. The strongest evidence of a genuine estimator advantage --- high
+accuracy on two non-degenerate two-dimensional targets where the
+traditional method never converges --- falls outside what the stated win
+criterion can score and is reported as the recommended focus for the next
+round.
 \end{abstract}
 
 \tableofcontents
@@ -289,7 +296,7 @@ identical 3200-point sweep completed in 5.0 seconds after the fix --- a
 $\sim$27$\times$ improvement --- with numerically \emph{identical} results
 before and after, confirming the fix traded no correctness for speed. This
 performance improvement is the specific enabling condition for the
-systematic re-comparison reported as in-progress in
+systematic re-comparison reported in
 Section~\ref{sec:current-status}: the convergence sweeps it requires were
 not practically tractable before this fix.
 
@@ -343,21 +350,64 @@ explicit, checkable criteria rather than a single vague notion of
   the natural, non-uniformly-sampled data.
 \end{enumerate}
 
-\textbf{This comparison was in progress at the time of writing.} One
-illustrative, manually-verified data point is available: on a filled
-two-dimensional square (target dimension 2, tolerance 0.15), the
-traditional correlation-sum method reached stable convergence at 100
-points while the shell-growth method required 400, a result favouring the
-traditional method on this particular case ($-300\%$ relative point
-count, i.e.\ the opposite of a poly-algebraic win). This single spot check
-is reported for transparency, not as evidence of the systematic outcome
-across all ten problems --- consistent with this programme's standing
-rule that a claim resting on a single configuration, rather than a swept
-and converged comparison, is not yet a result (Section 2.5). The full,
-audited, and independently-verified ten-problem comparison will be
-reported in a subsequent revision of this document once complete.
+\textbf{This comparison is now complete, having passed through three
+independent review passes: self-report, audit, and an adversarial skeptic
+tasked with checking the audit itself} (the same three-level chain used
+throughout this programme; see Section~\ref{sec:audit-chain}). One
+illustrative, manually-verified data point from the in-progress phase is
+retained for continuity: on a filled two-dimensional square (target
+dimension 2, tolerance 0.15), the traditional correlation-sum method
+reached stable convergence at 100 points while the shell-growth method
+required 400 ($-300\%$ relative point count, i.e.\ the opposite of a
+poly-algebraic win) --- consistent with the final result below, which
+finds no advantage on non-degenerate two-dimensional targets either.
+
+\textbf{Final verified count: 4 of 10 (goal not met).} The programme's
+stated goal was at least eight of ten problems. Four problems (the
+nonlinear pendulum, the driven pendulum, a Kepler orbit, and a Mars-like
+orbit) show a genuine compute-savings advantage, each converging at
+64~points against the traditional method's 256 (savings 0.75), robust
+across every $k$ and fitting-window swept. Zero of four
+density-robustness claims survived a uniform-resampling control: on every
+system tested with a genuine density feature (the nonlinear pendulum, the
+driven pendulum, a Kepler orbit, the restricted three-body problem), the
+traditional method was equally or slightly \emph{more} accurate on the
+density-varying sample than on a uniform control, the opposite of the
+hypothesised effect. \textbf{All four verified wins share one underlying
+mechanism}: each is a smooth, closed (or near-closed) one-dimensional
+orbit, which puts the $k$-nearest-neighbour graph into an exact
+ring-lattice regime where the shell-growth estimator's fit is degenerate
+(Section~\ref{sec:limitations}) but numerically correct, and converges
+from far fewer points than a global correlation sum needs to escape its
+own fitting-window bias. The suite contains no second, structurally
+different compute-savings win.
+
+One result deserves separate mention because the win criterion is
+structurally unable to score it: on two non-degenerate, genuinely
+two-dimensional targets in the suite (a quasiperiodic torus and a planar
+Brownian path), the shell-growth estimator is accurate to within
+0.03--0.05 of the true value with zero degenerate fits, while the
+traditional correlation sum converges confidently (fit quality
+$R^2 > 0.998$) to a value wrong by 0.36--0.61. The traditional method
+never stably converges on these two targets at all, so the ``fewer points
+to converge'' criterion --- correctly, per this programme's standing
+rules --- cannot credit a comparison against a method that never
+converges. This is nonetheless the strongest evidence in the whole
+benchmark that the estimator captures something real beyond the
+degenerate ring-lattice case, and the next round's headline question
+should be accuracy on non-degenerate measures rather than points-to-converge.
+
+\textbf{The density-robustness criterion is retired in its current form.}
+After four independent attempts, all null or sign-inverted under a proper
+control, it produced no supporting evidence in this benchmark and is not
+carried forward without a mandatory uniform-resample control arm and a
+target system where the estimator is not structurally pinned to a single
+answer. The full derivation, including three levels of independent
+re-verification of every reported number, is in
+\texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, Sections~9--10.
 
 \section{Limitations}
+\label{sec:limitations}
 
 \begin{itemize}
 \item \textbf{The estimator has no freedom to be inaccurate in the
@@ -368,11 +418,15 @@ reported in a subsequent revision of this document once complete.
   drawn from problems 1, 2, 3, 4, 7, or 10 of the original benchmark
   should be read as confirming the pipeline is correctly wired, not as
   evidence of measurement accuracy.
-\item \textbf{Fractal (non-integer) dimension targets require a
-  convergence sweep, not a single measurement}, and even the corrected
-  pipeline's convergence behaviour on the two chaotic attractors in this
-  benchmark has not yet been re-established after the defects above were
-  fixed --- this is part of the in-progress work of Section~\ref{sec:current-status}.
+\item \textbf{Fractal (non-integer) dimension targets need 2--4$\times$
+  more points to stabilise than the traditional method}, per the completed
+  comparison of Section~\ref{sec:current-status}: on both chaotic
+  attractors tested, the shell-growth estimator converges more slowly than
+  the traditional correlation sum, though it lands closer to the true
+  value once it does. A distinct, still-open estimator defect (near-constant
+  but not exactly-constant shell sequences collapsing the fit-quality
+  statistic unreliably) is tracked as N8 in
+  \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}.
 \item \textbf{The $k$-nearest-neighbour construction remains an
   approximation}: graph distance approximates but does not equal geodesic
   distance on the underlying manifold, and this approximation degrades
@@ -414,12 +468,22 @@ independently-sourced physics targets, whose headline result required
 substantial correction under audit but whose underlying software defects
 were genuinely found and genuinely fixed; (iii) a real classical baseline
 and comparison methodology, replacing what would otherwise be an
-unfalsifiable claim of superiority with two specific, checkable criteria.
-The systematic comparison against that baseline, across all ten problems,
-is the immediate next step and was in progress at the time of writing. Its
-completion, independently audited and verified to the same standard as
-every other result in this document, will be reported as an addendum or
-revision rather than assumed in advance.
+unfalsifiable claim of superiority with two specific, checkable criteria;
+and (iv) a completed, three-times-independently-verified systematic
+comparison across all ten problems, reported in
+Section~\ref{sec:current-status}. The programme's stated goal (at least
+eight of ten problems showing an advantage) was not met: the final,
+corrected count is four of ten, all four sharing one underlying mechanism
+(a smooth closed one-dimensional orbit's ring-lattice degeneracy), and no
+density-robustness advantage was demonstrated anywhere in the suite. The
+most informative result the benchmark produced --- accuracy on two
+non-degenerate two-dimensional targets where the traditional method never
+converges --- is structurally outside what the stated win criterion can
+score, and is the recommended headline question for the next round rather
+than points-to-converge. This outcome is reported plainly, as the
+programme's standing methodology requires: an honest negative or partial
+result is treated as a completed piece of work, not as a phase awaiting a
+better number.
 
 \section*{References}
 

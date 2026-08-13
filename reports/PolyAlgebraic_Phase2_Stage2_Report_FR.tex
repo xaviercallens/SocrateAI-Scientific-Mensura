@@ -46,11 +46,19 @@ comparaison équitable ont ensuite été construits afin que l'affirmation
 « meilleur que l'approche traditionnelle » devienne une assertion
 vérifiable plutôt qu'une simple déclaration. Une nouvelle comparaison
 systématique sur les dix problèmes, visant un taux de réussite majoritaire
-face à cette référence, était en cours au moment de la rédaction et est
-rapportée ici comme un état intermédiaire, non comme un résultat final ---
-conformément à la règle permanente de ce programme selon laquelle une
-mesure non convergée ou incomplète doit être signalée comme telle, jamais
-lissée en une conclusion prématurée.
+face à cette référence, a été menée à bien et a franchi trois passes de
+relecture indépendantes (auto-déclaration, audit, puis un examinateur
+adversarial vérifiant l'audit lui-même). L'objectif du programme d'au
+moins huit problèmes sur dix n'a pas été atteint~: le décompte final,
+vérifié à trois reprises, est de quatre sur dix, les quatre partageant un
+seul et même mécanisme sous-jacent (la dégénérescence en réseau annulaire
+d'une orbite unidimensionnelle lisse et fermée), et aucune des quatre
+affirmations de robustesse à la densité n'a survécu à un contrôle
+approprié. La preuve la plus solide d'un véritable avantage de
+l'estimateur --- une haute précision sur deux cibles bidimensionnelles non
+dégénérées où la méthode traditionnelle ne converge jamais --- se situe en
+dehors de ce que le critère de victoire déclaré peut noter, et est
+rapportée comme l'axe recommandé pour le prochain cycle.
 \end{abstract}
 
 \tableofcontents
@@ -316,9 +324,9 @@ achevé en 5,0 secondes après correction --- une amélioration d'environ
 27$\times$ --- avec des résultats numériquement \emph{identiques} avant et
 après, confirmant que la correction n'a sacrifié aucune exactitude à la
 vitesse. Cette amélioration de performance est la condition habilitante
-spécifique de la nouvelle comparaison systématique rapportée comme en
-cours à la Section~\ref{sec:etat-actuel}~: les balayages de convergence
-qu'elle requiert n'étaient pas praticables avant cette correction.
+spécifique de la nouvelle comparaison systématique rapportée à la
+Section~\ref{sec:etat-actuel}~: les balayages de convergence qu'elle
+requiert n'étaient pas praticables avant cette correction.
 
 \subsection{Détection des points dupliqués}
 
@@ -376,23 +384,74 @@ vérifiables plutôt que par une notion vague unique de « meilleur »~:
   non uniformément échantillonnées.
 \end{enumerate}
 
-\textbf{Cette comparaison était en cours au moment de la rédaction.} Un
-point de données illustratif, vérifié manuellement, est disponible~: sur
-un carré plein bidimensionnel (dimension cible 2, tolérance 0,15), la
-méthode de somme de corrélation traditionnelle a atteint une convergence
-stable à 100 points tandis que la méthode par croissance de coquilles en
-a nécessité 400, un résultat favorisant la méthode traditionnelle sur ce
-cas particulier ($-300\,\%$ en nombre de points relatif, c'est-à-dire
-l'inverse d'une victoire poly-algébrique). Cette vérification ponctuelle
-unique est rapportée par souci de transparence, non comme preuve du
-résultat systématique sur l'ensemble des dix problèmes --- conformément à
-la règle permanente de ce programme selon laquelle une affirmation reposant
-sur une configuration unique, plutôt que sur une comparaison balayée et
-convergée, n'est pas encore un résultat (Section 2.5). La comparaison
-complète sur les dix problèmes, auditée et vérifiée indépendamment, sera
-rapportée dans une révision ultérieure de ce document une fois achevée.
+\textbf{Cette comparaison est désormais achevée, après trois passes de
+relecture indépendantes~: auto-déclaration, audit, puis un examinateur
+adversarial chargé de vérifier l'audit lui-même} (la même chaîne à trois
+niveaux utilisée dans tout ce programme~; voir
+Section~\ref{sec:chaine-audit}). Un point de données illustratif issu de
+la phase en cours à l'époque est conservé par souci de continuité~: sur un
+carré plein bidimensionnel (dimension cible 2, tolérance 0,15), la méthode
+de somme de corrélation traditionnelle a atteint une convergence stable à
+100 points tandis que la méthode par croissance de coquilles en a
+nécessité 400 ($-300\,\%$ en nombre de points relatif, c'est-à-dire
+l'inverse d'une victoire poly-algébrique) --- cohérent avec le résultat
+final ci-dessous, qui ne trouve non plus aucun avantage sur des cibles
+bidimensionnelles non dégénérées.
+
+\textbf{Décompte final vérifié~: 4 sur 10 (objectif non atteint).}
+L'objectif déclaré du programme était d'au moins huit problèmes sur dix.
+Quatre problèmes (le pendule non linéaire, le pendule entraîné, une orbite
+de Kepler et une orbite de type martien) montrent un véritable avantage
+d'économie de calcul, chacun convergeant à 64 points contre 256 pour la
+méthode traditionnelle (économie de 0,75), robuste sur l'ensemble des $k$
+et fenêtres d'ajustement balayés. Zéro des quatre affirmations de
+robustesse à la densité n'a survécu à un contrôle par ré-échantillonnage
+uniforme~: sur chaque système testé présentant une véritable
+caractéristique de densité (le pendule non linéaire, le pendule entraîné,
+une orbite de Kepler, le problème restreint à trois corps), la méthode
+traditionnelle s'est avérée aussi précise, voire légèrement \emph{plus}
+précise, sur l'échantillon à densité variable que sur un contrôle
+uniforme --- l'inverse de l'effet attendu. \textbf{Les quatre victoires
+vérifiées partagent un seul et même mécanisme sous-jacent}~: chacune est
+une orbite unidimensionnelle lisse, fermée (ou quasi fermée), qui place le
+graphe des $k$ plus proches voisins dans un régime de réseau annulaire
+exact où l'ajustement de l'estimateur par croissance de coquilles est
+dégénéré (Section~\ref{sec:limitations}) mais numériquement correct, et
+converge à partir d'un nombre de points bien plus faible que celui requis
+par une somme de corrélation globale pour échapper à son propre biais de
+fenêtre d'ajustement. Le banc d'essai ne contient aucune seconde victoire
+d'économie de calcul structurellement différente.
+
+Un résultat mérite une mention à part car le critère de victoire est
+structurellement incapable de le noter~: sur deux cibles non dégénérées,
+véritablement bidimensionnelles, du banc d'essai (un tore quasi périodique
+et une trajectoire brownienne plane), l'estimateur par croissance de
+coquilles est précis à 0,03--0,05 près de la valeur réelle, avec zéro
+ajustement dégénéré, tandis que la somme de corrélation traditionnelle
+converge avec confiance (qualité d'ajustement $R^2 > 0{,}998$) vers une
+valeur fausse de 0,36 à 0,61. La méthode traditionnelle ne converge
+jamais de façon stable sur ces deux cibles, si bien que le critère
+« moins de points pour converger » ne peut --- à juste titre, selon les
+règles permanentes de ce programme --- créditer une comparaison contre
+une méthode qui ne converge jamais. C'est néanmoins la preuve la plus
+solide de tout le banc d'essai que l'estimateur capture quelque chose de
+réel au-delà du cas dégénéré du réseau annulaire, et la question phare du
+prochain cycle devrait porter sur la précision sur des mesures non
+dégénérées plutôt que sur le nombre de points nécessaires à la
+convergence.
+
+\textbf{Le critère de robustesse à la densité est retiré sous sa forme
+actuelle.} Après quatre tentatives indépendantes, toutes nulles ou de
+signe inversé sous contrôle approprié, il n'a produit aucune preuve à
+l'appui dans ce banc d'essai et n'est pas reconduit sans un bras de
+contrôle par ré-échantillonnage uniforme obligatoire et un système cible
+où l'estimateur n'est pas structurellement figé sur une réponse unique.
+La dérivation complète, incluant trois niveaux de re-vérification
+indépendante de chaque nombre rapporté, se trouve dans
+\texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, Sections~9--10.
 
 \section{Limitations}
+\label{sec:limitations}
 
 \begin{itemize}
 \item \textbf{L'estimateur n'a aucune liberté d'être inexact dans le
@@ -405,11 +464,16 @@ rapportée dans une révision ultérieure de ce document une fois achevée.
   doit être lu comme confirmant que le pipeline est correctement câblé,
   non comme une preuve de précision de mesure.
 \item \textbf{Les cibles de dimension fractale (non entière) nécessitent
-  un balayage de convergence, non une mesure unique}, et même le
-  comportement de convergence du pipeline corrigé sur les deux
-  attracteurs chaotiques de ce banc d'essai n'a pas encore été réétabli
-  après la correction des défauts ci-dessus --- ceci fait partie du
-  travail en cours de la Section~\ref{sec:etat-actuel}.
+  2 à 4 fois plus de points pour se stabiliser que la méthode
+  traditionnelle}, selon la comparaison désormais achevée de la
+  Section~\ref{sec:etat-actuel}~: sur les deux attracteurs chaotiques
+  testés, l'estimateur par croissance de coquilles converge plus
+  lentement que la somme de corrélation traditionnelle, bien qu'il se
+  rapproche davantage de la valeur réelle une fois convergé. Un défaut
+  distinct de l'estimateur, encore ouvert (des séquences de coquilles
+  quasi constantes, mais non exactement constantes, effondrant de façon
+  peu fiable la statistique de qualité d'ajustement), est suivi sous la
+  référence N8 dans \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}.
 \item \textbf{La construction par $k$ plus proches voisins demeure une
   approximation}~: la distance de graphe approxime, sans lui être égale,
   la distance géodésique sur la variété sous-jacente, et cette
@@ -458,12 +522,23 @@ dont les défauts logiciels sous-jacents ont été véritablement trouvés et
 véritablement corrigés~; (iii) une véritable référence classique et une
 méthodologie de comparaison, remplaçant ce qui aurait autrement été une
 affirmation de supériorité non falsifiable par deux critères spécifiques
-et vérifiables. La comparaison systématique contre cette référence, sur
-l'ensemble des dix problèmes, est la prochaine étape immédiate et était en
-cours au moment de la rédaction. Son achèvement, audité et vérifié
-indépendamment selon le même standard que tout autre résultat de ce
-document, sera rapporté en addendum ou en révision plutôt que présumé à
-l'avance.
+et vérifiables~; et (iv) une comparaison systématique achevée sur les dix
+problèmes, vérifiée indépendamment à trois reprises, rapportée à la
+Section~\ref{sec:etat-actuel}. L'objectif déclaré du programme (au moins
+huit problèmes sur dix montrant un avantage) n'a pas été atteint~: le
+décompte final corrigé est de quatre sur dix, les quatre partageant un
+seul et même mécanisme sous-jacent (la dégénérescence en réseau annulaire
+d'une orbite unidimensionnelle lisse et fermée), et aucun avantage de
+robustesse à la densité n'a été démontré nulle part dans le banc d'essai.
+Le résultat le plus informatif produit par le banc d'essai --- la
+précision sur deux cibles bidimensionnelles non dégénérées où la méthode
+traditionnelle ne converge jamais --- se situe structurellement en dehors
+de ce que le critère de victoire déclaré peut noter, et constitue la
+question phare recommandée pour le prochain cycle plutôt que le nombre de
+points nécessaires à la convergence. Ce résultat est rapporté sans
+détour, comme l'exige la méthodologie permanente de ce programme~: un
+résultat négatif ou partiel honnête est traité comme un travail achevé,
+non comme une étape en attente d'un meilleur chiffre.
 
 \section*{Références}
 

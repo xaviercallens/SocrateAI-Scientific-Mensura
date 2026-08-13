@@ -94,6 +94,19 @@ before touching that module's code.
    the adjudicator's positive/confirming claims as hard as its negative
    ones.
 
+   **A third, sharper instance of the same failure (Poly-Algebraic
+   Calculus improvement loop, `docs/POLY_ALGEBRAIC_BENCHMARK.md` §10.10 /
+   `docs/LL.md` lesson 8):** the reviewer correctly diagnosed a methodology
+   flaw, stated the right fix, and applied it to *some* of the
+   measurements it governed — then scored the rest with the old, already
+   self-diagnosed-as-unsound method, without re-checking whether the fix
+   applied there too. A skeptic that only checks "is each claim correct"
+   can miss this; it also has to ask "was a stated correction applied
+   everywhere it logically should have been, not just where the reviewer
+   happened to be looking." Instruct the refuting skeptic to check this
+   explicitly whenever the adjudicator's report states a general
+   methodology principle partway through.
+
 ## Tier routing (from docs/IMPLEMENTATION_PLAN.md, with one addition)
 
 Use the plan's table as the default (Haiku: mechanical/sweep, Sonnet:

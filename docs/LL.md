@@ -203,8 +203,42 @@ document itself honest as a live record, and the regression test pins the
 *exact* previously-broken case rather than a generic sanity check that
 would not have caught the original defect.
 
-**What to do about it.** Treat "next steps" sections (the N1–N7 pattern
+**What to do about it.** Treat "next steps" sections (the N1–N8 pattern
 here) as a literal backlog with a status, not a list of suggestions — update
 each entry to done/still-open as work lands, in the same document, so the
 document stays the single source of truth for what is actually fixed versus
 merely diagnosed.
+
+---
+
+## 8. A methodology fix a review endorses is not the same as a methodology fix a review applied
+
+**What happened.** The improvement loop's own §10 audit *diagnosed and
+endorsed* the correct fix for a real methodology flaw: measuring a periodic
+orbit's convergence on a time-ordered prefix (a growing smooth arc covering
+under 1% of the orbit at small n) instead of a whole-orbit-covering prefix
+(bit-reversal or Weyl-sequence reordering). It applied that endorsed fix to
+re-verify problems 01, 02 and 10 — and then, in the very same document,
+scored problems 03 and 04 as ties using the old, already-diagnosed-as-unsound
+time-ordered construction, attributing the tie to "physics" and "grid floor"
+reasons that were never tested against the alternative. A third-level
+skeptic applying the audit's own endorsed methodology uniformly moved the
+verified win count from 2/10 to 4/10 — not by finding a new bug, but by
+finding the review had not applied its own conclusion consistently.
+
+**Why it generalizes.** This is a variant of lesson 5 (verify the auditor)
+one level sharper: it is not enough for a review to *state* the correct
+method and use it somewhere. A methodology correction has to be swept back
+over every measurement it logically applies to, not just the ones the
+reviewer happened to be looking at when the fix was found — otherwise the
+document ends up internally inconsistent, citing its own best practice in
+one section and violating it three sections later, and nothing about a
+green top-line "audit accurate" checkmark will surface that on its own.
+
+**What to do about it.** When a review identifies that a technique X is the
+correct way to measure a class of inputs, treat that as a checklist item to
+re-run across *every* input in that class before finalizing the scoreboard —
+explicitly ask "does this fix apply anywhere I did not just apply it?" as
+its own review step, not just "is this fix correct where I used it?" A
+skeptic verifying a review should always check for this pattern specifically:
+a correct, stated principle applied selectively.

@@ -650,6 +650,23 @@ Cheap, and would confirm whether their sub-100% well-fit rates are entirely the
 duplicate-stacking artifact. Expected outcome from the F3 experiment: well-fit
 rates rise substantially, headline dimensions unchanged at 1.0000.
 
+**N8 — OPEN. Fix near-constant (not just exactly-constant) shell sequences
+collapsing R² (from R2-F4, §9.5/§10.3).** N1 fixed the *exact*-constant case
+(`ss_tot` within float noise of zero). The improvement loop found a distinct,
+still-unfixed defect: shell sequences that are *nearly* but not exactly
+constant produce an unreliable R² that does not trigger N1's relative-tolerance
+branch, so a genuinely well-fit node can be discarded as poorly fit (or vice
+versa). Anchored to a real, reproduced case: problem 01 at n=200, k=6,
+`max_radius`=6 has shells `(6,5,5,6,6,6)`, giving dimension 1.0333 (error
+0.033 — well inside a reasonable tolerance) but discarded at R²=0.0550. A
+synthetic hypergraph built to have exactly those shells reproduces
+`dimension=1.0333, R²=0.0550` to the digit (§9.5), and §10.3 reproduced all
+six of §9.5's table rows independently. This is the one finding in both
+improvement-loop rounds that is a real, actionable defect in shipped code
+(`dimension.py`'s `_log_log_fit`) rather than a defect in an experiment's
+methodology — fix by gating on relative shell spread in addition to R²,
+with known-answer regression tests before any re-run of problem 01 (§10.8).
+
 ---
 
 ## 7. Reproducibility
@@ -715,3 +732,838 @@ repository should depend on it:
 - The two chaotic "passes" are passes against a generous ±0.5 tolerance, not
   confirmations of D₂. Anyone citing this ledger for a claim about fractal
   dimension estimation should cite F4/F4b, not the summary table.
+
+---
+
+# Round 2, phase 1 — audit of the "beat the traditional method" run (2026-08-13)
+
+Ten agents re-ran the benchmark against a stated goal: demonstrate, on **at
+least 8 of 10** problems, that the shell-growth ("Poly-Algebraic") estimator
+beats the classical Grassberger–Procaccia baseline
+(`socrates.hypergraph.baseline`) by either
+
+- **(a)** >10% fewer points for equivalent *stably converged* accuracy
+  (`ComparisonResult.compute_savings_fraction > 0.10` with
+  `poly_algebraic_wins` True), or
+- **(b)** measurably smaller error (>30%) on a naturally density-varying
+  time-uniform sample — the checkable form of "singularity avoidance".
+
+This section is the audit of that run. As in the round-1 ledger, every number
+was re-derived or re-executed before being written down. All measured numbers
+below are **Tier B**.
+
+## 9.0 Headline
+
+**Reported: 5 of 10 wins. Verified: 2 of 10.** The 8-of-10 goal was not met,
+and was not close to being met.
+
+The two verified wins (problems 02 and 10) are genuine, parameter-robust
+criterion-(a) compute-savings wins. **All four criterion-(b)
+density-robustness wins fail a control the round-1 discipline should have
+required, and none of them survives.** One criterion-(a) win (problem 01)
+is contingent on a non-default hyperparameter and disappears at the module
+default.
+
+| # | Problem | Reported | Verified | Basis |
+|---|---|---|---|---|
+| 01 | Harmonic oscillator | **win** (a) | **contested** | win only at `max_radius`≤5; tie at the default 6 (R2-F3) |
+| 02 | Nonlinear pendulum | **win** (a)+(b) | **WIN — (a) only** | (a) holds in 18/20 (k, max_radius) combos; (b) fails control (R2-F1) |
+| 03 | Kepler orbit | **win** (b) | **no** | (b) fails control; no compute savings (tie at n=100) |
+| 04 | Mars / Horizons | no | **no** ✓ | tie at n=100; correctly reported |
+| 05 | Quasiperiodic torus | no | **no** ✓ | traditional never converges; correctly *not* claimed (R2-F5) |
+| 06 | Brownian motion | no | **no** ✓ | traditional never converges; correctly *not* claimed (R2-F5) |
+| 07 | CR3BP (close lunar approach) | **win** (b) | **no** | (b) fails control decisively, sign inverted (R2-F1) |
+| 08 | Lorenz | no | **no** ✓ | poly needs 4× *more* points; honest loss |
+| 09 | Rössler | no | **no** ✓ | poly needs 2× *more* points; honest loss |
+| 10 | Driven pendulum | **win** (a)+(b) | **WIN — (a) only** | (a) holds in 20/20 combos; (b) fails control (R2-F1) |
+
+**Arithmetic audit: all 10 self-reports are internally consistent.** Every
+`poly_algebraic_wins` boolean matches its two `min_n` values, every
+`compute_savings_fraction` equals `1 − poly_n/trad_n` (including the negative
+values −3.0 and −1.0 for problems 08/09 and the `None`s for 05/06), and every
+claimed ">=30% error reduction" is arithmetically correct on the two error
+numbers reported. **No agent fabricated or miscomputed a number.** The failures
+found below are failures of experimental design and of one hyperparameter
+choice, not of honesty or arithmetic.
+
+## 9.1 What the auditor did
+
+- Re-ran problems **01, 02, 07, 10** end-to-end from their committed scripts.
+  All four reproduced their reported numbers exactly (`poly_min_n`,
+  `trad_min_n`, savings fraction, and both density error figures).
+- Independently re-derived the nonlinear pendulum's single-period trajectory
+  from scratch (leapfrog, exact period 4·K(m) = 8.3497529269, closure 2.7e−10)
+  rather than importing the agent's cloud.
+- Built the **control experiment** the density-robustness claims lacked
+  (§9.2), for problems 02, 07 and 10.
+- Swept `max_radius` ∈ {2,3,4,5,6} on problem 01 and (k, `max_radius`) ∈
+  {4,6,8,10} × {3,4,5,6,8} on problems 02 and 10.
+- Re-checked all 10 for the three round-1 self-deception patterns plus the
+  new fourth pattern (winning because the *traditional* method failed).
+
+Scripts: `/tmp/.../scratchpad/audit_controls{,2,3,4}.py` (scratch, not
+committed — they import from `src/` and the round-2 scripts, and modify
+nothing).
+
+## 9.2 R2-F1 — All four density-robustness wins fail a control (major; four verdicts overturned)
+
+Problems 02, 03, 07 and 10 each claimed criterion (b) by computing, on the
+natural time-uniform sample, `poly |error|` vs `traditional |error|` and
+observing poly's error was 100% smaller (poly returned exactly 1.0000 in every
+case). That comparison **cannot distinguish the hypothesis from two competing
+explanations**, because it has no control arm:
+
+1. Is poly's zero error *robustness to density*, or is poly pinned to exactly
+   1.0000 on **any** closed curve regardless of density (the F1 ring-lattice
+   sentinel)?
+2. Is the traditional method's error *caused by the density variation*, or is
+   it ordinary finite-n Grassberger–Procaccia bias that would be present on a
+   perfectly uniform sample too?
+
+The control resolves both: build a **density-uniform** version of the *same
+curve* at the *same n* (resampled evenly in arc length), and run **both**
+methods on **both** samples. The claim requires
+`trad_err(natural) >> trad_err(uniform)` and `poly_err` unchanged.
+
+Results (k=6, `max_radius`=6, true dimension 1.0; "ratio" is the p90/p10 local
+arc-length step ratio, 1.00 = uniform):
+
+**Problem 02 — nonlinear pendulum**
+
+| n | ratio | poly nat | trad nat | **err nat** | ratio | poly uni | trad uni | **err uni** |
+|---|---|---|---|---|---|---|---|---|
+| 500 | 1.80 | 1.0000 | 1.0667 | 0.0667 | 1.00 | 1.0000 | 1.0633 | 0.0633 |
+| 1000 | 1.79 | 1.0000 | 1.0319 | 0.0319 | 1.00 | 1.0000 | 1.0356 | 0.0356 |
+| 2000 | 1.79 | 1.0000 | 1.0163 | 0.0163 | 1.00 | 1.0000 | 1.0217 | 0.0217 |
+| 4000 | 1.79 | 1.0000 | 1.0087 | 0.0087 | 1.00 | 1.0000 | 1.0123 | 0.0123 |
+
+Traditional error is worse on the density-varying sample in **1 of 4** n;
+median error ratio natural/uniform = **0.84×** — i.e. the traditional method is
+*slightly more accurate* with the density variation present.
+
+**Problem 07 — CR3BP, 5.5× density ratio, closest approach 0.0135 (~3 lunar radii)**
+
+| n | ratio | poly nat | trad nat | **err nat** | ratio | poly uni | trad uni | **err uni** |
+|---|---|---|---|---|---|---|---|---|
+| 1000 | 5.49 | 1.0000 | 1.0171 | 0.0171 | 1.00 | 1.0000 | 1.0192 | 0.0192 |
+| 2000 | 5.50 | 1.0000 | 1.0063 | 0.0063 | 1.00 | 1.0000 | 1.0183 | 0.0183 |
+| 5000 | 5.51 | 1.0000 | 1.0001 | 0.0001 | 1.00 | 1.0000 | 1.0127 | 0.0127 |
+| 10000 | 5.51 | 1.0000 | 0.9982 | 0.0018 | 1.00 | 1.0000 | 1.0090 | 0.0090 |
+| 20000 | 5.51 | 1.0000 | 0.9972 | 0.0028 | 1.00 | 1.0000 | 1.0071 | 0.0071 |
+
+Traditional error is worse on the density-varying sample in **0 of 5** n;
+median ratio = **0.22×**. **The sign of the effect is inverted**: on the
+sharpest close-approach test in the whole suite, the traditional method is
+**4.5× more accurate** *with* the density variation than without it.
+Reproduced on a 5×-finer base trajectory (200k steps) with identical results,
+so this is not an interpolation artifact of the control resampling.
+
+**Correction (post-audit independent verification, §10.10):** the "4.5×"
+headline does not follow from the table printed directly above it. The five
+per-row ratios (err nat / err uni) are 0.0171/0.0192=0.89, 0.0063/0.0183=0.34,
+0.0001/0.0127=0.008, 0.0018/0.0090=0.20, 0.0028/0.0071=0.39 — **median 0.34,
+i.e. ~2.9×**, not 4.5×. An independent CR3BP re-derivation (own shooting
+solution, 21296-point single period, arc-length control implemented
+independently) reproduces the natural-arm column to 4 decimals and gives
+median 0.35. **The direction of the finding (0 of 5, sign inverted) is
+correct; the magnitude was overstated by roughly 50%.** Every later repetition
+of "4.5×" in this document (§9.6, §10.2, §10.6) should be read as **~2.9×**.
+
+**Problem 10 — driven pendulum**
+
+Median error ratio = **0.99×**, worse in 2 of 4 n. The traditional method's
+error is *unchanged* by removing the density variation; its n-dependence
+(0.069 → 0.035 → 0.018 → 0.011 as n doubles) is textbook 1/n finite-sample
+bias.
+
+**Problem 03 — Kepler.** The Kepler agent ran this control itself, found the
+natural sample worse in only 2 of 6 n, and reported plainly that the
+traditional method's residual error "is not clearly, causally attributable to
+the density variation". That agent was right, and its recommendation to weight
+the problem cautiously should have been applied to problems 02, 07 and 10 as
+well.
+
+**In all four problems, poly returned exactly 1.0000 on the natural sample and
+exactly 1.0000 on the uniform control, at every n, with degenerate-fit fraction
+1.000.** Poly's score is a structural constant of the ring-lattice regime; it
+carries no information about density whatsoever.
+
+**Verdict: 0 of 4 density-robustness wins are supported. Problems 03 and 07
+rested on criterion (b) alone and therefore have no verified win at all.**
+
+This is not a marginal call. Two independent things had to be true for the
+claim and *neither* is: the traditional method is not measurably biased by
+these density variations, and the poly method's perfect score is not evidence
+of anything.
+
+## 9.3 R2-F2 — The density criterion as operationalized is unfalsifiable (major, methodological)
+
+R2-F1's root cause is a design flaw, and it is **the fourth kind of
+self-deception** this benchmark has now caught — the round-2 brief predicted a
+fourth kind would appear if the agents were not careful, and it did.
+
+On a smooth, densely sampled closed 1D curve, the k-NN graph is a circulant
+ring lattice, so `local_dimension` returns the exactly-constant-shell sentinel
+and `mean_dimension` returns exactly 1.0000 — **necessarily, on every such
+curve, at every n, under every sampling density**. A test scored as
+"poly error vs traditional error on a curve of known dimension 1" therefore
+awards poly a perfect score *by construction*, and reduces to asking only
+whether the traditional method's error is nonzero. It always is, at finite n.
+
+So criterion (b), applied to any of this suite's closed-orbit problems, is a
+test the poly method cannot fail and the traditional method cannot pass.
+It measures the F1 degeneracy, relabelled.
+
+The clearest evidence that this was invisible from inside a single problem:
+**problem 07's own script scored `won_on_density_robustness = True` on its
+n=1000 window, whose measured density ratio was 0.985 — i.e. no density
+variation at all.** The script printed that ratio, correctly noted the window
+"does NOT exercise the close-approach density variation", and still returned a
+win for it, because poly scored 1.0000 and traditional scored 0.9894. That
+self-refuting control was run, printed, and not recognized.
+
+**Correction (post-audit independent verification, §10.10): "run, printed,
+and not recognized" overstates the failure.** The raw script report shows the
+agent *did* recognize the n=1000 window was null — it explicitly labels it
+the "PARTIAL window ... does not exercise the effect" and rests the
+`won_on_density_robustness = True` verdict on the full single period instead
+(n=21723, measured density ratio 5.518:1), not on the null window. The real
+defect is narrower and still stands: **the claim lacked a mandatory
+uniform-resample control arm**, which is what let a structurally-pinned
+metric (§9.3 above) pass on the full-period data regardless. The agent did
+not fail to notice its own null window; the criterion it was applying had no
+control that could have caught the structural pinning either way.
+
+**Consequence for the criterion, not just this run:** any future
+density-robustness claim must report the uniform-resample control arm and show
+`trad_err(natural)/trad_err(uniform)` > 1 by a stated margin. A "poly error vs
+traditional error" comparison on the natural sample alone is not evidence and
+should not be accepted again.
+
+## 9.4 R2-F3 — Problem 01's win is contingent on a non-default `max_radius`, and its stated justification is wrong (major; one verdict contested)
+
+Problem 01 reported 87.5% compute savings (poly n=50 vs traditional n=400)
+using `max_radius=3` instead of `comparison.py`'s default of 6 — the only
+round-2 problem to deviate from the default. Sweeping it:
+
+| `max_radius` | poly min_n | trad min_n | savings | win |
+|---|---|---|---|---|
+| 2 | 50 | 400 | 0.875 | yes |
+| 3 (**used**) | 50 | 400 | 0.875 | yes |
+| 4 | 50 | 400 | 0.875 | yes |
+| 5 | 50 | 400 | 0.875 | yes |
+| **6 (default)** | **400** | **400** | **0.000** | **no** |
+
+At the default, problem 01 is a **tie**, not an 87.5% win. The whole win rests
+on this one parameter.
+
+The agent disclosed the deviation prominently and argued it was "a fair,
+honestly-disclosed tuning choice, not a hyperparameter search for the answer
+that wins". The disclosure is real and creditable. **But the stated mechanism
+is factually wrong**, which is what makes the choice unverified rather than
+merely contingent. The script claims `max_radius=6` "saturates the WHOLE k-NN
+graph at n=100/200". Direct inspection of the failing case (n=200, k=6) shows
+volumes `(7, 12, 17, 23, 29, 35)` out of 200 nodes — **nowhere near
+saturation**. The real mechanism is R2-F4 below, and it is the opposite of
+benign: shortening `max_radius` shortens the shell sequence, which makes it
+more likely to be *exactly* constant, which routes it into the degenerate
+sentinel branch where `r_squared = 1.0` and the estimate passes
+`mean_dimension`'s well-fit filter. Measured at n=200: `max_radius=3` gives 20
+well-fit nodes of which **20 are degenerate sentinels**; `max_radius=6` gives 0
+well-fit and 0 degenerate.
+
+**The tuning that produces problem 01's win works by maximizing the fraction of
+F1 degenerate sentinels.** That is precisely the regime round 1 established
+must not be cited as accuracy. Verdict: **not verified**; re-run at the default,
+or fix R2-F4 first.
+
+## 9.5 R2-F4 — New estimator defect: near-constant shell sequences collapse R² and are silently discarded (major, actionable; distinct from F2/N1)
+
+Round 1's F2 found that *exactly* constant shell sequences collapsed R² to 0
+through floating-point cancellation, and N1 fixed it with a relative-scale
+tolerance. **A distinct and unfixed failure sits immediately adjacent**: a
+shell sequence that is *nearly* but not exactly constant has genuinely tiny
+`ss_tot`, so N1's tolerance does not fire, `degenerate=False`, and R² — which
+measures *fraction of variance explained* — collapses on its own merits
+because there is almost no variance to explain. The dimension estimate is
+excellent; the quality flag says it is worthless:
+
+| shells (fit length 6) | dimension | R² | degenerate | kept by `is_well_fit(0.9)` |
+|---|---|---|---|---|
+| (6,6,6,6,6,6) | 1.0000 | 1.0000 | True | **yes** |
+| (6,6,6,6,6,7) | 1.0488 | 0.2642 | False | **no** |
+| (6,5,6,6,6,6) | 1.0335 | 0.0889 | False | **no** |
+| (5,6,6,6,6,6) | 1.0911 | 0.6572 | False | **no** |
+| (7,5,5,6,6,6) | 0.9563 | 0.0505 | False | **no** |
+| (4,8,4,8,4,8) | 1.1836 | 0.1027 | False | **no** |
+
+A sequence off-by-one at a single radius yields dimension 1.0488 — a better
+estimate than most of this benchmark's non-degenerate results — and is thrown
+away with R²=0.26. Note the last row: a wildly oscillating garbage sequence
+scores R²=0.1027, statistically indistinguishable from the near-perfect
+(6,5,6,6,6,6) at R²=0.0889. **In the near-constant regime R² is not merely
+conservative, it is uninformative** — it cannot rank a good fit above a bad one.
+
+Consequences, both observed in this run:
+- When *all* sampled nodes land in this band, `mean_dimension` returns `nan`
+  (problem 01 at n=200, `max_radius`=6) even though every discarded per-node
+  dimension was within 0.08 of the truth. That `nan` then breaks
+  `poly_algebraic_minimum_points`'s stable-convergence chain and moves
+  `poly_min_n` from 50 to 400 — the entire mechanism of R2-F3.
+- It creates a perverse incentive to shrink `max_radius` until shells go
+  exactly constant, converting real (if noisy) fits into F1 sentinels.
+
+**Suggested fix** (not applied — round-2 scripts are being read concurrently):
+gate on an absolute residual criterion in the near-constant regime rather than
+on R² alone, e.g. accept a fit when the shell sequence's relative spread is
+below a threshold (treat it as constant-like and report the slope with a
+`near_degenerate` flag), reserving R² for sequences with real dynamic range.
+This would subsume N1's exact-constant special case rather than sitting beside
+it. Needs its own known-answer tests before use.
+
+## 9.6 R2-F5 — The predicted fourth failure pattern was correctly avoided (positive)
+
+The brief warned specifically against claiming a compute-savings win because
+the *traditional* method failed to converge. **Checked explicitly on all three
+criterion-(a) claims and on both non-convergence cases; no agent committed
+this error.**
+
+- Problems 05 (torus) and 06 (Brownian) both had `traditional_min_n = None`
+  and `poly_algebraic_min_n` finite (400 in both). Both agents reported
+  `overall_win = False` and declined to convert the traditional method's
+  failure into a savings number, explicitly citing the rule. Problem 05 went
+  further and verified the non-convergence was structural (a second,
+  independently-ordered IID-time construction up to n=16000 gave the same
+  1.59–1.63 plateau at R²>0.999) rather than a too-small n_grid.
+- For problems 02 and 10, the traditional method genuinely converges: dim
+  1.9358/1.9890 → 1.51 → 1.51/1.44 → **1.138 (in tolerance at n=256)** →
+  1.067 → 1.034 → 1.018 → 1.010, monotone with R² rising 0.93 → 1.000.
+  This is real convergence at n=256, not a lucky crossing, and the poly method
+  beat it from a genuinely lower n.
+
+Problem 05's agent also flagged, as an unscored diagnostic, that
+`baseline.correlation_dimension`'s fixed `r_min_frac=0.01`/`r_max_frac=0.2`
+window (not exposed through `compare()`) may bias the traditional estimator on
+non-uniform invariant measures generally. That is worth pursuing: it is a
+plausible partial explanation for the *inverted* CR3BP result in R2-F1, where
+changing the point distribution moved the traditional estimate by ~4.5× in
+error while the fitting window stayed fixed.
+
+## 9.7 R2-F6 — The two verified wins, and what they actually show
+
+Problems **02** (nonlinear pendulum) and **10** (driven pendulum) are genuine
+criterion-(a) wins and survive parameter sweeps: poly beats traditional by
+>10% savings in **18 of 20** (problem 02) and **20 of 20** (problem 10)
+combinations of k ∈ {4,6,8,10} and `max_radius` ∈ {3,4,5,6,8}. Both used the
+module default `max_radius=6`; neither was tuned. Reported savings 0.75 at
+(k=6, `max_radius`=6) sits mid-range of the sweep (0.50–0.875), not at a
+favourable edge.
+
+Both agents' point-cloud construction is sound and worth reusing: a single
+period only (removing F3 duplicate corruption at the source rather than via
+`dedupe`), reordered by a **bit-reversal permutation** so that `points[:n]` is
+a genuine time-uniform sample of the *whole* orbit at every power-of-two n
+rather than a growing arc. Problem 02 verified the bit-reversal prefix property
+programmatically instead of assuming the textbook result. Problem 01's
+golden-ratio Weyl sequence achieves the same nesting property and is equally
+sound.
+
+**What the win means, stated narrowly:** on a smooth closed 1D orbit, a local
+shell-growth estimator identifies the ring topology as soon as points are
+well-separated (n≈64), while a global pairwise correlation sum needs enough
+points to populate a clean multi-radius log-log scaling region (n≈256). That
+is a real and reproducible algorithmic difference in sample efficiency. Both
+agents disclosed, correctly, that poly's estimate in this regime is the F1
+degenerate sentinel — so this is a statement about *how few points each method
+needs to identify a ring*, **not** a statement that the shell-growth estimator
+is more accurate. On the two problems where accuracy was genuinely tested
+against a non-trivial answer (Lorenz, Rössler), poly needed **4× and 2× more**
+points than the traditional method, not fewer.
+
+## 9.8 Where round 2 stands against its goal
+
+- **Goal: ≥8 of 10 wins. Achieved: 2 of 10** (3 if problem 01's non-default
+  `max_radius` is accepted, which R2-F3 argues it should not be).
+- The 5-of-10 self-reported figure was not dishonest — every number in it is
+  correct and every agent disclosed its degeneracy caveats, several in
+  considerable detail. It was **under-controlled**: four of the five wins
+  rested on a comparison with no control arm (R2-F1/R2-F2) or on a
+  hyperparameter whose stated justification did not survive inspection
+  (R2-F3).
+- The round-1 discipline held where it had been encoded in code
+  (`poly_algebraic_wins`, `compute_savings_fraction`, the stable-convergence
+  requirement, `DuplicatePointsError`) — every problem passed those checks
+  correctly, and R2-F5 shows the newest trap was avoided everywhere. **The
+  failures were exclusively in the one area that had no code-level guard: the
+  new, hand-rolled density-robustness test.** That is the lesson to carry
+  forward — a criterion that lives only in prose gets applied inconsistently
+  across ten agents, and it did.
+
+## 9.9 What phase 2 should do
+
+1. **Do not re-attempt criterion (b) on closed 1D orbits.** It is unfalsifiable
+   there (R2-F2). If singularity-avoidance is to be tested, it needs a system
+   where poly's answer is *not* structurally pinned — i.e. a non-degenerate
+   regime (dimension ≠ 1, or a curve with genuine self-intersection/branching),
+   with the uniform-resample control arm mandatory and reported.
+2. **Encode the control in code**, as a `compare_density_robustness()` in
+   `comparison.py` that takes both samples and refuses to return a win unless
+   `trad_err(natural)/trad_err(uniform)` exceeds a stated margin. Prose
+   criteria did not survive ten parallel agents; the coded ones did.
+3. **Fix R2-F4** (near-constant R² collapse) with known-answer tests, then
+   re-run problem 01 at the default `max_radius` to settle R2-F3 honestly.
+4. **Retract the (b) sub-claims of problems 02 and 10** in any summary; their
+   (a) claims stand and are the two solid results of this round.
+5. The honest current headline is: *on smooth closed 1D orbits the local
+   shell-growth estimator needs ~4× fewer points than Grassberger–Procaccia to
+   identify the ring, on chaotic attractors it needs 2–4× more, and no
+   robustness-to-sampling-density advantage has been demonstrated.*
+
+## 9.10 Tier C — interpretation, explicitly not load-bearing
+
+Nothing in round 2 changes the round-1 Tier C position. The two verified wins
+are a statement about sample efficiency of a graph statistic on a ring lattice,
+not about geometry, emergence, or physics. In particular, the phrase
+"singularity/stiffness avoidance" has **no supporting evidence** after this
+round: the four measurements that were offered for it are, on control, either
+null (problems 02, 03, 10) or inverted (problem 07). It should not be repeated
+in the README, the paper, or any summary until a test that can fail produces a
+result that does not.
+
+---
+
+# Round 2, phase 2 — FINAL AUDIT and closing verdict (2026-08-13)
+
+This is the closing audit of the round-2 programme. It re-derives every
+verdict independently of both the ten problem agents and the phase-1 audit
+(§9), spot-checks four problems end-to-end from scratch, and runs two
+controls §9 did not run. It supersedes nothing in §9 — it confirms §9's
+headline and adds three findings, one of which *strengthens* the surviving
+wins and one of which is a criticism of the scoreboard itself.
+
+## 10.0 Final verdict
+
+**Goal: ≥8 of 10 wins. Final verified count: 2 of 10. The goal was not
+reached.** Phase-1's count is confirmed by fully independent re-derivation.
+
+The two wins (problems **02** and **10**) are criterion-(a) compute-savings
+wins, both at module-default hyperparameters. **Criterion (b),
+density-robustness — the "singularity avoidance" axis — produced zero verified
+wins from four claims**, and an independent replication here (§10.3) shows why.
+
+**Correction (post-audit independent verification, §10.10): this "2 of 10"
+count is an audit of what was run, not of what the benchmark shows under this
+same audit's own audited-best methodology.** A third-level skeptic applying
+§10.4/R2-F8's endorsed bit-reversal/Weyl whole-orbit prefix construction
+(which §10.1–§10.7 use for problems 01, 02 and 10, but never applied to 03 or
+04) found problems 03 (Kepler) and 04 (Mars) each cross to a genuine
+criterion-(a) win — poly `min_n`=64 vs traditional `min_n`=256, savings 0.75 —
+once measured on a whole-orbit-covering prefix instead of the time-ordered
+arc §10.1/§10.2 actually used. **Corrected final verified count: 4 of 10**
+(02, 03, 04, 10), still far short of the 8/10 goal, and all four wins share
+the identical underlying mechanism (see §10.10). The goal was still not
+reached; §10.2's per-problem reasoning for 03 and 04 is superseded by §10.10,
+not by this line.
+
+## 10.1 What this audit did, independently of §9
+
+Nothing below reuses the round-2 scripts' point clouds or the phase-1 audit's
+scratch files. Trajectories were re-integrated with a *different* integrator
+(`scipy.solve_ivp`/RK45 at rtol=atol=1e-12, where the repo scripts use
+hand-rolled leapfrog/RK4), and the two estimators were re-implemented from
+scratch in numpy (brute-force O(n²) k-NN adjacency, hand-written BFS shell
+counting and log-log least squares; explicit O(n²) pair-count
+Grassberger–Procaccia) and checked against the library before any library
+output was trusted.
+
+| check | result |
+|---|---|
+| Problem 02 re-derived from scratch (RK45, closure 5.3e−12 over the exact period 4K(m)=8.3497529269) | poly `min_n`=64, trad `min_n`=256, savings **0.75** — identical to the report |
+| My brute-force estimators vs the library, every n ≤ 1024 | agree to 4 decimal places on **both** methods at **every** n |
+| Bit-reversal prefix property (n=32…256) | verified: prefix indices evenly strided over the whole period, not assumed |
+| Problem 10 re-derived from scratch (stroboscopic spread 4.7e−13 over 50 drive periods, closure 2.4e−14) | poly 64, trad 256, savings **0.75** — identical to the report |
+| Problem 01 re-derived from the **exact** solution (cos t, −sin t; Weyl index sequence, 3200 distinct indices) | tie at the default `max_radius`, confirming R2-F3 |
+| Problem 08 (Lorenz) re-derived (RK45, 18000 points) | poly 800, trad 200, savings **−3.0** — identical to the report, per-n values matching to 3 decimals |
+| Arithmetic audit of all 10 self-reports | every `poly_algebraic_wins` and `compute_savings_fraction` consistent with its two `min_n` values, ✓ (confirms §9) |
+
+**Correction (post-audit independent verification, §10.10):** the Lorenz
+row's "matching to 3 decimals" is inconsistent with §10.5's own table, which
+lists Lorenz at n=12800 as poly 1.9932 / trad 1.9300 — neither the round-2
+agent's reported 2.038/1.943 nor this row's own independent RK4 re-derivation
+(dt=0.005, t=100, transient 10, 18001 points, k=10: poly 2.0375, trad 1.9429,
+`compare()` savings −3.0, confirmed) matches those two decimals. §10.5's row
+comes from a different, coarser cloud (its scratch script samples 4096 points
+via `solve_ivp`) that was never labelled as such, unlike the analogous
+Rössler discrepancy in §10.5 which *is* labelled. The direction and the
+savings figure (−3.0) are unaffected; the mismatch actually **understates**
+poly's accuracy advantage (real |err| 0.0125 vs traditional's 0.1071, not the
+0.0568/0.1200 §10.5 prints), so R2-F9's argument in §10.5 is unaffected.
+
+Scripts: `scratchpad/final_audit_{1,2,3,4}.py` (scratch, uncommitted; they
+import from `src/` and modify nothing). `src/socrates/hypergraph/` and all
+round-1 and round-2 scripts were left untouched — confirmed by `git status`:
+the only modified file in the repository is this document.
+
+## 10.2 Final scoreboard
+
+| # | Problem | Criterion (a) | Criterion (b) | **Verified** | Why |
+|---|---|---|---|---|---|
+| 01 | Harmonic oscillator | tie at default | n/a | **no** | 87.5% savings only at `max_radius`≤5; **tie (0.000) at the default 6** — re-derived here from the exact solution (R2-F3) |
+| 02 | Nonlinear pendulum | **0.75** (64 vs 256) | fails control | **WIN (a)** | holds in 20/20 (k, `max_radius`) combos and **19/19 baseline fitting windows** (§10.4) |
+| 03 | Kepler orbit | tie at n=100 | fails control | **no** | both converge at the smallest n tested; (b) null on control (R2-F1, replicated §10.3) |
+| 04 | Mars / Horizons | tie at n=100 | n/a | **no** | tie; finer grid favours *traditional* (converges at n≈15) |
+| 05 | Quasiperiodic torus | trad never converges | n/a | **no** | rule 2 forbids scoring the baseline's failure as a win — **but see §10.5** |
+| 06 | Planar Brownian motion | trad never converges | n/a | **no** | same as 05 — **but see §10.5** |
+| 07 | CR3BP, close lunar approach | tie at n=100 | fails control, **inverted** | **no** | the sharpest close-approach test in the suite; traditional was 4.5× *more* accurate with the density variation (R2-F1) |
+| 08 | Lorenz | **−3.0** (poly needs 4× more) | n/a | **no** | honest loss, re-derived here independently |
+| 09 | Rössler | **−1.0** (poly needs 2× more) | n/a | **no** | honest loss |
+| 10 | Driven pendulum | **0.75** (64 vs 256) | fails control | **WIN (a)** | holds in 20/20 (k, `max_radius`) combos and 19/19 fitting windows |
+
+**2 / 10 verified. Both are criterion (a). Criterion (b): 0 verified from 4
+claimed.**
+
+**Correction (post-audit independent verification, §10.10):**
+
+- **Row 02's "20/20"** is a copy-paste error: the phase-2 scratch script that
+  produced it (`final_audit_3.py`) ran the (k, `max_radius`) sweep on
+  problem 10's point cloud only and its 20/20 result was written into
+  problem 02's row too, silently overwriting §9.7's correct 18/20 for
+  problem 02 in the same document. Re-measured independently on both an
+  RK45 re-derivation and the agent's own committed cloud
+  (`02_nonlinear_pendulum.generate_single_period_cloud`): **17/20** (k=10
+  with `max_radius` in {5, 6, 8} ties at 256=256, savings 0.0). The win
+  still holds in 17 of 20 combinations — the win itself is not in question,
+  only this one cell's number.
+- **Rows 03 and 04 ("no")** used a time-ordered prefix of the trajectory
+  (Kepler: n=100 of 12798 points, under 1% of the orbit) rather than the
+  bit-reversal/Weyl whole-orbit construction §10.4/R2-F8 explicitly
+  endorses and problems 01/02/10 actually used. Under that same
+  construction (single period, 8192 time-uniform points, k=6,
+  `max_radius`=6): Kepler (e=0.6, tolerance 0.15) gives poly 64 vs
+  traditional 256 → **savings 0.75**, robust across k (0.875, 0.75, 0.5,
+  0.5 at k=4/6/8/10); a Mars-like ellipse (e=0.0934, tolerance 0.2) gives
+  the same 64 vs 256 → **0.75**. Under the time-ordered construction both
+  instead give poly 64 vs trad 32 (savings −1.0) — the reported tie was a
+  prefix artifact, not a property of the orbit. **Corrected: 03 and 04 are
+  criterion-(a) WINS.** CR3BP (07) re-measured the same way stays a genuine
+  tie (128 vs 128), so this construction does not mechanically manufacture
+  wins everywhere it is applied — 07's "no" stands.
+
+**Corrected count: 4 / 10 (02, 03, 04, 10), all criterion (a).** See §10.10
+for the full derivation and its limits.
+
+## 10.3 R2-F1 replicated on a fresh system — criterion (b) is null, independently
+
+§9's control was rebuilt here from scratch on a **different** problem (Kepler,
+e=0.6, integrated at rtol 1e-12, energy drift 2.4e−12, r ∈ [0.400, 1.600]
+exactly as theory requires), with arc-length resampling implemented
+independently. Density ratio on the natural time-uniform sample is a genuine
+**3.2×**:
+
+| n | ratio nat | poly nat | trad nat | \|err\| nat | ratio uni | poly uni | trad uni | \|err\| uni | nat/uni |
+|---|---|---|---|---|---|---|---|---|---|
+| 500 | 3.20 | 1.0000 | 1.0572 | 0.0572 | 1.00 | 1.0000 | 1.0652 | 0.0652 | 0.88 |
+| 1000 | 3.21 | 1.0000 | 1.0279 | 0.0279 | 1.00 | 1.0000 | 1.0310 | 0.0310 | 0.90 |
+| 2000 | 3.22 | 1.0000 | 1.0146 | 0.0146 | 1.00 | 1.0000 | 1.0168 | 0.0168 | 0.87 |
+| 4000 | 3.22 | 1.0000 | 1.0080 | 0.0080 | 1.00 | 1.0000 | 1.0107 | 0.0107 | 0.75 |
+| 8000 | 3.27 | 1.0000 | 1.0047 | 0.0047 | 1.00 | 1.0000 | 1.0069 | 0.0069 | 0.68 |
+
+**The traditional method is worse on the density-varying sample in 0 of 5 n**
+(median error ratio 0.87×) — it is slightly *more* accurate with the density
+variation present, the same sign inversion §9 found on CR3BP. Poly returns
+exactly 1.0000 on both samples at every n, degenerate fraction **1.000**.
+
+R2-F1 and R2-F2 are therefore confirmed on an independent implementation and a
+system §9 did not itself re-derive. **No evidence for singularity/stiffness
+avoidance exists in this benchmark.**
+
+R2-F4 was likewise reproduced exactly — all six rows of §9.5's table — and
+anchored to the real failing case: problem 01 at n=200, k=6, `max_radius`=6 has
+node volumes `(7,12,17,23,29,35)`, i.e. shells `(6,5,5,6,6,6)`, giving
+**dimension 1.0333** (error 0.033) discarded at **R²=0.0550**. A synthetic
+graph built to have exactly those shells reproduces `dimension=1.0333,
+R²=0.0550` to the digit. The volumes reach 35 of 200 nodes, so §9.4's rebuttal
+of the "saturation" justification is confirmed: nothing is saturated.
+
+## 10.4 R2-F7 and R2-F8 (NEW, both positive) — the two surviving wins survive both controls
+
+### R2-F7 — the wins are not an artifact of the baseline's fitting window
+
+§9.6 left a phase-2 lead open: `baseline.correlation_dimension` hard-codes
+`r_min_frac=0.01`, `r_max_frac=0.2` and does not expose them through
+`compare()`, so "traditional needs n=256" might be a property of that window
+rather than of the algorithm. If so, the two surviving wins would be
+contingent on a baseline hyperparameter — exactly the objection R2-F3 raised
+against problem 01's `max_radius`, and fairness requires asking it in both
+directions.
+
+**Closed, in poly's favour.** Sweeping 19 defensible windows
+(`r_min_frac` ∈ {0.001, 0.003, 0.01, 0.03} × `r_max_frac` ∈ {0.05, 0.1, 0.2,
+0.3, 0.5}) on both problems:
+
+| | best trad `min_n` over all windows | default window | worst | poly `min_n` | savings range |
+|---|---|---|---|---|---|
+| 02 nonlinear pendulum | 128 (at `r_min_frac`=0.03) | 256 | 2048 | 64 | **0.50 – 0.97** |
+| 10 driven pendulum | 128 (at `r_min_frac`=0.03) | 256 | 2048 | 64 | **0.50 – 0.97** |
+
+The traditional method never converges before n=128 under **any** window
+tested, while poly converges at n=64. Savings exceeds the 10% bar in **19 of
+19** windows on both problems. The default window is mid-range, not a
+handicap. Combined with the 20/20 (k, `max_radius`) sweeps, **problems 02 and
+10 are robust wins on every hyperparameter either method has.**
+
+**Correction (post-audit independent verification, §10.10):** the grid is
+`r_min_frac` (4 values) × `r_max_frac` (5 values) = **20** combinations, not
+19 — a trivial miscount. Re-run in full on problem 02: all **20 of 20**
+windows clear the 10% bar (best traditional `min_n`=128 at `r_min_frac`=0.03,
+default 256, worst 2048, savings range 0.50–0.97), reproducing the table
+above exactly apart from the denominator. Combined with the 20/20 and 17/20
+(k, `max_radius`) sweeps (previous correction), problems 02 and 10 remain
+robust wins on every hyperparameter either method has — only the count of
+windows was wrong, not the result.
+
+### R2-F8 — criterion (a) is *not* unfalsifiable the way criterion (b) is
+
+R2-F2 showed poly is structurally pinned to 1.0000 on any
+smooth closed curve, which destroyed criterion (b). The obvious next question,
+which §9 did not ask, is whether that same pin also hollows out criterion (a):
+if poly reported ≈1.0 at n=64 for *every* point cloud, then "poly converged at
+n=64" on a dimension-1 problem would be a prior, not a measurement. Tested
+directly — `mean_dimension`, k=6, `max_radius`=6, on clouds of known dimension
+at the same small n:
+
+| cloud (true dim) | n=32 | n=64 | n=128 | n=256 | n=512 | n=1024 |
+|---|---|---|---|---|---|---|
+| circle (1) | nan | **1.0000** | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+| uniform square (2) | 1.3206 | nan | 1.6420 | 1.9437 | 1.8488 | 1.9977 |
+| uniform disk (2) | 1.5730 | **1.5642** | 1.5709 | 1.8835 | 1.9620 | 2.0003 |
+| uniform cube (3) | 1.6227 | nan | 1.7839 | 2.1302 | 2.3233 | 2.4705 |
+| Lorenz, whole attractor (2.05) | nan | nan | 1.2270 | 1.7564 | 1.8991 | 1.9129 |
+
+Poly **never returns ≈1.0 for a 2- or 3-dimensional cloud** at any n ≥ 32
+(degenerate fraction is 0.000 for all four non-circle clouds at every n, vs
+0.45→0.98 for the circle). So poly's 1.0000 at n=64 on the pendulums does
+carry dimensional information, and the criterion-(a) wins are measurements,
+not tautologies. This is the one place where a control *supports* the claimed
+mechanism.
+
+Two honest qualifications. First, poly is biased **downward** at small n on
+higher-dimensional clouds (2D square needs n≈256 to reach 2.0), so its early
+convergence is specific to the dimension-1 case. Second, an artifact worth
+recording: a *time-ordered prefix* of a chaotic trajectory is a short smooth
+arc, and poly correctly calls it 1-dimensional — Lorenz at n=100 with
+consecutive dt=0.005 samples gives exactly 1.0000 (degenerate fraction 0.35).
+That is right about the sample and wrong about the attractor. It is an argument
+for the whole-orbit-covering prefix constructions (bit-reversal, Weyl) that
+problems 01, 02 and 10 used, and against naive time-ordered prefixes.
+
+## 10.5 R2-F9 (NEW, methodological) — the scoreboard hides poly's only non-degenerate advantage
+
+The two surviving wins are on problems where poly's estimate is the F1
+degenerate sentinel (degenerate fraction 1.000). The two problems where poly is
+**most clearly and non-degenerately better than the baseline** score as
+non-wins. Verified independently here at max n:
+
+| problem | true | poly | \|err\| | degen. frac | trad | \|err\| | trad R² | scored |
+|---|---|---|---|---|---|---|---|---|
+| 05 quasiperiodic torus (n=12800) | 2.00 | **2.0500** | **0.0500** | **0.00** | 1.6357 | 0.3643 | 0.9994 | **no win** |
+| 06 Brownian motion (n=25600) | 2.00 | **2.0270** | **0.0270** | **0.00** | 1.3943 | 0.6057 | 0.9980 | **no win** |
+| 09 Rössler (n=12800) | 2.01 | 1.9011 | 0.1089 | 0.00 | 1.7036 | 0.3064 | 0.9997 | **no win (poly needs 2× more points)** |
+| 08 Lorenz (n=12800) | 2.05 | 1.9932 | 0.0568 | 0.00 | 1.9300 | 0.1200 | 0.9989 | **no win (poly needs 4× more points)** |
+
+(05 and 06 reproduce the agents' figures to the digit; my Rössler differs from
+the agent's cloud in transient/stride and lands at 1.90 rather than 2.04 — the
+ordering is the same, the exact value is not, and I report mine as the
+independent number.)
+
+On problems 05 and 06 the shell-growth estimator is within 0.03–0.05 of the
+truth **with zero degenerate fits**, while Grassberger–Procaccia is off by
+0.36–0.61 with R²>0.998 — a confident, converged, and wrong fit. Rule 2
+correctly refuses to score this as a win (the baseline never converging is not
+poly's achievement, and scoring it would have been the fourth self-deception
+the brief warned about). **But the consequence should be stated plainly: the
+programme's win condition measures points-to-converge only, so it is
+structurally incapable of rewarding the one thing this benchmark shows the
+shell-growth estimator genuinely does better — asymptotic accuracy on
+non-degenerate measures.** The 2-of-10 scoreboard is correct under the stated
+criteria and is *not* the most informative summary of the data.
+
+This is a criticism of the criterion, not a licence to re-score. The count
+stays 2.
+
+**Correction (post-audit independent verification, §10.10):** "the count
+stays 2" was correct given what §10.1–§10.6 actually measured, but §10.1/§10.2
+measured 03 and 04 with a methodology this same section (§10.4) had already
+found unsound for problems 01/02/10. Applying the endorsed methodology
+uniformly moves the count to **4**. This section's criticism of the *criterion*
+(that it is blind to 05/06) is untouched by that correction — it is a
+separate finding.
+
+## 10.6 Which win type carried the total, and which problems remain unwon
+
+**Win type.** Criterion (a) carried **100%** of the verified total (2 of 2 —
+**corrected to 4 of 4**, §10.10). Criterion (b) carried **0%**, from 4 claims
+— and after §10.3's independent replication, the honest position is stronger
+than "unproven": on every system tested (pendulum, driven pendulum, Kepler,
+CR3BP) the traditional method is *equally or more* accurate on the
+density-varying sample, so the effect criterion (b) was designed to detect
+**does not exist at these densities and point counts**, in the direction
+hypothesized.
+
+Both (a) wins are the *same* win, twice: a small-amplitude pendulum orbit and a
+mode-locked pendulum limit cycle are both smooth closed 1D curves. The suite
+contains no second, structurally different (a) win.
+
+**Correction (post-audit independent verification, §10.10):** with 03 and 04
+corrected into wins, this is the *same win, four times*, not twice — Kepler
+and Mars are also smooth closed (03) or effectively closed (04) 1D orbits,
+identical in kind to 02/10. The qualitative conclusion is unchanged and
+somewhat reinforced: every verified win in this benchmark, without exception,
+is one mechanism (ring-lattice degeneracy giving the shell-growth estimator
+an early, exact answer) applied to structurally identical inputs.
+
+**Unwon problems, each a finding rather than a gap** (standing rule 5):
+
+- **01 harmonic oscillator** — a genuine tie (400 vs 400) at the default. The
+  reported win required `max_radius`≤5, whose effect is to shorten shell
+  sequences until they are *exactly* constant and so pass the well-fit filter
+  as F1 sentinels. Blocked by the R2-F4 estimator defect, not by physics: the
+  discarded fits at the default were accurate to 0.03.
+- **03 Kepler, 04 Mars, 07 CR3BP** — ties: both methods converge at the
+  smallest n tested (100). These problems cannot produce a savings number at
+  all without an n_grid extended *below* 100, and on problem 04 the finer grid
+  favours the traditional method (converges at n≈15). Their (b) claims are
+  null (03, replicated here) or inverted (07).
+
+  **Correction (post-audit independent verification, §10.10): this stated
+  cause is wrong for 03 and 04.** The tie was a prefix artifact, not a
+  property of the physics or the grid floor — both problems fed `compare()`
+  a time-ordered arc rather than the whole-orbit bit-reversal/Weyl
+  construction §10.4 itself endorses. Under that construction, 03 and 04
+  each cross to a genuine (a) win (savings 0.75). 07 (CR3BP) re-measured the
+  same way stays a genuine tie, so this correction applies to 03/04 only;
+  07's diagnosis is unaffected.
+- **05 torus, 06 Brownian** — the baseline never stably converges (verified to
+  n=16000 and n=25600 respectively, R²>0.998, drifting *away* from the truth).
+  Correctly not banked. See §10.5: this is where poly's real advantage lives.
+- **08 Lorenz, 09 Rössler** — honest losses on the stated criterion; poly needs
+  4× and 2× *more* points to stabilize. Both are non-degenerate, both survived
+  parameter sweeps, and 08 was re-derived from scratch here. Grassberger–
+  Procaccia was designed and literature-calibrated for exactly this quantity on
+  exactly these attractors; it is not a strawman losing artificially, it is the
+  right tool for its own home problem.
+
+## 10.7 The honest one-paragraph summary
+
+On smooth closed 1D orbits the local shell-growth estimator identifies the ring
+topology from ~4× fewer points than the classical Grassberger–Procaccia
+correlation sum (verified on two problems, robust across every k,
+`max_radius`, and correlation-fit window tested). On chaotic attractors it
+needs 2–4× more points to stabilize, though it lands closer to the true value
+once it does. On two non-degenerate 2-dimensional measures (quasiperiodic
+torus, Brownian path) it is accurate to 0.03–0.05 where the classical estimator
+is confidently wrong by 0.36–0.61 — the strongest real result in the suite, and
+one the win criterion cannot score. **No robustness-to-sampling-density
+advantage has been demonstrated; four attempts to show one were null or
+inverted under control.** The programme's stated goal of 8 of 10 was not met:
+the final count is **2 of 10** (**corrected to 4 of 10 — see §10.10**).
+
+## 10.8 Carry-forward
+
+1. **Fix R2-F4 before any re-run of problem 01** (gate on relative shell
+   spread, not R² alone; needs known-answer tests). It is the only finding in
+   two rounds that is an actionable defect in shipped code rather than a
+   defect in an experiment.
+2. **Retire criterion (b) in its current form.** §9.9's recommendation stands
+   and is now backed by an independent replication on a fresh system. If it is
+   ever retried, the uniform-resample control arm must be *in code*, and the
+   system must be one where poly is not structurally pinned.
+3. **The next round's headline question should be accuracy on non-degenerate
+   measures, not points-to-converge** (§10.5). Problems 05 and 06 are the
+   template: a known non-integer or 2-dimensional answer, no closed-curve
+   degeneracy, both methods run to large n. That is a test poly can fail and
+   did not.
+4. Do not repeat "singularity/stiffness avoidance" in the README, the paper, or
+   any summary. After two audits and an independent replication it has no
+   supporting measurement.
+
+## 10.9 Tier C — interpretation, explicitly not load-bearing
+
+Unchanged from §9.10. The two (now four — §10.10) verified wins are
+statements about the sample efficiency of a graph statistic on a ring
+lattice. The 05/06 accuracy results in §10.5 are the first measurements in
+this benchmark that plausibly say something about the estimator itself
+rather than about ring lattices, and they are Tier B statistics of two
+specific point clouds — not evidence about geometry, emergence, or physics.
+
+## 10.10 Third-level verification — corrected final count and consolidated summary
+
+A skeptic tasked with checking §10 itself (per the decisive-experiment
+skill's phase 6, "verify the auditor, not just the workers" — already
+confirmed twice earlier in this document) found that §10, despite being an
+independent re-derivation of §9, repeated the same class of error it exists
+to catch: it endorsed a methodology fix (§10.4/R2-F8's whole-orbit
+bit-reversal/Weyl prefix) without checking whether §10.1's own measurements
+actually used it everywhere the fix applied. They did not — problems 03 and
+04 were measured with the older, unsound time-ordered-prefix construction
+that §9/§10 had already diagnosed as invalid for exactly this kind of orbit.
+This is a third independent confirmation, within this single document, that
+a reviewer's favorable/confirming claims receive less scrutiny from itself
+than the claims it is busy criticizing.
+
+**Six findings, all independently re-derived by the skeptic before being
+recorded here** (full reasoning and numbers are inline at each correction
+site above; this section is the consolidated index, not a new claim):
+
+1. **(major)** Problems 03 (Kepler) and 04 (Mars) are misclassified ties in
+   §10.1/§10.2 — see the correction blocks at §10.0, §10.2, §10.6. Corrected:
+   both are genuine criterion-(a) wins, savings 0.75.
+2. **(moderate)** §10.2's problem 02 row states "20/20"; the real,
+   independently re-measured figure is **17/20** (§10.2 correction) — a
+   copy-paste of problem 10's number, not a new measurement error. The win
+   itself still holds.
+3. **(moderate)** The CR3BP "4.5× more accurate" headline (§9.2, repeated in
+   §9.6/§10.2/§10.6) does not follow from its own printed table; the correct
+   median is **~2.9×** (§9.2 correction). Direction unaffected, magnitude
+   overstated ~50%.
+4. **(minor)** §10.1's Lorenz row ("matching to 3 decimals") is internally
+   inconsistent with §10.5's own table, which uses an unlabelled, coarser
+   point cloud (§10.1 correction). Direction and −3.0 savings figure
+   unaffected; if anything the mismatch understates poly's accuracy.
+5. **(trivial)** §10.4's "19 defensible windows" / "19 of 19" is a miscount:
+   the grid is 4×5=**20** combinations, and re-running all 20 confirms **20
+   of 20** clear the bar (§10.4 correction).
+6. **(minor)** §9.3's characterization of problem 07's script as having
+   printed a self-refuting control "and not recognized" it is unfair to the
+   agent: the raw report explicitly labels the n=1000 window as not
+   exercising the effect and rests its verdict on the full period instead
+   (§9.3 correction). The underlying criticism — no mandatory uniform-resample
+   control arm — is correct and stands.
+
+**Corrected final scoreboard: 4 of 10 verified (02, 03, 04, 10), against the
+stated goal of 8 of 10 — the goal was still not reached.** All four wins are
+criterion (a) (compute savings); criterion (b) (density-robustness) remains
+at 0 of 4, confirmed null or inverted under control, unaffected by any of the
+six corrections above. All four wins are the *same* win, four times over: a
+smooth closed (or near-closed) 1D orbit puts the k-NN graph into an exact
+ring-lattice regime where the shell-growth estimator's fit is degenerate
+(F1) but correct, and converges from a much smaller n than a global
+correlation-sum needs to escape its own fitting-window bias. §10.5/R2-F9's
+point stands unchanged by this correction: the scoreboard's points-to-converge
+criterion is structurally blind to the one place (problems 05/06) this
+benchmark shows the estimator doing something a non-degenerate control
+cannot — that is a critique of the criterion, not a reason to re-score 05/06,
+and is not folded into the 4/10 count.
+
+**What is unchanged by this correction:** the goal (8/10) was not met; no
+density-robustness win survives; R2-F4 (near-constant-shell R² collapse) is
+still an open, unfixed defect blocking problem 01; criterion (b) still needs
+retirement or a redesign with a mandatory control arm; §10.8's carry-forward
+list stands as written. **What changed:** the win count (2→4) and the
+generalization claim (two independent smooth-orbit demonstrations become
+four, strengthening rather than weakening the "one mechanism, repeated"
+reading) — not the qualitative verdict.
+
+Scripts: skeptic's re-derivations were scratch, uncommitted, read `src/` and
+modified nothing (confirmed by `git status` at the time) — the only file this
+correction pass modifies is this document.
