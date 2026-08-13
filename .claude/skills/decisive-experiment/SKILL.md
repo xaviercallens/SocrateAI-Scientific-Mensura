@@ -17,6 +17,14 @@ is for the sharp, falsifiable measurements: W1 (Sym² lock vs. Hypothesis U),
 and by extension W2-W4 in `docs/IMPLEMENTATION_PLAN.md` once they reach their
 own decisive-measurement stage.
 
+For the *separate* Poly-Algebraic Calculus / hypergraph-physics initiative
+(`src/socrates/hypergraph/`, unrelated to the T-dual work above), see
+`.claude/skills/poly-algebraic-calculus/SKILL.md` — it uses this same
+six-phase shape but adds module-specific failure modes a real benchmark run
+already found (degenerate fits, unconverged fractal estimates, duplicate-point
+corruption). Read this skill for the *orchestration pattern*; read that one
+before touching that module's code.
+
 ## The six-phase shape
 
 1. **Repair/Design** (Opus, high or xhigh effort). Whatever the previous
@@ -63,6 +71,28 @@ own decisive-measurement stage.
    the numbers are right?). Tell every skeptic explicitly that a second
    honest "inconclusive" is a completely acceptable outcome, so there's no
    implicit pressure to rescue a clean answer.
+
+   **When Adjudicate writes a rich analysis, not just a boolean verdict,
+   Refute must check the analysis's individual claims, not only its
+   top-line conclusion.** Confirmed twice independently — once in this
+   project's own W1 round 2 (a repair report's self-disclosed "weakest
+   untested assumption" predicted almost exactly what the skeptic later
+   found), and once in the separate Poly-Algebraic Calculus benchmark
+   (`docs/POLY_ALGEBRAIC_BENCHMARK.md`), where an Opus auditor wrote a
+   detailed, multi-finding ledger that correctly identified real problems
+   in the original agents' work — and a second skeptic tasked specifically
+   with checking *that ledger* found three real errors in the auditor's
+   own added analysis: an over-generalized bug claim, a wrong speculative
+   reattribution that overturned a correct original finding without
+   testing the counter-claim, and a factually wrong claim that happened to
+   prop up one of the ledger's two headline "success" verdicts. A reviewer
+   is not exempt from the discipline it applies to others, and its
+   *favorable* verdicts get less scrutiny from itself than the ones it is
+   busy criticizing — precisely because writing the criticism feels like
+   the rigorous part of the job. Instruct the refuting skeptic explicitly
+   to re-derive numbers the adjudicator only asserted, and to spot-check
+   the adjudicator's positive/confirming claims as hard as its negative
+   ones.
 
 ## Tier routing (from docs/IMPLEMENTATION_PLAN.md, with one addition)
 
