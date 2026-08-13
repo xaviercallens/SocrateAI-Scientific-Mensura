@@ -10,6 +10,7 @@ speculative interpretation, never load-bearing.
 
 from .core import Hypergraph, ball
 from .dimension import DimensionEstimate, dimension_profile, local_dimension, mean_dimension
+from .pointcloud import knn_hypergraph
 from .polyalgebra import RuleSearchResult, rule_space, solve_for_rule
 from .rewriting import (
     MultiwaySystem,
@@ -31,6 +32,7 @@ __all__ = [
     "dimension_profile",
     "evolve",
     "find_matches",
+    "knn_hypergraph",
     "local_dimension",
     "mean_dimension",
     "multiway_evolve",
