@@ -9,8 +9,14 @@ speculative interpretation, never load-bearing.
 """
 
 from .core import Hypergraph, ball
-from .dimension import DimensionEstimate, dimension_profile, local_dimension, mean_dimension
-from .pointcloud import knn_hypergraph
+from .dimension import (
+    DimensionEstimate,
+    degenerate_fraction,
+    dimension_profile,
+    local_dimension,
+    mean_dimension,
+)
+from .pointcloud import DuplicatePointsError, knn_hypergraph
 from .polyalgebra import RuleSearchResult, rule_space, solve_for_rule
 from .rewriting import (
     MultiwaySystem,
@@ -23,12 +29,14 @@ from .rewriting import (
 
 __all__ = [
     "DimensionEstimate",
+    "DuplicatePointsError",
     "Hypergraph",
     "MultiwaySystem",
     "RewriteRule",
     "RuleSearchResult",
     "apply_at",
     "ball",
+    "degenerate_fraction",
     "dimension_profile",
     "evolve",
     "find_matches",

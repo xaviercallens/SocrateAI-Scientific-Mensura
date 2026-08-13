@@ -34,20 +34,36 @@ from .core import Hypergraph, Node, ball
 
 @dataclass(frozen=True)
 class DimensionEstimate:
-    """Result of a log-log fit of ball volume vs radius."""
+    """Result of a log-log fit of ball volume vs radius.
+
+    `degenerate=True` means the shell sequence being fit was constant (to
+    within floating-point noise) -- e.g. a k-NN graph on a smooth closed
+    curve, which is an exact circulant ring lattice. In that regime
+    `r_squared=1.0` is a *sentinel* meaning "the input had no variation to
+    fit," not a measurement of fit quality on a diverse shell sequence. This
+    distinction exists because a 10-problem physics benchmark
+    (docs/POLY_ALGEBRAIC_BENCHMARK.md, finding F1/N2) found that 6 of 10
+    "passes" were exactly this case, misread by the estimator's own API as
+    a perfect fit -- `is_well_fit()` alone could not distinguish them.
+    """
 
     source: Node
     radii: tuple[int, ...]
     volumes: tuple[int, ...]
     dimension: float
     r_squared: float
+    degenerate: bool = False
 
     def is_well_fit(self, threshold: float = 0.95) -> bool:
         return self.r_squared >= threshold
 
+    def is_genuinely_well_fit(self, threshold: float = 0.95) -> bool:
+        """Well-fit AND not a degenerate constant-shell sentinel."""
+        return self.is_well_fit(threshold) and not self.degenerate
 
-def _log_log_fit(xs: list[float], ys: list[float]) -> tuple[float, float]:
-    """Least-squares slope and R^2 of log(ys) vs log(xs)."""
+
+def _log_log_fit(xs: list[float], ys: list[float]) -> tuple[float, float, bool]:
+    """Least-squares slope, R^2, and a degeneracy flag for log(ys) vs log(xs)."""
     n = len(xs)
     log_x = [math.log(x) for x in xs]
     log_y = [math.log(y) for y in ys]
@@ -56,7 +72,7 @@ def _log_log_fit(xs: list[float], ys: list[float]) -> tuple[float, float]:
     cov = sum((x - mean_x) * (y - mean_y) for x, y in zip(log_x, log_y, strict=True))
     var_x = sum((x - mean_x) ** 2 for x in log_x)
     if var_x == 0:
-        return 0.0, 0.0
+        return 0.0, 0.0, True
     slope = cov / var_x
     intercept = mean_y - slope * mean_x
     ss_tot = sum((y - mean_y) ** 2 for y in log_y)
@@ -69,8 +85,9 @@ def _log_log_fit(xs: list[float], ys: list[float]) -> tuple[float, float]:
     # even though the underlying fit is exact. A relative-scale tolerance avoids
     # treating that noise as a real residual.
     scale = max(1.0, sum(y * y for y in log_y))
-    r_squared = 1.0 if ss_tot <= 1e-24 * scale else 1.0 - ss_res / ss_tot
-    return slope, r_squared
+    degenerate = ss_tot <= 1e-24 * scale
+    r_squared = 1.0 if degenerate else 1.0 - ss_res / ss_tot
+    return slope, r_squared, degenerate
 
 
 def local_dimension(
@@ -105,17 +122,39 @@ def local_dimension(
 
     if len(fit_radii) < 2:
         return DimensionEstimate(
-            source, tuple(radii[1:]), tuple(volumes[1:]), dimension=0.0, r_squared=0.0
+            source,
+            tuple(radii[1:]),
+            tuple(volumes[1:]),
+            dimension=0.0,
+            r_squared=0.0,
+            degenerate=False,
         )
 
-    slope, r_squared = _log_log_fit([float(r) for r in fit_radii], [float(s) for s in fit_shells])
+    slope, r_squared, degenerate = _log_log_fit(
+        [float(r) for r in fit_radii], [float(s) for s in fit_shells]
+    )
     return DimensionEstimate(
-        source, tuple(radii[1:]), tuple(volumes[1:]), dimension=slope + 1.0, r_squared=r_squared
+        source,
+        tuple(radii[1:]),
+        tuple(volumes[1:]),
+        dimension=slope + 1.0,
+        r_squared=r_squared,
+        degenerate=degenerate,
     )
 
 
 def mean_dimension(hg: Hypergraph, *, samples: int | None = None, max_radius: int = 6) -> float:
-    """Average local dimension over (a sample of) nodes, ignoring poor fits."""
+    """Average local dimension over (a sample of) nodes, ignoring poor fits.
+
+    Includes degenerate (constant-shell) fits in the average -- their
+    dimension value is still correct, only their r_squared is a sentinel
+    (see `DimensionEstimate.degenerate`). Callers who need to distinguish a
+    genuine measurement from a degenerate one (e.g. before citing accuracy,
+    per docs/POLY_ALGEBRAIC_BENCHMARK.md finding F1) should call
+    `local_dimension` directly and check `.degenerate` themselves; this
+    convenience wrapper answers "what does the estimator say", not "is that
+    answer informative."
+    """
     nodes = sorted(hg.nodes)
     if samples is not None and samples < len(nodes):
         step = max(1, len(nodes) // samples)
@@ -125,6 +164,26 @@ def mean_dimension(hg: Hypergraph, *, samples: int | None = None, max_radius: in
     if not well_fit:
         return float("nan")
     return sum(well_fit) / len(well_fit)
+
+
+def degenerate_fraction(
+    hg: Hypergraph, *, samples: int | None = None, max_radius: int = 6
+) -> float:
+    """Fraction of sampled nodes whose fit was degenerate (constant shell sequence).
+
+    A high value (e.g. all of `exact_periodic` in the physics benchmark) is
+    itself informative: it means the r_squared column for this hypergraph is
+    largely sentinel-valued, and `mean_dimension`'s apparent "perfect fit"
+    should not be cited as evidence of estimator accuracy (finding F1).
+    """
+    nodes = sorted(hg.nodes)
+    if samples is not None and samples < len(nodes):
+        step = max(1, len(nodes) // samples)
+        nodes = nodes[::step][:samples]
+    if not nodes:
+        return float("nan")
+    estimates = [local_dimension(hg, n, max_radius=max_radius) for n in nodes]
+    return sum(1 for e in estimates if e.degenerate) / len(estimates)
 
 
 def dimension_profile(

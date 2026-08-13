@@ -613,21 +613,31 @@ owed to problems 05 and 06**, both of which showed a comparable-magnitude
 shift under a small change to their sampling grid but were never checked
 against varying point count the way 08/09 were.
 
-**N4 — Detect and reject near-duplicate points in `knn_hypergraph` (from F3).**
-Three of ten problems hit duplicate stacking; two diagnosed it, one
-misdiagnosed it. A cheap guard — warn or de-duplicate when any inter-point
-distance falls below some fraction of the median nearest-neighbour distance —
-would have caught all three automatically. At minimum, `pointcloud.py`'s
-docstring should state that repeated traversals of a periodic orbit are not
-valid input.
+**N4 — ✅ DONE. Detect and reject near-duplicate points in `knn_hypergraph`
+(from F3).** Implemented as `DuplicatePointsError` plus a `dedupe=True`
+option: duplicate *clusters* (not just pairs — a 3-period orbit produces
+clusters of 3, which a pairwise-only check can miss) are found via
+`scipy.spatial.cKDTree.query_pairs` + connected components, thresholded
+against the point cloud's **bounding-box diagonal**, not the local
+nearest-neighbour spacing. That distinction mattered: an initial
+implementation using median nearest-neighbour distance as the scale
+reference failed silently, because a duplicated point's "nearest neighbour"
+*is* its own duplicate — the corruption you are trying to detect corrupts
+the very statistic used to calibrate the detector. Verified on the exact
+reproduction case (300 points, each period-tripled at ~1e-9 offset): raises
+naming all 300 size-3 clusters; `dedupe=True` recovers exactly 300 nodes and
+dimension 1.0. Verified for no false positives on a 5000-point densely
+(but genuinely) sampled circle. Four new tests in
+`tests/test_hypergraph_pointcloud.py`.
 
-**N5 — Replace the O(n²) neighbour search (enabling N3).** The point counts in
-this run (182–1516) were chosen against a compute ceiling, not against a
-statistical requirement, and F4 shows that ceiling is precisely what limits the
-fractal results. A k-d tree or ball tree brings n=10⁴–10⁵ into range and is the
-single change that would most improve the estimator's headline capability. The
-docstring already concedes the construction is "not intended for large-scale
-point clouds"; F4 is the concrete cost of that.
+**N5 — ✅ DONE. Replace the O(n²) neighbour search (enabling N3).** Rebuilt
+`knn_hypergraph` on `scipy.spatial.cKDTree` (O(n log n) construction).
+Verified directly: 15,000 points in ~1.2s, a scale the O(n²) brute-force
+construction made impractical (the concrete cost F4 measured). This is the
+prerequisite for N3's convergence sweeps to reach the point counts (Lorenz
+2000–4000, Rössler 3000–6000) needed to find where the chaotic estimates
+actually plateau, rather than being capped by the neighbour-search cost
+itself.
 
 **N6 — Widen the fit window before trusting fractional slopes (from F4/§5).**
 Every fractal fit here spanned radii 1–5, well under a decade of scale. Investigate

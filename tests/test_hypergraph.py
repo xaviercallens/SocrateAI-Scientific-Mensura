@@ -174,6 +174,11 @@ def test_path_graph_has_dimension_one():
     assert est.is_well_fit()
     assert est.dimension == pytest.approx(1.0, abs=1e-9)
     assert est.r_squared == pytest.approx(1.0, abs=1e-9)
+    # N2: the path's shell sequence is exactly constant, so this r_squared=1.0
+    # is the degenerate sentinel, not a genuine multi-value fit -- is_well_fit()
+    # alone cannot see this distinction; is_genuinely_well_fit() must not.
+    assert est.degenerate is True
+    assert est.is_well_fit() and not est.is_genuinely_well_fit()
 
 
 def test_grid_graph_has_dimension_two():
@@ -200,12 +205,43 @@ def test_grid_graph_has_dimension_two():
     assert est.is_well_fit(threshold=0.98)
     assert est.dimension == pytest.approx(2.0, abs=1e-9)
     assert est.r_squared == pytest.approx(1.0, abs=1e-9)
+    # N2: the grid's shell sequence (4, 8, 12, 16) genuinely varies -- this
+    # r_squared=1.0 is a real fit, not the degenerate sentinel.
+    assert est.degenerate is False
+    assert est.is_genuinely_well_fit()
 
 
 def test_mean_dimension_matches_local_dimension_on_a_homogeneous_lattice():
     hg = Hypergraph.of(*[(i, i + 1) for i in range(40)])
     m = mean_dimension(hg, samples=5, max_radius=5)
     assert m == pytest.approx(1.0, abs=1e-9)
+
+
+def test_degenerate_fraction_distinguishes_path_from_grid():
+    # N2: a path's shell sequence is constant everywhere sampled -> fully
+    # degenerate. A grid's shell sequence genuinely varies (4,8,12,16) ->
+    # not degenerate. This is exactly the distinction finding F1 of
+    # docs/POLY_ALGEBRAIC_BENCHMARK.md showed is missing from a bare
+    # r_squared reading.
+    from socrates.hypergraph.dimension import degenerate_fraction
+
+    path = Hypergraph.of(*[(i, i + 1) for i in range(40)])
+    assert degenerate_fraction(path, samples=8, max_radius=5) == pytest.approx(1.0)
+
+    size = 10
+
+    def node(x: int, y: int) -> int:
+        return x * size + y
+
+    edges = []
+    for x in range(size):
+        for y in range(size):
+            if x + 1 < size:
+                edges.append((node(x, y), node(x + 1, y)))
+            if y + 1 < size:
+                edges.append((node(x, y), node(x, y + 1)))
+    grid = Hypergraph.of(*edges)
+    assert degenerate_fraction(grid, samples=8, max_radius=4) == pytest.approx(0.0)
 
 
 def test_dimension_of_disconnected_singleton_edge_is_poorly_fit():
@@ -233,11 +269,12 @@ def test_log_log_fit_r_squared_does_not_collapse_on_constant_shells():
         for n in (3, 6):
             xs = [float(x) for x in range(1, n + 1)]
             ys = [float(shell)] * n
-            slope, r_squared = _log_log_fit(xs, ys)
+            slope, r_squared, degenerate = _log_log_fit(xs, ys)
             assert slope == pytest.approx(0.0, abs=1e-9)
             assert r_squared == pytest.approx(1.0, abs=1e-9), (
                 f"shell={shell} n={n}: r_squared collapsed to {r_squared}"
             )
+            assert degenerate is True  # N2: a constant shell sequence must self-report as such
 
 
 def test_circle_at_k6_is_well_fit_at_the_default_max_radius():
