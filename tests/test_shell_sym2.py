@@ -32,6 +32,7 @@ from socrates.dualscale.shell_sym2 import (
     is_symmetric_square,
     locked_rhs,
     order3_to_sym2_params,
+    parameter_curvature,
     predicted_enstrophy_exponent,
     reconstruct_jacobian,
     reconstruct_profile,
@@ -315,12 +316,43 @@ def _signed_drift(result) -> float:
     return float((result.energy[-1] - result.energy[0]) / result.energy[0])
 
 
-def _drift_scan(k: np.ndarray, cfls: tuple[float, ...], *, t_max: float) -> list[float]:
+def _drift_scan(
+    k: np.ndarray,
+    cfls: tuple[float, ...],
+    *,
+    t_max: float,
+    initial_profile: np.ndarray | None = None,
+    max_cond: float = 1e4,
+    min_ulps: float = 200.0,
+) -> list[float]:
+    """Signed drift at each cfl, with the gate's own evaluability preconditions.
+
+    The two preconditions are asserted, not silently skipped, so that a change
+    which pushes a pinned seed out of the regime where this gate MEANS anything
+    fails loudly instead of quietly measuring nothing:
+
+    * `max_cond` -- the conditioning question of FINDINGS 7.3 item 4 is open and
+      is NOT what this gate tests.  A run whose Jacobian gets that badly
+      conditioned has a dt-insensitive error contribution that no step rule can
+      remove; measured, a fixed-dt plain RK4 control on the identical field is
+      2-200x WORSE than the adaptive rule at every such seed (FINDINGS 10.4).
+    * `min_ulps` -- below ~1e-13 relative the drift stops measuring the
+      integrator and starts measuring the roundoff of the energy sum
+      (FINDINGS 8.6.2).  Same control: a fixed-dt run whose drift lands there
+      flips sign too.
+    """
     drifts = []
     for cfl in cfls:
-        result = simulate_sym2_shell_model(k, lock="sym2", t_max=t_max, cfl=cfl, n_samples=8)
+        result = simulate_sym2_shell_model(
+            k, lock="sym2", t_max=t_max, cfl=cfl, n_samples=8, initial_profile=initial_profile
+        )
         assert result.terminated == "t_max", f"cfl={cfl} stopped at {result.terminated}"
-        drifts.append(_signed_drift(result))
+        cond = float(result.metadata["max_jacobian_condition"])
+        assert cond < max_cond, f"cfl={cfl}: max cond(J) = {cond:.3g}, gate not discriminating"
+        drift = _signed_drift(result)
+        ulps = abs(result.energy[-1] - result.energy[0]) / np.spacing(result.energy[0])
+        assert ulps >= min_ulps, f"cfl={cfl}: drift is {ulps:.0f} ulps, at the roundoff floor"
+        drifts.append(drift)
     return drifts
 
 
@@ -365,38 +397,88 @@ def _assert_compensated_flatness(
     )
 
 
+# The round-2c seed sweep, as a gate.  Every root pair from the 26-seed sweep of
+# FINDINGS 10.3 whose three runs all terminate "t_max", whose max cond(J) stays
+# under 1e4, and whose drift stays above the roundoff floor at every cfl -- i.e.
+# every seed at which this gate is a discriminating measurement of the STEP RULE
+# rather than of the open conditioning question (FINDINGS 7.3 item 4) or of the
+# energy sum's roundoff (FINDINGS 8.6.2).  The membership rule is a property of
+# the run, not of the answer, and `_drift_scan` asserts it rather than skipping,
+# so a regression that pushes a seed out of the regime fails loudly.
+#
+# The 13 seeds NOT listed are all reported in FINDINGS 10.3 with their numbers;
+# at every one of them a fixed-dt plain RK4 control with no adaptive rule at all
+# fails the same criterion, in all but one case far worse (FINDINGS 10.4).
+# (0.7,-0.2) is omitted as an exact duplicate: it gives the same (A, b) =
+# (0.25, 0.14), hence the same profile and the same trajectory, as (0.2,-0.7).
+SEED_SWEEP: tuple[tuple[float, float], ...] = (
+    (0.5, 0.25),  # module default / flagship
+    (0.2, -0.7),  # FINDINGS 9.2 failure 1 (2.51x on this ladder under 4.8'')
+    (0.1, -0.6),  # FINDINGS 9.2 failure 2 (24.75x)
+    (0.15, -0.65),  # found failing in round 2c (12.67x AND a sign flip)
+    (0.3, -0.4),  # contract seed C7
+    (0.25, -0.75),
+    (0.5, -0.5),  # A(0) = 0 exactly -- the a = 0 fold of FINDINGS 7
+    (0.45, -0.35),
+    (0.55, -0.45),
+    (0.6, 0.3),
+    (-0.2, 0.75),
+    (0.05, 0.85),
+    (0.8, -0.1),
+)
+
+
 @pytest.mark.slow
-@pytest.mark.parametrize("n_shells", [24, 30])
-def test_full_window_energy_drift_converges_at_fourth_order(n_shells: int) -> None:
-    """Gate T5/B2 over the FULL window, AT THE CONFIGURATION THE CLAIM IS ABOUT.
+@pytest.mark.parametrize("roots", SEED_SWEEP, ids=lambda r: f"{r[0]}_{r[1]}")
+def test_full_window_energy_drift_converges_at_fourth_order(roots: tuple[float, float]) -> None:
+    """Gate T5/B2 over the FULL window, at the configuration the claim is about,
+    ACROSS A SEED SWEEP.
 
     Round 1 measured, at t_max = 0.8, alpha' = 1e-6, N = 24, drift
     1.02e-5 / 9.33e-6 / 1.27e-5 / 6.77e-6 / 6.57e-6 / 6.27e-6 / 1.10e-5 /
     2.43e-6 as cfl swept 0.2 -> 0.001: neither convergent nor monotone.
 
-    W1 ROUND 2 PHASE 3 -- RE-PINNED, and this is the point.  The previous
-    version of this test pinned N = 6 on the plain dyadic ladder and asserted
-    a *fitted* order.  FINDINGS 7.2.F showed that placement was where the test
-    passed, not where the claim lived: its own pass criterion failed at
-    N = 7, 10, 12, 16, 20, 24, 30 and on the T-dual ladder at alpha' = 1e-6
-    for both N = 24 and N = 30 (first halving ratio 0.82 against the required
-    8.0), while N = 6 is a qualitatively different regime (fitted order 7.39
-    there).  A green gate confined to a regime that does not exercise the
-    claim is not a gate.
+    W1 ROUND 2 PHASE 3 re-pinned this from N = 6 -- a regime where the test
+    passed but the claim did not live (FINDINGS 7.2.F) -- to N = 24 and N = 30
+    on the T-dual ladder at alpha' = 1e-6, asserting compensated-error
+    flatness rather than a fitted order.  See `_assert_compensated_flatness`
+    for why a fitted order is not evidence.
 
-    So this now pins the flagship configuration itself -- T-dual ladder,
-    alpha' = 1e-6, full window t_max = 0.8 -- at BOTH N = 24 and N = 30, and
-    asserts compensated-error flatness rather than a fitted order.  See
-    `_assert_compensated_flatness` for why.
+    W1 ROUND 2c RE-PINS IT AGAIN, and this is now the point.  FINDINGS 9.2
+    refuted the round-2b claim on generalisation: N = 24 and N = 30 are
+    near-duplicates (the drift is essentially N-independent above N = 12, and
+    the two agreed to four significant figures), so parametrising over them was
+    never a generalisation check -- while at 2 of 13 *seeds* the criterion
+    failed outright.  The parametrisation is therefore over SEEDS at fixed
+    N = 24, and it includes both seeds that refuted round 2b plus a third,
+    (0.15,-0.65), that round 2c found failing (12.67x with a sign flip) and
+    that nobody had tried.  N = 30 keeps a single check of its own below.
 
-    Measured under eq. 4.8'' with a 20-point log-spaced scan (cfl 0.1 ->
-    0.005) at N = 24: compensated spread 1.45x, zero sign flips, worst
-    adjacent pair equivalent to 13.8x per halving, over 5.4 decades of drift.
-    Exact halvings 0.16 -> 0.005 give 13.98/17.44/17.29/17.03/12.36x.  This
-    criterion was applied at N = 6, 8, 12, 16, 20, 24, 30 before shipping it
-    and passes at every one (FINDINGS 8.8).
+    Measured under eq. 4.8''' at N = 24, cfl 0.08/0.04/0.02: compensated
+    spreads 1.014 / 1.922 / 1.178 / 1.360 / 1.054 / 1.446 / 1.067 / 1.079 /
+    1.066 / 1.056 / 1.476 / 1.078 / 1.031 in the order listed in SEED_SWEEP,
+    zero sign flips everywhere, minimum exact-halving ratio 13.12 against gate
+    T5's 8.  The 2x band therefore has only 4% headroom at its worst seed,
+    (0.2,-0.7).  That is the honest state of the gate; it is recorded in
+    FINDINGS 10.5 rather than padded out, and it is the first thing to attack.
     """
-    k = effective_wavenumber(1e-6, dyadic_wavenumbers(n_shells))
+    k = effective_wavenumber(1e-6, dyadic_wavenumbers(24))
+    cfls = (0.08, 0.04, 0.02)
+    seed = seed_profile(24, lock="sym2", roots=roots)
+    _assert_compensated_flatness(_drift_scan(k, cfls, t_max=0.8, initial_profile=seed), cfls)
+
+
+@pytest.mark.slow
+def test_full_window_gate_also_holds_at_the_other_shell_count() -> None:
+    """N = 30 at the flagship seed -- round 2b's second parametrisation, kept as
+    a cheap N-check but no longer mistaken for a generalisation check.
+
+    FINDINGS 9.1: N = 24 and N = 30 agree to four significant figures because
+    the drift is essentially N-independent above N = 12.  That is worth pinning
+    once; it is not worth pinning thirteen times, which is why the seed sweep
+    above runs at a single N.
+    """
+    k = effective_wavenumber(1e-6, dyadic_wavenumbers(30))
     cfls = (0.08, 0.04, 0.02)
     _assert_compensated_flatness(_drift_scan(k, cfls, t_max=0.8), cfls)
 
@@ -527,15 +609,17 @@ def test_lemma_4_4_invariants_hold_pointwise_over_the_full_window() -> None:
 
 
 def test_repaired_timestep_rule_is_never_looser_than_contract_eq_4_8() -> None:
-    """eq. 4.8'' >= eq. 4.8' >= eq. 4.8 pointwise -- a tightening, never a
-    loosening, of the contract's stability convention.
+    """eq. 4.8''' >= eq. 4.8'' >= eq. 4.8' >= eq. 4.8 pointwise -- a tightening,
+    never a loosening, of the contract's stability convention.
 
-    Exercises the shipped `stability_rate`/`step_rate` rather than an inline
-    re-derivation, so the test cannot pass while the integrator uses something
-    else.  eq. 4.8' is the 2-norm blend of eq. 4.8's terms (the 2-norm
-    dominates the max, and 1/sqrt(t**2+eps**2) >= 1/(|t|+eps)); eq. 4.8''
-    adds a non-negative error density under a fifth root, so it can only
-    shorten the step further.
+    Exercises the shipped `stability_rate`/`parameter_curvature`/`step_rate`
+    rather than an inline re-derivation, so the test cannot pass while the
+    integrator uses something else.  eq. 4.8' is the 2-norm blend of eq. 4.8's
+    terms (the 2-norm dominates the max, and
+    1/sqrt(t**2+eps**2) >= 1/(|t|+eps)); eq. 4.8''' adds the non-negative
+    curvature term |thetaddot|/sqrt(theta**2+eps**2) under the same square
+    root; eq. 4.8'' adds a non-negative error density under a fifth root.
+    Each can only shorten the step further.
     """
     k = dyadic_wavenumbers(12)
     eps = 1e-3
@@ -557,10 +641,88 @@ def test_repaired_timestep_rule_is_never_looser_than_contract_eq_4_8() -> None:
             )
             blend = stability_rate(z, u, zdot, k, nu, lock="sym2")
             assert blend >= legacy, f"eq. 4.8' looser than eq. 4.8 at z={z}, nu={nu}"
+            zddot = parameter_curvature(z, zdot, k, nu, lock="sym2")
+            curved = stability_rate(z, u, zdot, k, nu, lock="sym2", zddot=zddot)
+            assert curved >= blend, f"eq. 4.8''' looser than eq. 4.8' at z={z}, nu={nu}"
             for density in (0.0, 1.0, 1e6):
-                assert step_rate(blend, density) >= blend
+                assert step_rate(curved, density) >= curved >= blend
     # lock="none" is bit-for-bit shell.py's rate -- that is what gate T1 pins.
+    # The curvature term must not reach it: "none" has no lock parameters.
     u_none = seed_profile(12, lock="sym2")
     assert stability_rate(u_none, u_none, u_none, k, 0.0, lock="none") == float(
         np.max(k * np.abs(u_none))
     )
+    assert not np.any(parameter_curvature(u_none, u_none, k, 0.0, lock="none"))
+
+
+def test_stability_rate_does_not_collapse_at_a_lock_parameter_turning_point() -> None:
+    """The round-2c defect, pinned directly at its mechanism.
+
+    Every lock-parameter term of the contract's eq. 4.8 and of eq. 4.8' is a
+    multiple of |thetadot|, so it vanishes IDENTICALLY wherever a lock
+    parameter turns around -- and a turning point is exactly where RK4's
+    truncation error is largest, since that error is driven by the high
+    derivatives of the trajectory and not by its velocity.  eq. 4.8' therefore
+    has a local *minimum* of the rate at each such passage and lengthens the
+    step straight through it (FINDINGS 10.1: at roots (0.1,-0.6) the rate falls
+    20.2 -> 4.49 across the turn of A while dt grows 2.5x, and the three steps
+    there carry +125%/+102%/-103% of the run's energy drift).
+
+    The trajectory here is generated by a PLAIN fixed-dt RK4 with no adaptive
+    rule at all, so the test does not depend on the rule it is testing.  If
+    this ever fails, either the curvature term has stopped firing or eq. 4.8'
+    has stopped dipping -- both worth knowing.
+    """
+    n_shells, n_steps, t_end = 24, 400, 0.2
+    k = effective_wavenumber(1e-6, dyadic_wavenumbers(n_shells))
+    z, _ = fit_lock_state(seed_profile(n_shells, lock="sym2", roots=(0.1, -0.6)), lock="sym2")
+
+    def field(state: np.ndarray) -> np.ndarray:
+        return locked_rhs(state, k, 0.0, lock="sym2")[0]
+
+    def rk4(state: np.ndarray, h: float) -> np.ndarray:
+        k1 = field(state)
+        k2 = field(state + 0.5 * h * k1)
+        k3 = field(state + 0.5 * h * k2)
+        k4 = field(state + h * k3)
+        return state + (h / 6.0) * (k1 + 2 * k2 + 2 * k3 + k4)
+
+    dt = t_end / n_steps
+    states = [z]
+    for _ in range(n_steps):
+        states.append(rk4(states[-1], dt))
+
+    primes, curved, pdots = [], [], []
+    for state in states:
+        zdot = field(state)
+        u = reconstruct_profile(state, n_shells, lock="sym2")
+        prime = stability_rate(state, u, zdot, k, 0.0, lock="sym2")
+        zddot = parameter_curvature(state, zdot, k, 0.0, lock="sym2", rate=prime)
+        primes.append(prime)
+        curved.append(stability_rate(state, u, zdot, k, 0.0, lock="sym2", zddot=zddot))
+        pdots.append((float(zdot[3]), float(zdot[4])))
+
+    # 1. Where eq. 4.8' is at its weakest IS a turning point of a lock
+    #    parameter -- that is the defect, stated as a coincidence that must hold.
+    worst = int(np.argmin(primes))
+    turning = any(
+        pdots[i - 1][j] * pdots[i][j] < 0
+        for i in range(max(1, worst - 2), min(len(pdots), worst + 3))
+        for j in (0, 1)
+    )
+    assert turning, (
+        f"eq. 4.8' bottoms out at step {worst} (t={worst * dt:.4f}) without a "
+        "lock-parameter turning point -- the round-2c diagnosis needs redoing"
+    )
+
+    # 2. The dip is deep: eq. 4.8' collapses by more than 5x into the turn.
+    lo, hi = max(0, worst - 30), min(len(primes), worst + 31)
+    assert max(primes[lo:hi]) / primes[worst] > 5.0, (
+        f"the (4.8') dip has gone: {max(primes[lo:hi]):.3f} / {primes[worst]:.3f}"
+    )
+
+    # 3. eq. 4.8''' does not collapse there: the curvature term carries it.
+    assert curved[worst] > 5.0 * primes[worst], (
+        f"curvature term does not fire at the turn: {curved[worst]:.3f} vs {primes[worst]:.3f}"
+    )
+    assert curved[worst] > min(curved), "eq. 4.8''' still bottoms out at the turn"

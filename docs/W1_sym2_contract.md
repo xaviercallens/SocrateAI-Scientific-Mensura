@@ -528,6 +528,88 @@ validated only by the dt-refinement control (§7.C1), not by argument.
 > stages no longer pay for the per-step Euler-identity `lstsq` and the SVD.
 > Measured wall-clock and drift at matched cfl are in FINDINGS §8.5.
 
+> **Erratum 3 (W1 round 2c, Tier C — numerical convention). Every
+> lock-parameter term of (4.8) and (4.8′) is first order in $t$, hence
+> identically blind at turning points of the lock parameters.** (4.8″) is kept
+> — FINDINGS §9.1 confirms it is real progress — but §9.2 refuted the claim
+> that it makes the drift compensated-flat *as a property of the rule*: at 2 of
+> 13 well-conditioned seeds it does not. FINDINGS §10 locates why, and the
+> cause is neither the branch point of §7 nor a further blindness of the
+> Richardson estimator (measured: $C(\Delta t)$ at the failing passages is flat
+> to $1.03$–$1.04\times$ in rate over a $4\times$ range of $\Delta t$, so the
+> estimator is *not* the blind component).
+>
+> Both (4.8) and (4.8′) measure each lock parameter through
+> $|\dot\theta|/(|\theta|+\varepsilon)$ resp.
+> $\dot\theta^{2}/(\theta^{2}+\varepsilon^{2})$ — a multiple of $|\dot\theta|$
+> in either case. That vanishes identically wherever $\theta$ turns around.
+> A turning point is exactly where RK4's truncation error is *largest*: the
+> truncation error is driven by the high derivatives of the trajectory, not by
+> its velocity, and $\ddot\theta\ne0$ there by definition. So the rate has a
+> local **minimum** at each such passage and the rule lengthens the step
+> straight through it. Measured (FINDINGS §10.1): at roots $(0.1,-0.6)$,
+> $A(t)$ turns over at $t=0.1545$; over the eight steps astride the turn the
+> (4.8′) rate falls $20.2\to4.49$ and $\Delta t$ *grows* $2.5\times$, and the
+> three steps there carry $+125\%$, $+102\%$, $-103\%$ of the whole run's
+> energy drift. At roots $(0.2,-0.7)$ the same thing happens at $t=0.2658$
+> ($8.61\to2.81$, $\Delta t$ up $1.6\times$, one step carrying $-93\%$).
+> (4.8″)'s error term lifts the rate there by only $1.9\times$ — not enough to
+> undo a $3\times$ collapse.
+>
+> **This defect is present at the flagship seed too, and is not seed-specific.**
+> What is seed-dependent is only *how much of the run's total drift the
+> unresolved passage carries*: $\approx26\%$ at the flagship (compensated
+> spread $1.30\times$, passes), $\approx100\%$ at the two failing seeds
+> (spread $3.65\times$ and $24.7\times$, fails). The flagship is protected by
+> an accident — its flow drives $A$ through $0$, where the
+> $\varepsilon$-softened denominator makes the *same* term spike to
+> $\mathrm{rate}'\approx6\times10^{3}$, over-resolving that neighbourhood. A
+> seed whose flow has a turning point but no near-zero of $A$ gets the dip
+> without the spike.
+>
+> The implementation therefore adds the **curvature** of the lock parameters:
+>
+> $$\mathrm{rate}_{4.8'''} = \sqrt{\;\sum_n (k_nu_n)^2
+> \;+\; \sum_{\theta}\left[\frac{\dot\theta^{\,2}}{\theta^{2}+\varepsilon^{2}}
+> \;+\; \frac{|\ddot\theta|}{\sqrt{\theta^{2}+\varepsilon^{2}}}\right]
+> \;+\; \bigl(\nu\max_nk_n^2\bigr)^2\;},
+> \tag{4.8$'''$ — Tier C}$$
+>
+> and (4.8″) is applied to *this* rate:
+> $\Delta t = \mathrm{cfl}/(\mathrm{rate}_{4.8'''}^{\,5}+C)^{1/5}$.
+> $\sqrt{|\ddot\theta|/|\theta|}$ is the rate naturally attached to a turning
+> point — the time for the acceleration to change $\theta$ by $O(\theta)$ —
+> which is why it enters $\mathrm{rate}^{2}$ linearly, and why it reduces to
+> $|\dot\theta/\theta|$ (the existing term) on a pure exponential
+> $\theta=\theta_0e^{\lambda t}$ rather than introducing a new scale.
+>
+> $\ddot z$ is obtained by **one** directional finite difference,
+> $\ddot z\approx(\dot z(z+\delta\dot z)-\dot z(z))/\delta$ with
+> $\delta=\eta/\mathrm{rate}_{4.8'}(z)$ and $\eta=10^{-3}$ fixed
+> (`parameter_curvature`, `CURVATURE_PROBE`). One extra field evaluation out of
+> the thirteen a doubled step already costs.
+>
+> **$\delta$ must be set by the state, never by cfl.** Compensated flatness is
+> the statement that $\Delta t=\mathrm{cfl}\cdot g(z)$ for a $g$ that does not
+> depend on cfl; any probe length proportional to cfl would make $g$
+> cfl-dependent and break the refinement study at the coarse end. Measured
+> insensitivity to $\eta$ at the flagship, exact halvings $0.08/0.04/0.02$:
+> compensated spread $1.000\times$ / $1.008\times$ / $1.012\times$ at
+> $\eta=10^{-2}/10^{-3}/10^{-4}$.
+>
+> **Properties (all Tier B, checked).**
+> 1. $\mathrm{rate}_{4.8'''}\ge\mathrm{rate}_{4.8'}\ge\mathrm{rate}_{4.8}$
+>    pointwise — the added term is non-negative — so this is again a strict
+>    tightening and gate T5 is met, not moved.
+> 2. `lock="none"` has no lock parameters: same rate, same single RK4 step.
+>    Gate T1 remains bit-for-bit.
+> 3. Lemma 4.4 is a property of the projector, not the stepper; re-verified.
+> 4. Cost: $+8\%$ field evaluations per step, and $16$–$37\%$ more accepted
+>    steps. The drift falls by $3.2\times$ (flagship), $40\times$
+>    ($(0.2,-0.7)$) and $84\times$ ($(0.1,-0.6)$) at matched cfl — i.e. $1.8$,
+>    $12$ and $24\times$ *beyond* what the extra steps alone would buy, which is
+>    the signature of a targeted repair rather than a uniform tightening.
+
 ---
 
 ## 5. The enstrophy bridge: from the lock to the measured exponent

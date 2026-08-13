@@ -481,6 +481,59 @@ def locked_rhs(
 
 STEP_EPS: float = 1e-3  # eq. 4.8's epsilon, the lock-parameter softening
 
+# eq. 4.8''' -- dimensionless length of the directional-derivative probe used to
+# measure the lock-parameter curvature (`parameter_curvature`).  The probe
+# displacement is delta = CURVATURE_PROBE / rate', i.e. a fixed *fraction* of
+# the state's own natural timescale, which makes it a pure function of the state
+# and therefore leaves the whole step rule homogeneous of degree 1 in cfl -- the
+# property compensated flatness actually needs (FINDINGS 10.2).  Measured
+# insensitivity: the flagship's compensated spread over cfl 0.08/0.04/0.02 is
+# 1.000x / 1.008x / 1.012x at CURVATURE_PROBE = 1e-2 / 1e-3 / 1e-4.
+CURVATURE_PROBE: float = 1e-3
+
+
+def parameter_curvature(
+    z: np.ndarray,
+    zdot: np.ndarray,
+    k: np.ndarray,
+    viscosity: float,
+    *,
+    lock: str,
+    closure: str = "galerkin",
+    rcond: float = 1e-10,
+    rate: float | None = None,
+    probe: float = CURVATURE_PROBE,
+) -> np.ndarray:
+    """zddot = d/dt zdot along the flow, by one directional finite difference.
+
+        zddot ~ ( zdot(z + delta*zdot) - zdot(z) ) / delta,
+        delta = probe / rate'(z)
+
+    Costs exactly one extra field evaluation per step (out of the thirteen a
+    doubled step already takes).  `delta` is set by the state's own timescale
+    1/rate', never by cfl, so `zddot` is a pure function of z -- see
+    `CURVATURE_PROBE`.  Returns zeros for lock="none" (no lock parameters) and
+    whenever the difference is not finite.
+    """
+    z = np.asarray(z, dtype=float)
+    if lock == "none":
+        return np.zeros_like(z)
+    k = np.asarray(k, dtype=float)
+    zdot = np.asarray(zdot, dtype=float)
+    if rate is None:
+        u = reconstruct_profile(z, k.size, lock=lock)
+        rate = stability_rate(z, u, zdot, k, viscosity, lock=lock)
+    if not (rate > 0 and math.isfinite(rate)):
+        return np.zeros_like(z)
+    delta = probe / rate
+    zdot_ahead = _locked_zdot(
+        z + delta * zdot, k, viscosity, lock=lock, closure=closure, rcond=rcond
+    )[0]
+    zddot = (zdot_ahead - zdot) / delta
+    if not np.all(np.isfinite(zddot)):
+        return np.zeros_like(z)
+    return zddot
+
 
 def stability_rate(
     z: np.ndarray,
@@ -491,19 +544,44 @@ def stability_rate(
     *,
     lock: str,
     eps: float = STEP_EPS,
+    zddot: np.ndarray | None = None,
 ) -> float:
-    """eq. 4.8' -- the smooth 2-norm blend of the contract's eq. 4.8 rates.
+    """eq. 4.8' (zddot=None) / eq. 4.8''' (zddot given) -- the stability rate.
 
-        rate' = sqrt( sum_n (k_n u_n)**2
-                      + sum_theta thetadot**2 / (theta**2 + eps**2)
-                      + (nu max_n k_n**2)**2 )
+        rate'   = sqrt( sum_n (k_n u_n)**2
+                        + sum_theta thetadot**2 / (theta**2 + eps**2)
+                        + (nu max_n k_n**2)**2 )
 
-    This is a *stability* rate: the fastest nonlinear timescale plus the drift
-    timescales of the lock parameters. It is >= eq. 4.8's max() form term by
-    term (the 2-norm dominates the max, and
+        rate''' = sqrt( rate'**2
+                        + sum_theta |thetaddot| / sqrt(theta**2 + eps**2) )
+
+    eq. 4.8' is a *stability* rate: the fastest nonlinear timescale plus the
+    drift timescales of the lock parameters. It is >= eq. 4.8's max() form term
+    by term (the 2-norm dominates the max, and
     (theta**2+eps**2)**-1/2 >= (|theta|+eps)**-1), so it never permits a longer
     step than the contract allows. It is NOT an accuracy estimate and must not
     be used as one: see `error_density` and eq. 4.8''.
+
+    WHY THE CURVATURE TERM (FINDINGS section 10, contract Erratum 3).  Every
+    lock-parameter term of eq. 4.8 and eq. 4.8' is FIRST order in t: it is a
+    multiple of |thetadot|.  It therefore vanishes identically at every
+    *turning point* of a lock parameter -- and a turning point is exactly where
+    RK4's truncation error is largest, because the truncation error is driven
+    by the high derivatives of the trajectory, not by its velocity.  So eq. 4.8'
+    has a local *minimum* of the rate at each such passage and lengthens the
+    step straight through it. Measured: at roots (0.1,-0.6), A(t) turns over at
+    t = 0.1545 and the eq. 4.8' rate dips 20.2 -> 4.49 over eight steps while dt
+    *grows* 2.5x; the three steps astride that turn carry +125%, +102% and
+    -103% of the whole run's energy drift.  eq. 4.8'''s curvature term is
+    5.1e3 there (rate' 4.49 -> 71.6), so the passage is resolved instead.
+
+    sqrt(|thetaddot|/|theta|) is the natural rate attached to a turning point
+    (the time for the acceleration to change theta by O(theta)), which is why
+    it enters rate**2 linearly.  Adding a non-negative term can only shorten
+    the step, so eq. 4.8''' >= eq. 4.8' >= eq. 4.8 still holds pointwise and
+    the contract's stability convention is tightened, never relaxed.
+    lock="none" has no lock parameters and is untouched -- gate T1 is
+    bit-for-bit unaffected.
     """
     if lock == "none":
         rate = float(np.max(k * np.abs(u)))
@@ -514,7 +592,10 @@ def stability_rate(
     n_params = 2 if lock in ("sym2", "veronese") else 3
     for pidx in range(len(z) - n_params, len(z)):
         pv, pd = float(z[pidx]), float(zdot[pidx])
-        rate_sq += pd * pd / (pv * pv + eps * eps)
+        soft = pv * pv + eps * eps
+        rate_sq += pd * pd / soft
+        if zddot is not None:
+            rate_sq += abs(float(zddot[pidx])) / math.sqrt(soft)
     if viscosity > 0:
         rate_sq += (viscosity * float(np.max(k**2))) ** 2
     return math.sqrt(rate_sq)
@@ -897,19 +978,20 @@ def simulate_sym2_shell_model(
     a pure integrator diagnostic under closure="galerkin". With lock="none"
     this reduces exactly to simulate_shell_model (gate T1/B4).
 
-    Timestep rule (eq. 4.8'', W1 round 2 phase 3).  For lock="none" the rate is
+    Timestep rule (eq. 4.8'''/4.8'', W1 round 2c).  For lock="none" the rate is
     bit-for-bit `shell.py`'s ``max(max_n k_n|u_n|, nu max_n k_n**2)`` and the
     step is a single RK4 -- that is what gate T1 pins, and nothing below
     touches it.  For a locked run,
 
-        dt = cfl / ( stability_rate(...)**5 + C )**(1/5)
+        dt = cfl / ( stability_rate(..., zddot=zddot)**5 + C )**(1/5)
 
-    where `stability_rate` is eq. 4.8' (the smooth 2-norm blend of eq. 4.8's
-    terms) and `C` is the relative local-error density measured by step
-    doubling on the *previous* step (`error_density`).  The step itself is
-    taken as two half RK4 steps, with the single full step retained only as
-    the Richardson estimator -- so `C` is available for the next step at no
-    extra field evaluations beyond the doubling itself.
+    where `stability_rate` with `zddot` is eq. 4.8''' (the eq. 4.8' smooth 2-norm
+    blend of eq. 4.8's terms, plus the lock-parameter CURVATURE term) and `C` is the
+    relative local-error density measured by step doubling on the *previous*
+    step (`error_density`).  The step itself is taken as two half RK4 steps,
+    with the single full step retained only as the Richardson estimator -- so
+    `C` is available for the next step at no extra field evaluations beyond
+    the doubling itself.  `zddot` costs exactly one more.
 
     eq. 4.8' alone is blind to accuracy.  On the flagship trajectory its rate
     has a local minimum (2.115) at t = 0.182, where the measured local-error
@@ -921,6 +1003,18 @@ def simulate_sym2_shell_model(
     it remains a strict tightening of the contract's eq. 4.8) and lifts it
     only where the measured error says the step must be shorter -- the median
     rate''/rate' over a run is 1.000.  See `step_rate` and FINDINGS 8.
+
+    eq. 4.8'' was not enough, and FINDINGS 9.2 refuted it on generalisation:
+    at 2 of 13 well-conditioned seeds the full-window drift is still not
+    compensated-flat.  The reason (FINDINGS 10) is that eq. 4.8's local minima
+    are not accidents -- every lock-parameter term of eq. 4.8 and 4.8' is a
+    multiple of |thetadot| and therefore vanishes IDENTICALLY at every turning
+    point of a lock parameter, which is precisely where the truncation error
+    peaks.  eq. 4.8''' adds the curvature term |thetaddot|/sqrt(theta**2+eps**2)
+    so the rate cannot collapse there.  The defect is present at the flagship
+    too; what is seed-dependent is only how much of the run's drift the
+    unresolved passage carries (26% at the flagship, ~100% at the two failing
+    seeds).  See `stability_rate` and `parameter_curvature`.
 
     `cond_ceiling` terminates the run "lock_singular" if cond(J) exceeds it for
     20 consecutive steps.  This is a *new, tighter* guard than the previous
@@ -1017,11 +1111,20 @@ def simulate_sym2_shell_model(
         u = profile_of(z)
         zdot_now = field(z)
 
-        # eq. 4.8'/4.8''.  lock="none" keeps shell.py's rate bit-for-bit
+        # eq. 4.8'''/4.8''.  lock="none" keeps shell.py's rate bit-for-bit
         # (gate T1) and a plain single RK4 step; a locked run uses the
-        # error-lifted rate and the doubled step.
+        # curvature- and error-lifted rate and the doubled step.
         rate = stability_rate(z, u, zdot_now, k, viscosity, lock=lock)
         if lock != "none":
+            # eq. 4.8''': (4.8')'s lock-parameter terms are first order in t and
+            # so vanish at every turning point of a lock parameter -- exactly
+            # where the truncation error peaks.  The curvature term removes that
+            # structural blindness; `delta` is set by 1/rate', never by cfl, so
+            # the rule stays homogeneous in cfl.  See `stability_rate`.
+            zddot = parameter_curvature(
+                z, zdot_now, k, viscosity, lock=lock, closure=closure, rcond=rcond, rate=rate
+            )
+            rate = stability_rate(z, u, zdot_now, k, viscosity, lock=lock, zddot=zddot)
             if not warmed:
                 # Startup probe: without it the very first step -- where the
                 # error density is largest on this seed -- would be the one

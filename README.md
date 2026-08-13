@@ -71,7 +71,7 @@ no computational spine is not the goal here.
 
 | Workflow | Goal | Status |
 |---|---|---|
-| **W1** | Does the Sym² lock change the Hypothesis-U exponent from $-2/3$? The decisive experiment. | Round 1: contract + implementation done, sweep inconclusive (gates caught a real defect). Round 2a: chart branch-point fixed and confirmed; step-rule fix refuted (FINDINGS §7). Round 2b: step-doubling estimator confirmed as real progress at 2 configurations, refuted on seed generalization (FINDINGS §9) — seed-dependence must be diagnosed before the separation measurement can run. |
+| **W1** | Does the Sym² lock change the Hypothesis-U exponent from $-2/3$? The decisive experiment. | Round 1: contract + implementation done, sweep inconclusive (gates caught a real defect). Round 2a: chart branch-point fixed and confirmed; step-rule fix refuted (FINDINGS §7). Round 2b: step-doubling estimator confirmed as real progress, refuted on seed generalization (FINDINGS §9). Round 2c: seed-dependence diagnosed and repaired by a curvature term (eq. 4.8‴), real progress confirmed — but refuted a third time on generalization: the failing set has positive measure in seed space (FINDINGS §11). A structural question is now open before round 2d: is finite seed sampling the wrong validation strategy for this rule family? |
 | **W2** | Solver-ladder maintenance and extension — new rungs (restricted three-body, Mercury perihelion 1PN, more Horizons targets) never edit an old rung's gate. | Not started. |
 | **W3** | EIU / exact-arithmetic layer — an exact-mode path for every solver with rational forces, bit-growth economics measured en route to an RNS-backed dot-product kernel. | Not started. |
 | **W4** | Paper, Lean development, and this repository state the same theorems. | Partial — `lean/CallensDualScale.lean` received and checked (3 theorems, 1 proof fixed), but the full original paper source with LEAN-tagged theorem statements has not been supplied, so the checklist can't be completed exhaustively yet. |
@@ -187,13 +187,50 @@ compensated-flat where a fixed-timestep control is clean — the exact weak
 point the repair's own report flagged in advance as most likely to fail.
 Full account: [FINDINGS §8–9](docs/FINDINGS.md).
 
+**Round 2c** diagnosed the seed-dependence and repaired it. The cause is not
+the branch point of round 2a and not a further blindness of the estimator
+(measured: the estimator is accurate to $1.03$–$1.04\times$ at the failing
+passages). Every lock-parameter term of the contract's timestep rule is a
+multiple of $|\dot\theta|$ and therefore vanishes *identically* wherever a
+lock parameter turns around — which is exactly where RK4's truncation error is
+largest, since that error is driven by the trajectory's high derivatives and
+not by its velocity. The rate has a local *minimum* at each such passage and
+the rule steps straight through it. **The defect is present at the flagship
+seed too**; what is seed-dependent is only how much of the run's drift the
+unresolved passage carries ($26\%$ at the flagship, $\approx100\%$ at the
+failing seeds). Adding the curvature term $|\ddot\theta|/\sqrt{\theta^2+
+\varepsilon^2}$ (eq. 4.8‴, one extra field evaluation per step) fixes it: over
+a **26-seed sweep**, spreads improve at 20 seeds, both refuting seeds pass
+($3.65\to1.92$, $24.7\to1.18$) along with a third failure the sweep itself
+found, and at every seed that still fails a fixed-timestep control with no
+adaptive rule at all fails the same criterion — in 7 of 8 cases far worse.
+The remaining headroom is thin and is disclosed rather than padded: the
+$\le2\times$ band clears by $4\%$ at its worst seed.
+Full account: [FINDINGS §10](docs/FINDINGS.md).
+
+**Round 2c's own report predicted this exactly**, in its self-disclosed
+weakest untested assumption: *"a sweep of 100 seeds is the obvious next
+test, and the honest prior is that it finds something."* The skeptic went
+looking and found 5 failures among 51 additional seeds, sitting in a
+**continuous band** between round 2c's samples, not an isolated outlier —
+the failing set has positive measure in seed space. At those failures a
+plain fixed-timestep control is clean where the shipped rule is not: the
+exact §7 / §9 signature, reproduced a third time. Full account:
+[FINDINGS §11](docs/FINDINGS.md).
+
 **This is the adversarial-verification stage
-(`.claude/skills/decisive-experiment/SKILL.md`) working as intended, twice
-in a row** — each round produced real, independently-confirmed progress,
-and each time a plausible, well-evidenced, honestly-written report still
-needed independent re-derivation before being trusted with the next step.
-Round 2 continues once the seed-dependence is diagnosed. See the Roadmap
-above.
+(`.claude/skills/decisive-experiment/SKILL.md`) working as intended, three
+times in a row** — each round produced real, independently-confirmed
+progress, and each time a plausible, well-evidenced, honestly-written report
+still needed independent re-derivation before being trusted with the next
+step. But three rounds of "bigger sweep, same rule family, refuted by a
+denser sweep" is a pattern worth naming rather than repeating unexamined:
+FINDINGS §11.4 argues finite seed sampling may be structurally the wrong way
+to validate a closed-form rate rule on this chart, and proposes two
+directions that would actually change the argument — an analytic bound over
+the whole parameter chart, or a standard embedded-pair controller with step
+rejection, whose correctness would not depend on which seeds were tested.
+See the Roadmap above.
 
 ---
 
