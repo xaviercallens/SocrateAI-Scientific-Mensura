@@ -15,6 +15,8 @@ from .dimension import (
     dimension_profile,
     local_dimension,
     mean_dimension,
+    near_constant_consensus,
+    near_degenerate_fraction,
 )
 from .pointcloud import DuplicatePointsError, knn_hypergraph
 from .polyalgebra import RuleSearchResult, rule_space, solve_for_rule
@@ -44,6 +46,8 @@ __all__ = [
     "local_dimension",
     "mean_dimension",
     "multiway_evolve",
+    "near_constant_consensus",
+    "near_degenerate_fraction",
     "rule_space",
     "solve_for_rule",
 ]

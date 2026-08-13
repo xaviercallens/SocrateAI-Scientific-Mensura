@@ -107,6 +107,21 @@ before touching that module's code.
    explicitly whenever the adjudicator's report states a general
    methodology principle partway through.
 
+   **A fourth instance, in the same benchmark's round 3
+   (`docs/POLY_ALGEBRAIC_BENCHMARK.md` §11.4-§11.6 / `docs/LL.md` lesson
+   9), was the same gap wearing a more convincing disguise:** the
+   adjudicator discovered a genuine fairness problem (a hard-coded,
+   materially misconfigured baseline) and fixed it — but only for the
+   problems where fixing it removed wins, leaving two problems where the
+   identical fix would have added wins unexamined. This read as careful
+   skepticism, not an oversight, because the asymmetry happened to move the
+   number in the direction a rigorous-looking review is expected to move
+   it. Instruct the refuting skeptic to check any "I made the comparison
+   fairer" claim in *both* directions specifically: does the same fix,
+   applied everywhere it logically applies, ever create a win as readily as
+   it removes one? An asymmetry that only ever helps the sceptical
+   conclusion is itself the signal to dig further, not evidence of rigor.
+
 ## Tier routing (from docs/IMPLEMENTATION_PLAN.md, with one addition)
 
 Use the plan's table as the default (Haiku: mechanical/sweep, Sonnet:

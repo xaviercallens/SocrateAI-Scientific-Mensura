@@ -58,7 +58,17 @@ approprié. La preuve la plus solide d'un véritable avantage de
 l'estimateur --- une haute précision sur deux cibles bidimensionnelles non
 dégénérées où la méthode traditionnelle ne converge jamais --- se situe en
 dehors de ce que le critère de victoire déclaré peut noter, et est
-rapportée comme l'axe recommandé pour le prochain cycle.
+rapportée comme l'axe recommandé pour le prochain cycle. Un troisième
+cycle a ensuite révisé l'objectif à six sur dix et l'a atteint (01, 02,
+03, 04, 06, 10), mais seulement après deux cycles supplémentaires de
+réparation de l'estimateur, une boucle d'amélioration fondée sur la
+littérature, et une chaîne de relecture à quatre niveaux ayant par deux
+fois surpris les \emph{examinateurs} en train d'appliquer une véritable
+correction d'équité à seulement une partie des problèmes qu'elle
+gouvernait --- la même catégorie d'erreur que la correction du cycle 2
+avait elle-même diagnostiquée, désormais confirmée pour affecter les
+examinateurs aussi facilement que les affirmations d'origine. Voir la
+Section~\ref{sec:cycle3}.
 \end{abstract}
 
 \tableofcontents
@@ -551,69 +561,84 @@ s'est démontrablement appuyé. C'est cette infrastructure, et non le seul
 décompte de victoires, qui fait qu'un troisième cycle consiste à appliquer
 de nouvelles idées plutôt qu'à reconstruire la capacité de les tester.
 
-\section{Cycle 3~: une boucle d'amélioration fondée sur la littérature (en cours)}
+\section{Cycle 3~: une boucle d'amélioration fondée sur la littérature --- objectif atteint}
 \label{sec:cycle3}
 
-Un troisième cycle a été lancé immédiatement après cette correction, avec
-deux changements de nature plutôt que de degré. Premièrement, l'objectif
-du programme est révisé à la baisse et précisé~: \textbf{six problèmes sur
-dix, via le critère d'économie de calcul existant ou un nouveau critère de
-précision désormais formalisé}, plutôt que huit sur dix par la seule
-économie de calcul --- un objectif choisi pour être atteignable par de
-véritables nouveaux mécanismes plutôt qu'en assouplissant ce qui compte
-comme une victoire. Deuxièmement, les étapes de conception, de réparation
-et d'arbitrage de ce cycle utilisent un modèle de niveau supérieur tout au
-long du processus, et la recherche de nouvelles idées suit une brève revue
-de littérature plutôt que de partir uniquement des modes de défaillance déjà
-connus de l'estimateur~:
+Un troisième cycle a été lancé immédiatement après la correction du cycle
+2, avec un objectif révisé à la baisse et précisé~: \textbf{six problèmes
+sur dix, via le critère d'économie de calcul existant ou un nouveau
+critère de précision désormais formalisé}, plutôt que huit sur dix par la
+seule économie de calcul. Les étapes de conception, de réparation et
+d'arbitrage ont utilisé un modèle de niveau supérieur tout au long du
+processus. \textbf{L'objectif révisé a été atteint~: 6 des 10 problèmes
+(01, 02, 03, 04, 06, 10) sont des victoires vérifiées}, au terme d'une
+chaîne de relecture à quatre niveaux --- auto-déclaration, audit, deux
+examinateurs adversariaux indépendants, et une passe de clôture dédiée ---
+qui a par deux fois surpris les \emph{examinateurs} eux-mêmes en train de
+répéter la même catégorie d'erreur trouvée au cycle 2.
 
-\begin{itemize}
-\item \textbf{Une exclusion par fenêtre de Theiler} (Theiler, 1986) pour
-  la référence traditionnelle par somme de corrélation~: les points
-  temporellement adjacents sur une trajectoire chaotique sont exclus du
-  comptage par paires, la correction standard dans la littérature des
-  systèmes dynamiques non linéaires pour le biais d'autocorrélation, que
-  la référence de ce programme n'a pas implémentée. Il s'agit d'une
-  correction d'équité apportée au comparateur, dans l'esprit de la règle
-  permanente de ce rapport selon laquelle seule une véritable référence,
-  non un épouvantail, peut servir à tester une affirmation de supériorité
-  --- elle peut rendre les problèmes plus difficiles à gagner, non plus
-  faciles, et est poursuivie quoi qu'il en soit.
-\item \textbf{Une seconde stratégie d'estimation de dimension locale}
-  inspirée de l'estimateur de dimension intrinsèque par maximum de
-  vraisemblance de Levina et Bickel (2004) et des méthodes de voisinage à
-  rayon adaptatif à la variété (Farahmand, Szepesv\'ari et Audibert, 2007),
-  ciblée spécifiquement sur les deux problèmes où l'estimateur actuel
-  nécessite 2 à 4 fois \emph{plus} de points que la référence (Lorenz,
-  R\"ossler) --- poursuivie comme une boucle rapide proposer-mesurer-garder
-  (un changement de code à la fois, testé immédiatement, conservé
-  uniquement s'il améliore mesurablement la convergence, écarté sinon)
-  plutôt qu'une refonte unique et majeure décidée à l'avance.
-\item \textbf{Formaliser le critère de précision que les résultats de ce
-  rapport ne pouvaient pas noter.} La Section~\ref{sec:etat-actuel} a
-  trouvé la preuve la plus solide d'un véritable avantage de l'estimateur
-  sur deux cibles non dégénérées où la méthode traditionnelle ne converge
-  jamais, et a noté que le critère de victoire par nombre de points
-  nécessaires à la convergence est structurellement incapable de le
-  créditer. Le cycle 3 encode un second type de victoire explicite et
-  vérifiable dans le dispositif de comparaison --- la précision à une
-  taille d'échantillon fixe, grande et convergée --- afin que ce type
-  d'avantage soit mesuré par du code, non affirmé en prose.
-\end{itemize}
+\textbf{Ce qui a changé.} Trois hypothèses fondées sur la littérature ont
+été poursuivies. Une exclusion par fenêtre de Theiler (Theiler, 1986) a
+été ajoutée à la référence traditionnelle, correctement indexée sur
+l'indice temporel original de chaque point dans la trajectoire plutôt que
+sur sa position dans un tableau réordonné. Un second critère de
+victoire, la précision asymptotique sur un grand échantillon fixe (critère
+c), a été formalisé en code afin que l'avantage de l'estimateur sur des
+cibles non dégénérées puisse être mesuré plutôt qu'affirmé en prose --- il
+n'a produit aucune victoire vérifiée sur deux cycles complets, et reste
+une question ouverte sur la définition même du critère. Une boucle de
+style AutoResearch à quatre itérations (Karpathy, 2026) a ciblé les deux
+attracteurs chaotiques où l'estimateur nécessitait 2 à 4 fois \emph{plus}
+de points que la référence~: deux changements de code proposés ont été
+conservés après avoir mesurablement amélioré la convergence (un garde-fou
+de saturation sur la fenêtre d'ajustement, et l'application de la
+correction de Theiler à la construction du graphe de l'estimateur
+lui-même), deux ont été rejetés après avoir mesurablement échoué à aider
+ou causé une régression. Un défaut distinct de l'estimateur, encore
+ouvert (des séquences de coquilles quasi constantes produisant une
+statistique de qualité d'ajustement peu fiable), a nécessité trois cycles
+de réparation pour être corrigé correctement~; le correctif qui a
+finalement tenu s'appuie sur une preuve que l'estimation affectée est
+structurellement confinée à un intervalle borné, non seulement
+empiriquement propre sur les cas testés.
 
-Chaque changement est soumis à la même discipline qui a produit la
-correction rapportée ci-dessus~: une vérification indépendante de chaque
-réparation avant qu'un changement ne soit considéré fiable, une nouvelle
-mesure complète sur les dix problèmes plutôt que sur les seuls problèmes
-qu'un changement cible (car un changement de référence peut déplacer les
-chiffres de tous les problèmes, comme l'illustre l'historique de
-correction de la Section~\ref{sec:etat-actuel}), et une passe d'audit de
-l'audit adversariale chargée spécifiquement de vérifier si une correction
-méthodologique validée a été appliquée partout où elle aurait dû
-logiquement l'être --- exactement le défaut que la correction de la
-Section~\ref{sec:etat-actuel} de ce rapport a dû détecter. Les résultats
-seront rapportés en addendum une fois vérifiés indépendamment, quels
-qu'ils soient.
+\textbf{Le résultat qui a décidé du cycle, cependant, était procédural.}
+L'arbitre a découvert que la fenêtre de rayon de la somme de corrélation
+de la référence traditionnelle était codée en dur et matériellement mal
+configurée sur plusieurs cibles --- un défaut d'équité dans le
+\emph{comparateur}, non dans l'estimateur, qui avait silencieusement
+affecté les chiffres de chaque cycle. Le corriger a changé de véritables
+verdicts. Mais la correction a d'abord été appliquée seulement aux
+problèmes où une référence plus équitable \emph{retirait} une victoire de
+poly, produisant un résultat de 4 sur 10 auto-cohérent qui se lisait comme
+un scepticisme rigoureux. Un examinateur dédié, chargé spécifiquement de
+vérifier si une correction déclarée avait été appliquée partout où elle
+aurait dû logiquement l'être --- exactement la discipline que la
+correction du cycle 2 de ce rapport avait elle-même établie --- a trouvé
+que la même correction d'équité, appliquée aux problèmes restants,
+ajoutait des victoires qu'elle n'avait pas encore été autorisée à
+ajouter. Une dernière passe de clôture, appliquant la correction de façon
+symétrique et avec la même règle de convergence stable complète utilisée
+dans tout ce programme, a arrêté le décompte à 6 sur 10.
+
+\textbf{Ceci doit être lu avec trois réserves.} Premièrement, cinq des six
+victoires relèvent du même mécanisme de dégénérescence en réseau annulaire
+rapporté au cycle 2, désormais mieux circonscrit~: il nécessite un
+échantillonnage \emph{déterministe}, et non simplement à densité uniforme,
+d'une orbite fermée lisse --- sur une variété identique échantillonnée de
+façon i.i.d.\ aléatoire, le résultat s'inverse complètement.
+Deuxièmement, chaque chiffre d'économie affiché est plus faible une fois
+la référence équitablement ajustée~: la plus grande victoire du cycle
+n'est plus l'oscillateur harmonique avec son 0,875 initialement rapporté,
+mais le mouvement brownien plan à \textbf{0,969} --- et le mouvement
+brownien est aussi la seule victoire des deux cycles qui ne soit pas un
+artefact de réseau annulaire, avec un véritable avantage de précision non
+dégénéré. Troisièmement, les cinq victoires en réseau annulaire perdent
+leur avantage à une fenêtre de Theiler d'environ deux espacements
+d'échantillonnage, une fragilité partagée plutôt que propre à chaque
+problème. Le tableau de bord complet, l'analyse du mécanisme et la chaîne
+de relecture à quatre niveaux se trouvent dans
+\texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, Section~11.
 
 \section*{Références}
 
@@ -634,6 +659,8 @@ qu'ils soient.
 \item[] Farahmand, A., Szepesv\'ari, C., \& Audibert, J.-Y. (2007).
   Manifold-adaptive dimension estimation. \emph{Proceedings of the 24th
   International Conference on Machine Learning (ICML)}.
+\item[] Karpathy, A. (2026). \emph{AutoResearch}~: une boucle agentique
+  proposer-mesurer-garder pour l'amélioration empirique autonome.
 \item[] Références internes~: \texttt{docs/HYPERGRAPH\_NOTES.md},
   \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, \texttt{docs/LL.md},
   \texttt{src/socrates/hypergraph/}.

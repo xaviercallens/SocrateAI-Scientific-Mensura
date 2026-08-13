@@ -242,3 +242,46 @@ explicitly ask "does this fix apply anywhere I did not just apply it?" as
 its own review step, not just "is this fix correct where I used it?" A
 skeptic verifying a review should always check for this pattern specifically:
 a correct, stated principle applied selectively.
+
+---
+
+## 9. A fairness fix applied to only one side of a comparison looks more rigorous than it is
+
+**What happened.** Round 3's adjudicator made a genuine, valuable discovery:
+the traditional baseline's correlation-sum radius window was hard-coded and
+materially misconfigured, so every prior round's "traditional_min_n" numbers
+had been measured against a quietly handicapped comparator. Correcting it
+was the right call — but the adjudicator applied the correction only to the
+six problems where a fairer baseline removes a poly win (flipping one tie
+to a loss, one win to contested), and left two problems ("baseline never
+converges") unexamined, where the identical correction would have added
+wins. The result read as a careful, skeptical, conservative 4-of-10 — and
+was in fact an asymmetric application of a real fix, not a stricter
+standard. A dedicated closing pass later found that applying the *same*
+fairness correction to both sides, in every direction, moved the honest
+count to 6 of 10 — the round's actual, harder-won result.
+
+**Why it generalizes.** This is lesson 8's failure mode wearing a more
+convincing disguise. Lesson 8 was "a stated correction not applied
+everywhere it should have been" — a coverage gap, easy to frame as an
+oversight. This is the same gap, but it happens to move the answer in the
+direction a skeptical reviewer's instincts already favour (toward "fewer
+wins, more scrutiny"), which makes it *look* like diligence rather than an
+error. A reviewer auditing another party's claim for fairness is exactly as
+capable of building an unfair *instrument* to do the auditing — a
+comparator tuned generously for one side and left alone for the other —
+and the direction of the unfairness being "toward skepticism" provides no
+protection, because the goal was never skepticism for its own sake; it was
+an accurate number.
+
+**What to do about it.** Any fix billed as making a comparison "fair" must
+be checked for whether it was applied to literally every problem the
+comparison covers, not only the ones where the reviewer happened to be
+looking when the unfairness was discovered — and specifically checked in
+*both* directions: does applying it anywhere create a win as readily as it
+removes one? If a fairness correction has only ever been observed to
+remove wins, that asymmetry is itself the signal to check harder, not
+evidence the correction is conservative. Prefer making the corrected
+comparison a mandatory, symmetric code path (as round 3's carry-forward
+item 2 now requires) over a one-off audit that has to be re-litigated by
+hand each round.

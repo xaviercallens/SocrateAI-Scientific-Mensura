@@ -52,7 +52,13 @@ control. The strongest evidence of a genuine estimator advantage --- high
 accuracy on two non-degenerate two-dimensional targets where the
 traditional method never converges --- falls outside what the stated win
 criterion can score and is reported as the recommended focus for the next
-round.
+round. A third round then revised the goal to six of ten and met it (01,
+02, 03, 04, 06, 10), but only after two further estimator-repair rounds, a
+literature-grounded improvement loop, and a four-level review chain that
+twice caught the \emph{reviewers} applying a genuine fairness fix to only
+some of the problems it governed --- the same class of error round 2's own
+correction diagnosed, now confirmed to affect reviewers as readily as
+original claims. See Section~\ref{sec:round3}.
 \end{abstract}
 
 \tableofcontents
@@ -495,60 +501,71 @@ infrastructure, not the win count alone, is what makes a third round a
 matter of applying new ideas rather than rebuilding the ability to test
 them.
 
-\section{Round 3: A Literature-Grounded Improvement Loop (in progress)}
+\section{Round 3: A Literature-Grounded Improvement Loop --- Goal Met}
 \label{sec:round3}
 
-A third round was launched immediately following this correction, with two
-changes in kind rather than degree. First, the programme's goal is revised
-downward and sharpened: \textbf{six of ten problems, via either the
-existing compute-savings criterion or a newly-formalized accuracy
-criterion}, rather than eight of ten via compute savings alone --- a target
-chosen to be reachable by genuinely new mechanisms rather than by relaxing
-what counts as a win. Second, design, repair, and adjudication steps in
-this round use a higher-tier model throughout, and the search for new
-ideas follows a short literature review rather than starting from the
-existing estimator's known failure modes alone:
+A third round was launched immediately following the round 2 correction,
+with a goal revised downward and sharpened: \textbf{six of ten problems,
+via either the existing compute-savings criterion or a newly-formalized
+accuracy criterion}, rather than eight of ten via compute savings alone.
+Design, repair, and adjudication steps used a higher-tier model throughout.
+\textbf{The revised goal was met: 6 of 10 problems (01, 02, 03, 04, 06, 10)
+are verified wins}, after a four-level review chain --- self-report, audit,
+two independent adversarial skeptics, and a dedicated closing pass --- that
+twice caught the \emph{reviewers} repeating the same class of error found
+in round 2.
 
-\begin{itemize}
-\item \textbf{A Theiler-window exclusion} (Theiler, 1986) for the
-  traditional correlation-sum baseline: temporally-adjacent points on a
-  chaotic trajectory are excluded from the pairwise count, the standard
-  correction in the nonlinear-dynamics literature for autocorrelation bias
-  that this programme's baseline has not implemented. This is a fairness
-  correction to the comparator, in the spirit of this report's standing
-  rule that a real baseline, not a strawman, is the only kind of baseline
-  a superiority claim can be tested against --- it may make problems
-  harder to win, not easier, and is being pursued regardless.
-\item \textbf{A second local-dimension estimation strategy} informed by
-  the maximum-likelihood intrinsic-dimension estimator of Levina \& Bickel
-  (2004) and by manifold-adaptive neighborhood-size methods (Farahmand,
-  Szepesv\'ari \& Audibert, 2007), targeted specifically at the two problems
-  where the current estimator needs 2--4$\times$ \emph{more} points than
-  the baseline (Lorenz, R\"ossler) --- pursued as a fast propose-measure-keep
-  loop (one code change at a time, tested immediately, kept only if it
-  measurably improves convergence, discarded otherwise) rather than a
-  single large redesign committed in advance.
-\item \textbf{Formalizing the accuracy criterion this report's own results
-  could not score.} Section~\ref{sec:current-status} found the estimator's
-  strongest evidence of genuine advantage on two non-degenerate targets
-  where the traditional method never converges, and noted that the
-  points-to-converge win criterion is structurally unable to credit it.
-  Round 3 encodes a second, explicit, checkable win type in the comparison
-  harness --- accuracy at a fixed, large, converged sample size --- so that
-  this kind of advantage is measured by code, not asserted in prose.
-\end{itemize}
+\textbf{What changed.} Three literature-grounded hypotheses were pursued.
+A Theiler-window exclusion (Theiler, 1986) was added to the traditional
+baseline, correctly keyed on each point's original trajectory time index
+rather than its position in a reordered array. A second win criterion,
+asymptotic accuracy on a fixed large sample (criterion c), was formalized
+in code so that the estimator's advantage on non-degenerate targets could
+be measured rather than asserted in prose --- it produced zero verified
+wins across two full rounds, and remains an open question about the
+criterion's definition. A four-iteration AutoResearch-style loop (Karpathy,
+2026) targeted the two chaotic attractors where the estimator needed
+2--4$\times$ \emph{more} points than the baseline: two proposed code
+changes were kept after measurably improving convergence (a saturation
+guard on the fit window, and applying the Theiler correction to the
+estimator's own graph construction), two were rejected after measurably
+failing to help or causing a regression. A separate, still-open estimator
+defect (near-constant shell sequences producing an unreliable fit-quality
+statistic) required three repair rounds to close correctly; the fix that
+finally held is backed by a proof that the affected estimate is
+structurally confined to a bounded interval, not merely empirically clean
+on the cases tested.
 
-Every change is subject to the same discipline that produced the
-correction reported above: an independent repair-verification gate before
-any change is trusted, a full ten-problem re-measurement rather than only
-the problems a change targets (since a baseline change can move every
-problem's numbers, as Section~\ref{sec:current-status}'s own correction
-history illustrates), and an adversarial audit-of-the-audit
-pass instructed specifically to check whether any endorsed methodology fix
-was applied everywhere it logically should have been --- the precise
-failure this report's own Section~\ref{sec:current-status} correction was
-needed to catch. Results will be reported as an addendum once independently
-verified, whatever they show.
+\textbf{The result that decided the round, however, was procedural.} The
+adjudicator discovered that the traditional baseline's correlation-sum
+radius window had been hard-coded and was materially misconfigured on
+several targets --- a fairness bug in the \emph{comparator}, not the
+estimator, that had quietly affected every round's numbers. Correcting it
+changed real verdicts. But the correction was first applied only to the
+problems where a fairer baseline \emph{removed} a poly win, producing a
+self-consistent-looking 4-of-10 that read as careful skepticism. A
+dedicated skeptic, instructed specifically to check whether a stated
+correction had been applied everywhere it logically should have been ---
+the exact discipline this report's own round 2 correction established ---
+found the same fairness fix, applied to the remaining problems, added wins
+it had not yet been permitted to add. A final closing pass, applying the
+correction symmetrically and with the same full stable-convergence rule
+used throughout this programme, settled the count at 6 of 10.
+
+\textbf{This must be read with three caveats.} First, five of the six wins
+are the same ring-lattice degeneracy mechanism reported in round 2, now
+scoped further: it requires \emph{deterministic}, not merely uniform-density,
+sampling of a smooth closed orbit --- on an identical manifold sampled
+i.i.d.\ at random, the result inverts completely. Second, every headline
+savings figure is smaller once the baseline is fairly tuned: the round's
+largest win is no longer the harmonic oscillator's originally-reported
+0.875 but planar Brownian motion at \textbf{0.969} --- and Brownian motion
+is also the only win in either round that is not a ring-lattice artifact,
+with a genuine, non-degenerate accuracy advantage. Third, all five
+ring-lattice wins lose their advantage at a Theiler window of roughly two
+sample spacings, a shared fragility rather than a per-problem one. Full
+scoreboard, mechanism analysis, and the four-level review chain are in
+\texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, Section~11.
 
 \section*{References}
 
@@ -569,6 +586,8 @@ verified, whatever they show.
 \item[] Farahmand, A., Szepesv\'ari, C., \& Audibert, J.-Y. (2007).
   Manifold-adaptive dimension estimation. \emph{Proceedings of the 24th
   International Conference on Machine Learning (ICML)}.
+\item[] Karpathy, A. (2026). \emph{AutoResearch}: an agentic
+  propose-measure-keep loop for autonomous empirical improvement.
 \item[] Internal references: \texttt{docs/HYPERGRAPH\_NOTES.md},
   \texttt{docs/POLY\_ALGEBRAIC\_BENCHMARK.md}, \texttt{docs/LL.md},
   \texttt{src/socrates/hypergraph/}.

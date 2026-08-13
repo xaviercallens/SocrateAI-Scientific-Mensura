@@ -24,12 +24,13 @@ time to diagnose the first time and are cheap to avoid the second.
 | Dimension | `dimension.py` | Shell-growth volume estimator; `DimensionEstimate.degenerate` distinguishes a real fit from a trivial one |
 | Point-cloud bridge | `pointcloud.py` | `knn_hypergraph()` — turns a trajectory into a graph; raises on near-duplicate points by default |
 | Rule search | `polyalgebra.py` | `solve_for_rule()` — the literal "solve for an unknown bond" operation |
-| **Traditional baseline** | `baseline.py` | The actual classical Grassberger-Procaccia correlation-sum method — NOT part of the toolkit, the thing to compare against |
-| Comparison harness | `comparison.py` | Apples-to-apples: minimum points each method needs for stable convergence |
+| **Traditional baseline** | `baseline.py` | The actual classical Grassberger-Procaccia correlation-sum method — NOT part of the toolkit, the thing to compare against. Opt-in Theiler-window exclusion (`theiler_window=`, keyed on *original trajectory time index*, not array position — see failure mode 6) added round 3 |
+| Comparison harness | `comparison.py` | Apples-to-apples: minimum points each method needs for stable convergence (criterion a). `compare_accuracy_at_max_n()` (criterion c, added round 3) scores asymptotic accuracy on non-degenerate targets the min-n criterion structurally cannot credit |
 
-## Five failure modes the benchmark already found — check for these first
+## Six failure modes the benchmark already found — check for these first
 
-1. **Degenerate "perfect" fits (finding F1).** A k-NN graph on any smooth
+1. **Degenerate "perfect" fits (finding F1), and the near-degenerate case
+   next to it (N8/R2-F4, closed round 3).** A k-NN graph on any smooth
    closed curve is an exact circulant ring lattice — `local_dimension`
    *cannot* return anything but dimension 1 with `r_squared=1.0` on it,
    regardless of whether anything was measured well. Before citing an
@@ -37,7 +38,13 @@ time to diagnose the first time and are cheap to avoid the second.
    `DimensionEstimate.degenerate` (or call `.is_genuinely_well_fit()`
    instead of `.is_well_fit()`). `degenerate_fraction()` reports what share
    of a sample hit this regime — a high value means the r² column you are
-   looking at is mostly sentinel.
+   looking at is mostly sentinel. A *near*-constant (not exactly constant)
+   shell sequence used to collapse R² unreliably too (two refuted repair
+   attempts before the fix that held — see `docs/POLY_ALGEBRAIC_BENCHMARK.md`
+   §11.1); the shipped fix is a graph-level `near_degenerate_fraction`
+   consensus check, backed by a proof that the pooled estimate is confined
+   to `[0.75, 1.25]` whenever it fires, not a per-node heuristic — do not
+   reintroduce a per-node-only gate without rederiving that guarantee.
 
 2. **Unconverged fractal estimates mistaken for measurements (F4/F4b).**
    A non-integer dimension estimate (chaotic attractors, anything without a
@@ -71,6 +78,22 @@ time to diagnose the first time and are cheap to avoid the second.
    is `None` (not a misleading number) whenever either method fails to
    converge. A "win" requires `poly_algebraic_wins=True`, which already
    encodes "both methods actually converged."
+
+6. **A real implementation of the traditional method is not the same as
+   a fairly-tuned one (round 3, docs/LL.md lesson 9).**
+   `baseline.correlation_dimension`'s radius window defaults to a
+   hard-coded `[0.01, 0.2]×diag`, which is materially misconfigured on
+   non-uniform-density targets — this quietly handicapped
+   `traditional_min_n` in rounds 1 and 2 without anyone noticing. Worse:
+   a fairness fix applied to *some* problems and not others (specifically,
+   only where it removes a poly win) looks like careful skepticism while
+   being exactly as biased as the original strawman, just in the opposite
+   direction. Before citing any `traditional_min_n` or `compute_savings_fraction`,
+   check the radius window was tuned (or deliberately left at a documented
+   default) the *same way* for every problem in the comparison — both
+   answer-blind or both oracle-tuned, never one of each — not only the
+   ones where tuning it happens to change the verdict you were already
+   expecting.
 
 ## Performance note
 
@@ -110,3 +133,16 @@ be explicit about which of the two honest metrics you mean:
 
 Neither metric is "the tool is right" — both are narrow, checkable claims
 about one algorithm's behavior on one input, exactly as Tier B requires.
+
+A third, formalized metric exists as of round 3: **asymptotic accuracy**
+(`comparison.compare_accuracy_at_max_n()`, criterion c) — runs both methods
+to a fixed large n and compares each to the known truth, refusing to call
+a win if poly sits in the F1 degenerate-sentinel regime (so a real accuracy
+edge cannot be confused with the ring-lattice artifact). It exists because
+points-to-converge is structurally unable to credit the one case
+(non-degenerate targets where the traditional method never stably
+converges) where the estimator has shown its clearest real advantage. As
+of round 3 it has never produced a verified win across two full attempts —
+before extending it further, treat that as a live open question about the
+criterion's definition, not only its application (`docs/POLY_ALGEBRAIC_BENCHMARK.md`
+§11.9, carry-forward item 6).

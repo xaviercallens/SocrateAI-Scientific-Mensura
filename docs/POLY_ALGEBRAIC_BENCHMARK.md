@@ -650,8 +650,8 @@ Cheap, and would confirm whether their sub-100% well-fit rates are entirely the
 duplicate-stacking artifact. Expected outcome from the F3 experiment: well-fit
 rates rise substantially, headline dimensions unchanged at 1.0000.
 
-**N8 — OPEN. Fix near-constant (not just exactly-constant) shell sequences
-collapsing R² (from R2-F4, §9.5/§10.3).** N1 fixed the *exact*-constant case
+**N8 — ✅ DONE (round 3, §11.1). Fix near-constant (not just exactly-constant)
+shell sequences collapsing R² (from R2-F4, §9.5/§10.3).** N1 fixed the *exact*-constant case
 (`ss_tot` within float noise of zero). The improvement loop found a distinct,
 still-unfixed defect: shell sequences that are *nearly* but not exactly
 constant produce an unreliable R² that does not trigger N1's relative-tolerance
@@ -666,6 +666,15 @@ improvement-loop rounds that is a real, actionable defect in shipped code
 (`dimension.py`'s `_log_log_fit`) rather than a defect in an experiment's
 methodology — fix by gating on relative shell spread in addition to R²,
 with known-answer regression tests before any re-run of problem 01 (§10.8).
+
+**Closed in round 3, after two refuted attempts (§11.1):** a per-node
+CV+slope-bound gate looked correct but had a real, measured collateral-
+damage defect; a follow-up minimum-fit-length gate fixed that case but
+silently changed other problems' recorded numbers without disclosing it.
+The fix that finally held is a graph-level consensus rule
+(`near_degenerate_fraction`) backed by a proof that the pooled estimate is
+structurally confined to `[0.75, 1.25]` whenever it fires — independently
+verified twice. See §11.1 for the full three-round account.
 
 ---
 
@@ -1567,3 +1576,342 @@ reading) — not the qualitative verdict.
 Scripts: skeptic's re-derivations were scratch, uncommitted, read `src/` and
 modified nothing (confirmed by `git status` at the time) — the only file this
 correction pass modifies is this document.
+
+---
+
+## 11.0 Round 3 headline
+
+**Goal (revised downward from round 2's 8/10, per programme owner direction):
+6 of 10, via compute savings (criterion a) or a newly-formalized accuracy
+criterion (criterion c) — criterion b stays retired. Final independently
+verified count: 6 of 10 (01, 02, 03, 04, 06, 10). The goal was met**, after
+a genuinely difficult path: three repair rounds to close a real estimator
+defect (N8), a literature-grounded fairness fix to the traditional baseline
+that turned out to change more verdicts than expected, an AutoResearch-style
+rapid-iteration loop, and a four-level review chain (self-report → audit →
+two independent refute-stage skeptics → a dedicated close-out pass) that
+twice found the *reviewers* repeating the exact "endorsed but not applied
+everywhere" failure mode this ledger's own lesson 8 exists to catch.
+
+Design/repair/adjudication throughout this round used a higher-tier model
+per explicit programme-owner direction. Three literature sources grounded
+the round's hypotheses: Theiler (1986) on autocorrelation bias in
+correlation-sum estimators; Levina & Bickel (2004) and Farahmand, Szepesvári
+& Audibert (2007) on alternative/adaptive local-dimension estimation; and
+Karpathy (2026, "AutoResearch") for the propose-measure-keep-or-rollback
+mechanism used in the H2 loop below.
+
+## 11.1 N8: three repair rounds to close a real, previously-open defect
+
+Round 2 left N8/R2-F4 (near-constant shell sequences collapsing R² and
+being wrongly rejected) as an open defect blocking a fair measurement of
+problem 01. Closing it took three attempts, each one independently
+verified, and each verification found something real:
+
+- **Round 1** (per-node gate: coefficient-of-variation ≤0.15 AND a
+  `slope_bound` ≤0.25 on the shell sequence): correctly fixed the
+  documented anchor case, passed 56 threshold-robustness pairs and 10 new
+  adversarial families, but the skeptic found the central safety claim was
+  false — `slope_bound` bounds `|dimension − 1|`, not `|dimension − truth|`.
+  On 2D Brownian motion (true dimension 2) at `k=6, max_radius=3`, the gate
+  newly admitted 13/200 nodes with error up to 1.18, moving the sampled
+  mean *away* from the truth (1.8321 → 1.7381). **Refuted.**
+- **Round 2** (added a minimum-fit-length ≥5 gate, tested and proposed by
+  round 1's own skeptic): fixed the Brownian collateral case cleanly and
+  generalized correctly to 10 new families and problem 05. But the second
+  skeptic found the repair's own reasoning for declaring "no round-2
+  verdict moves" was backwards — it argued every other round-2 script's
+  fit length was ≥5 as a reason *not* to check them, when fit length ≥5 is
+  exactly the regime where the branch is *active*. Measured directly: the
+  fix silently changed problem 06's recorded `poly_algebraic_min_n` (400→800)
+  and — undetected by either prior round — had also silently *inflated*
+  problems 02 and 10's recorded savings (0.75→0.875) via newly-admitted
+  short-window nodes. The residue was a class (14/141 swept configs across
+  Brownian/torus families), not the single case round 1 fixed. **Refuted.**
+- **Round 3** (graph-level consensus, human-selected after the programme
+  owner was shown the round-2 skeptic's two candidate fixes and their
+  tradeoffs): replaces the per-node decision with a graph-level one —
+  `near_degenerate_fraction` must clear a majority-consensus bar before the
+  branch fires at all, calibrated against a broadened set (problem 01's
+  ring plus problems 02/03/04/10's rings, not just one example as round 2's
+  candidate was). Backed by a proof, not just measurement: when the
+  confident branch decides, the pooled estimate is provably confined to
+  `[0.75, 1.25]` (a convex combination of confident-branch and near-constant
+  values, each independently bounded), so **every 2D/3D problem in the
+  suite is structurally immune to this failure mode**, not merely
+  empirically clean on the cases tried. Independently reproduced from
+  scratch (own leapfrog/RK4 integrators, own AGM elliptic-integral code, own
+  numpy re-derivation of every statistic) — anchor case preserved, the
+  round-2 Brownian regression correctly rejected, problem 05 unchanged, and
+  the broadened calibration set matches to the digit. Also confirmed the
+  fix restores problems 02/10's correct, documented savings (silently
+  inflated by round 2, now fixed). **Confirmed.**
+
+Eight non-blocking caveats travel with the final gate (documented in the
+round-3 workflow journal): the fix is one-sided (it protects targets whose
+true dimension is far from 1, not targets near 1, though none in this suite
+are exposed); the fallback branch's lower edge is anchored on a still-small
+number of must-fire examples; four of ten problems were not independently
+re-measured by the round-3 skeptic; and the node-local layer's constants
+(0.15/0.25/5) remain calibrated by looking at the documented cases, same as
+before — threshold circularity reduced, not eliminated.
+
+## 11.2 H1 (Theiler-window baseline fix) and H3 (criterion c)
+
+**H1** adds an opt-in Theiler-window exclusion to the traditional
+correlation-sum baseline (`baseline.py`), keyed correctly on each point's
+*original trajectory time index* rather than its position in a
+bit-reversal/Weyl-reordered array — verified against a from-scratch brute
+force under six index regimes including an actual bit-reversal permutation,
+`max|Δ|=0` at every radius. Getting this wrong (keying on array position)
+would have silently corrupted every reordered-cloud measurement in the
+benchmark; the skeptic confirmed it was implemented correctly and that
+default behaviour (`window=0`) reproduces prior results bit-for-bit.
+
+**H3** formalizes criterion (c), "asymptotic accuracy on a non-degenerate
+target," as `compare_accuracy_at_max_n()` in `comparison.py` — the
+programme's answer to R2-F9's complaint that the benchmark's only
+points-to-converge criterion structurally cannot credit the estimator's
+real advantage on problems 05/06. It runs both methods to a fixed large n,
+compares each to the known truth, and explicitly refuses to call a win
+where poly sits in the F1 degenerate-sentinel regime (so a real accuracy
+advantage cannot be confused with the ring-lattice artifact). Both changes
+passed independent verification on the first attempt.
+
+## 11.3 H2: an AutoResearch-style loop, and what it did and did not survive
+
+Following Karpathy's AutoResearch mechanism (propose one change, measure it
+immediately, keep only on a real measured improvement, roll back otherwise,
+no predefined search space), four iterations targeted Lorenz and Rössler —
+the two problems where round 2 recorded poly needing 2–4× *more* points
+than the traditional method:
+
+1. **Kept.** Apply the Theiler exclusion to the k-NN graph construction
+   itself, not only the correlation sum (informed by the same Theiler 1986
+   mechanism as H1, applied to the estimator under test rather than the
+   baseline).
+2. **Kept.** A finite-size saturation guard (`max_ball_fraction`) on the
+   shell-growth fit window, informed by the manifold-adaptive-neighborhood
+   literature (Farahmand et al.) — truncates a radius's shell from the fit
+   once its ball has swallowed too large a fraction of the graph.
+3. **Rejected.** A residual-degrees-of-freedom floor on the R² acceptance
+   branch — net zero effect on Lorenz, a measured regression on Rössler
+   (100→200).
+4. **Rejected.** Metric (Euclidean-weighted geodesic) balls in place of
+   hop-count balls — no help on Lorenz across a 5-point fraction sweep, and
+   a severe regression on Rössler (savings 0.875→0.111).
+
+Both kept changes are genuine, useful additions and remain in the codebase.
+But **the loop's own headline verdict on Rössler did not survive the
+benchmark's separate, slower verification discipline**: the two kept
+changes appeared to flip Rössler from a recorded loss to a 16×-fewer-points
+win (1600→100), but the Full Remeasure agent for problem 09 — applying the
+same "does this point cloud actually cover the attractor" check the ledger
+already required for problems 03/04 — found the winning n=100 cell is a
+short arc that has not yet completed one loop of the attractor, the same
+time-ordered-prefix artifact §10.10 diagnosed for Kepler and Mars.
+Re-measured under an attractor-covering (bit-reversal) construction,
+problem 09 is at best a tie. **This is the AutoResearch loop working as
+designed and being correctly checked**: a fast, cheap propose-measure-keep
+cycle found real local code improvements, but its own convergence
+*verdict* needed the slower, separate adversarial discipline to catch a
+flaw the cheap in-loop checks were not built to see. Treat the two kept
+code changes as real; treat the in-loop win claim they produced as retracted.
+
+## 11.4 Full remeasure, adjudication, and a new, larger fairness problem
+
+Full remeasure self-reported 7/10 wins (problem 09's own agent, per §11.3,
+disqualified its own AutoResearch-era win — a second, independent instance
+of the lesson-8 discipline working exactly as intended, inside the very
+same pipeline stage this time).
+
+The adjudicator went further than any prior round: it discovered that the
+traditional baseline's hard-coded correlation-sum radius window
+(`[0.01, 0.2]×diag`, never exposed as a parameter) was itself materially
+misconfigured on non-uniform-density targets — the round's answer to
+R2-F7's still-open lead. Giving the baseline a fair, non-default window
+(via two standards: an answer-aware "best of 20" oracle, and an
+answer-blind "plateau" selector validated on known-answer clouds) **flipped
+problem 07 (CR3BP) from a documented tie to an outright poly loss**, and
+left problem 04 "contested" (a credible but knife-edge tie). Firm count:
+4/10 (01, 02, 03, 10). A further, real scope-narrowing finding: the whole
+ring-lattice win family requires *deterministic* sampling — on an
+i.i.d.-uniform-angle-sampled circle (same manifold, same true dimension as
+problem 01), poly returns `nan` at every n across 10 seeds while the
+traditional method converges cleanly at every n across the same 10 seeds, a
+complete inversion. "On a smooth closed 1D orbit" was always the wrong
+scope; "on a *regularly, deterministically* sampled smooth closed 1D orbit"
+is the honest one.
+
+## 11.5 Refute: the lesson-8 pattern, caught a fourth time
+
+Two independent refute-stage skeptics reviewed the adjudication:
+
+- The first confirmed 4/10, but argued the answer-blind plateau standard
+  (validated on known answers, not answer-aware) is more principled than
+  the oracle standard the adjudicator called firm — under it, 04 becomes a
+  clean win and the count is 5/10.
+- The second, instructed specifically to check whether round 3 repeated
+  the exact failure `docs/LL.md` lesson 8 names, found that it had: **the
+  adjudicator's own baseline-fairness fix was applied to the six problems
+  where doing so removes wins (04, 07) but never applied to problems 05 and
+  06**, where `traditional_min_n = None` ("baseline never converges") had
+  been accepted as a flat fact rather than checked under the same fair
+  window. Run once, quickly, both flip to wins under the plateau standard
+  — taking the count to 6/10, meeting the goal — but the skeptic explicitly
+  flagged this as *unconfirmed*: 05's candidate crossing looked like it
+  might drift back out of tolerance at larger n, and 06's tie looked
+  knife-edge. It also found H1 had been swept and disclosed for every
+  problem except 01 (the round's largest claimed win, 0.875), an
+  undisclosed-robustness gap rather than a refutation.
+
+Rather than bank a number off an admittedly-unconfirmed quick check, both
+threads were sent to one more, tightly-scoped closing pass.
+
+## 11.6 Close-out: a symmetric standard, applied with full rigor, settles it
+
+Two more independently-verified agents (one resolving, one checking the
+resolution from scratch) closed both threads using the benchmark's own
+full stable-convergence rule (in tolerance at the first n **and every
+larger n tested**, not a single crossing point) rather than the quick
+checks the refute stage used:
+
+- **Problem 05 is confirmed a non-win.** Its apparent in-band crossing
+  under the plateau baseline was a transient drift, not convergence:
+  extending the grid to n=102400 (8× the production maximum) shows the
+  baseline drifts back out of tolerance under 27 of 30 swept baseline
+  settings. The direction of the original refute-stage instinct was right;
+  its specific evidence (which stopped at the production grid) was not yet
+  strong enough to show it.
+- **Problem 06 is confirmed a genuine, stable win** — savings 0.9688,
+  unanimous across all 30 swept baseline settings, sentinel fraction
+  **0.00 at every n**. This is the only non-degenerate win in either round
+  of this benchmark: not "fewer points to identify a ring," but a real
+  accuracy/sample-efficiency advantage on a target with no ring-lattice
+  shortcut available.
+- **Problem 01's Theiler-window robustness gap is closed, favourably.**
+  The win survives up to W=8 (dies at W=16), which is *more* robust in
+  absolute terms than problems 02/04/10 (die at W=2) and problem 03 (dies
+  at W=4) — the gap was one of disclosure, not of fragility. All five
+  ring-lattice wins die at roughly the same ≈2-sample-spacing Theiler
+  window once normalized by each cloud's own sampling density — a real,
+  shared fragility that should travel with the family, not a defect
+  specific to 01.
+- **The deeper finding: the 4/10 and 5/10 readings were both artifacts of
+  a one-sided fairness fix, not of a stricter standard.** The
+  adjudicator's oracle baseline let the traditional method choose its best
+  radius window (answer-aware) while poly stayed pinned at module
+  defaults, per standing rule R2-F3. Measured symmetrically — either both
+  methods answer-blind/default, or both given a matched oracle sweep — the
+  verdict is the *same* on every contested problem (04, 05, 06, 07), and
+  matches the plateau-standard count. **6 of 10 is not the generous
+  reading; it is what a fairly-applied standard gives on every axis
+  checked.**
+
+Independently re-verified from scratch by a second agent (own point
+clouds, own plateau selector, own brute-force Theiler-corrected baseline,
+imported nothing from the resolving agent's scripts): confirmed, to four
+decimals on every disputed cell. Four minor, non-count-changing residual
+caveats were logged (05's non-win depends on an 8×-extended grid applied
+only to 05/06 — under the same production-grid protocol used for every
+other problem, 05 would be a 7th win at 0.9375, a strictly conservative
+choice since 6/10 already meets the goal either way; 06's win magnitude is
+selector-dependent, 0.500–0.992, though never a non-win; a grid-choice
+inconsistency in one peer-comparison table that does not change any
+conclusion; the (c) refusals and 08/09 caveats were not independently
+re-verified this pass).
+
+## 11.7 Final scoreboard
+
+| # | Problem | Mechanism | poly `min_n` | trad `min_n` (fair) | Savings | Verdict |
+|---|---|---|---|---|---|---|
+| 01 | Harmonic oscillator | F1 ring-lattice | 50 | 100 | 0.500 | **WIN** |
+| 02 | Nonlinear pendulum | F1 ring-lattice | 64 | 128 | 0.500 | **WIN** |
+| 03 | Kepler orbit | F1 ring-lattice | 64 | 128 | 0.500 | **WIN** |
+| 04 | Mars / Horizons | F1 ring-lattice | 64 | 128 | 0.500 | **WIN** |
+| 05 | Quasiperiodic torus | n/a | 200 | none (drifts out at n=102400) | — | non-win (7th under an alternate, less strict, but internally consistent protocol — not banked) |
+| 06 | Planar Brownian motion | non-degenerate | 200 | 6400 | **0.969** | **WIN** |
+| 07 | CR3BP | F1 ring-lattice | 64 | 64 | — | tie → non-win |
+| 08 | Lorenz attractor | n/a | 100–200 | 200 | — | tie → non-win |
+| 09 | Rössler attractor | n/a | — | — | — | non-win (AutoResearch-era "win" retracted, §11.3) |
+| 10 | Driven pendulum | F1 ring-lattice | 64 | 128 | 0.500 | **WIN** |
+
+**6 of 10 verified: 01, 02, 03, 04, 06, 10. Goal (≥6/10) MET.**
+Criterion (c): 0 of 10 (every candidate — 05, 06, 08, 09 — refused once the
+baseline received the same fair-window treatment). Criterion (b) stays
+retired, correctly unused throughout.
+
+## 11.8 Mandatory caveats that travel with the six
+
+1. **Five of six wins are the same mechanism, one more time.** 01, 02, 03,
+   04, and 10 all read sentinel (degenerate + near-degenerate) fraction
+   ≈1.00 — the win means "fewer points to identify a ring," not a more
+   accurate fit. This is now four rounds' worth of the identical finding.
+2. **Every headline savings figure is smaller than previously recorded,
+   once the baseline is fairly tuned.** 01 falls from its round-3
+   self-reported 0.875 to **0.500**; 02/03/04/10 fall from 0.75 to
+   **0.500**. The round's largest genuine win is now **06 at 0.969**, not
+   01's inflated 0.875 — and 06 is also the round's only non-degenerate
+   result. This same fairness gap (an un-tuned, hard-coded baseline
+   window) plausibly affects round 1 and round 2's recorded savings
+   figures too; those are not retroactively corrected here, but should not
+   be read as the final word on the traditional method's real performance.
+3. **All five ring-lattice wins die at a Theiler window of roughly 2
+   sample spacings**, poly's side first. Quote this alongside any of the
+   five; it is a shared fragility, not a per-problem one.
+4. **The ring-lattice mechanism requires deterministic sampling.** On the
+   same manifold with i.i.d.-random instead of regular sampling, the
+   result inverts completely (§11.4). "Smooth closed 1D orbit" was never
+   sufficient scope on its own.
+5. **Problem 05 remains the sharpest open lead, not a settled failure.**
+   Its shell-growth estimate holds within 0.04 of the truth from n=200 to
+   n=102400 while every swept baseline radius window drifts monotonically
+   downward and eventually exits tolerance — R2-F9's point, restated with
+   far stronger evidence than either prior round had, and still
+   unscoreable by either win criterion as currently defined.
+
+## 11.9 Carry-forward
+
+1. **Audit round 1 and round 2's recorded savings figures against a fairly
+   -tuned baseline before citing them going forward.** §11.8's point 2
+   applies generally, not only to round 3's own numbers.
+2. **Give `comparison.py`'s convergence functions a mandatory baseline
+   -window arm.** `baseline.correlation_dimension` already exposes
+   `r_min_frac`/`r_max_frac`; `minimum_points_for_target_accuracy` and
+   `poly_algebraic_minimum_points` do not, which is what let an unfair
+   default window go unnoticed for two full rounds. This is the single
+   highest-value fix for round 4.
+3. **Formalize the "matched fairness" check as code, not a one-off
+   audit.** §11.6's finding (measure both methods under the same
+   standard — both answer-blind or both oracle-tuned — never one of each)
+   should become a reusable assertion in the comparison harness, not
+   something a skeptic has to rediscover by hand each round.
+4. **Problem 05/06-style non-degenerate targets are the next round's
+   real opportunity**, not the ring-lattice family. 06 is the strongest
+   result either round has produced; 05 is the sharpest unresolved lead.
+   Six repetitions of the same F1 mechanism have now been measured char-
+   acterized in more forensic detail than the underlying phenomenon
+   probably warrants.
+5. **N8's fallback-branch threshold and the node-local layer's constants
+   (0.15/0.25/5) still need a broader calibration set** before the next
+   round trusts them without question — real progress was made (round 3
+   broadened from 1 to 5 must-fire examples) but threshold circularity is
+   reduced, not eliminated.
+6. Criterion (c) as currently defined has never produced a single verified
+   win across two full attempts (round 2 and round 3). Before extending
+   it further, ask whether the definition itself, not just its
+   application, needs revisiting.
+
+## 11.10 Tier C — interpretation, explicitly not load-bearing
+
+The six verified wins are statements about the sample efficiency (five
+cases) or the accuracy (one case, problem 06) of a graph statistic on
+specific finite point clouds — Tier B, same convention as every prior
+round. The programme's stated goal was reached, but the path there
+(a fairness bug in the *comparator*, not the *estimator*, that took a
+four-level review chain and an explicit re-litigation of "what counts as
+fair" to surface) is arguably the more durable result of this round: it is
+now demonstrated, not merely argued, that "verify the auditor" has to
+include auditing the fairness of the instrument the auditor built to do
+the auditing, and that a review which corrects an asymmetry in one
+direction and not the other can look more rigorous than it is.
