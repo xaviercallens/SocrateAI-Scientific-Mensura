@@ -161,3 +161,23 @@ This is a real, runnable search — not a demonstration that any resulting
 rule "is" the rule of physical space. Report results the same way the rest
 of this repository reports everything: with the gate that produced them
 named, and the tier stated.
+
+---
+
+## Physics benchmark
+
+`docs/POLY_ALGEBRAIC_BENCHMARK.md` applies the dimension estimator (via a
+new `knn_hypergraph` point-cloud bridge, `pointcloud.py`) to 10 known
+physics problems — closed orbits, a quasi-periodic torus, planar Brownian
+motion, and the Lorenz/Rössler chaotic attractors against their
+Grassberger–Procaccia (1983) literature dimensions — as a real accuracy
+benchmark rather than a demonstration. Read that document, not this
+paragraph, before citing the estimator's accuracy for anything: the honest
+summary is that 6 of 10 "passes" are structurally degenerate (a k-NN graph
+on any smooth closed curve is forced to read exactly 1.0), and neither
+chaotic result is converged in point count. That run also surfaced and fixed
+a real bug in `dimension.py` (R² catastrophic cancellation on near-constant
+shell sequences at specific fit lengths, now regression-tested) — the kind
+of defect this document's own limitations section could not have predicted
+in advance, which is the point of running a real benchmark instead of only
+known-answer unit tests.
