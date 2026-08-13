@@ -29,7 +29,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-from .core import Hypergraph, Node, ball
+from .core import Hypergraph, Node
 
 
 @dataclass(frozen=True)
@@ -105,9 +105,34 @@ def local_dimension(
     component has been reached, so the shell drops to zero) are excluded --
     a saturated shell has no well-defined log and would otherwise crash or
     silently bias the fit.
+
+    Computes the whole radii=0..max_radius volume sequence in a single
+    incremental BFS pass (each radius extends the previous frontier rather
+    than recomputing `ball()` from the source each time) -- calling `ball()`
+    once per radius, as an earlier version of this function did, redid all
+    of radius r-1's work at every step, which compounded with the
+    O(hypergraph) cost of an uncached `adjacency()` call into the dominant
+    cost of a dimension-vs-n convergence sweep (see `core.py`'s
+    `_adjacency_cached`, fixed alongside this).
     """
+    if source not in hg.nodes:
+        raise ValueError(f"node {source} is not present in this hypergraph")
+    adj = hg.adjacency()
+    volumes = [1]
+    visited = {source}
+    frontier = {source}
+    for _ in range(max_radius):
+        next_frontier: set[Node] = set()
+        for u in frontier:
+            next_frontier |= adj.get(u, set()) - visited
+        visited |= next_frontier
+        volumes.append(len(visited))
+        if not next_frontier:
+            volumes.extend([len(visited)] * (max_radius - len(volumes) + 1))
+            break
+        frontier = next_frontier
+
     radii = list(range(0, max_radius + 1))
-    volumes = [len(ball(hg, source, r)) for r in radii]
     # shells[i - 1] is the shell size (new nodes) at radius i.
     shells = [volumes[i] - volumes[i - 1] for i in range(1, len(volumes))]
 

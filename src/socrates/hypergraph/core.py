@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 from itertools import count
 
 Node = int
@@ -71,14 +72,18 @@ class Hypergraph:
         clique on its constituent nodes -- the standard construction used to
         define distance and ball-volume growth on a hypergraph (Wolfram
         Model's "spatial graph").
+
+        Cached per (immutable, hashable) `Hypergraph` instance: `ball()` was
+        calling this once per radius queried, and `local_dimension` queries
+        several radii per node and is itself called many times by
+        `mean_dimension` -- rebuilding an O(edges) dict from scratch on every
+        one of those calls was the dominant cost in a dimension-vs-n
+        convergence sweep (measured: a 3200-point, k=10 sweep across a
+        6-point n-grid took over two minutes before this fix). Safe because
+        every `Hypergraph` is frozen; nothing can invalidate the cache
+        without producing a different (differently-hashed) instance.
         """
-        adj: dict[Node, set[Node]] = defaultdict(set)
-        for edge in self.edges:
-            for i, u in enumerate(edge):
-                for v in edge[i + 1 :]:
-                    adj[u].add(v)
-                    adj[v].add(u)
-        return dict(adj)
+        return _adjacency_cached(self)
 
     def relabeled(self, start: int = 0) -> Hypergraph:
         """Canonically relabel nodes 0..n-1 in first-appearance order.
@@ -110,6 +115,26 @@ class Hypergraph:
 
     def __iter__(self):
         return iter(self.edges)
+
+
+@lru_cache(maxsize=64)
+def _adjacency_cached(hg: Hypergraph) -> dict[Node, set[Node]]:
+    """Module-level cache keyed by the (immutable, hashable) Hypergraph itself.
+
+    Returns the SAME dict object on repeated calls with an equal hypergraph
+    -- callers must treat the result as read-only (this is why `Hypergraph`
+    exposes it only via the `.adjacency()` method, not this function
+    directly). `maxsize=64` bounds memory for workloads that build many
+    distinct hypergraphs (e.g. a rewriting evolution history); it does not
+    limit how many times any single hypergraph's adjacency can be reused.
+    """
+    adj: dict[Node, set[Node]] = defaultdict(set)
+    for edge in hg.edges:
+        for i, u in enumerate(edge):
+            for v in edge[i + 1 :]:
+                adj[u].add(v)
+                adj[v].add(u)
+    return dict(adj)
 
 
 def ball(hg: Hypergraph, source: Node, radius: int) -> set[Node]:
