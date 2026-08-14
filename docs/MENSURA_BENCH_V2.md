@@ -416,3 +416,24 @@ recorded as structurally unreachable for a per-point locally-linear metric
    1000:1 and 10000:1 → UNDECIDED; and the exact §8.1 violating row as a
    named regression case.
 4. Full suite + known-answer battery re-run before any Core-10 work.
+
+### 8.5 Owner decisions on the §8 verdict (2026-08-14)
+
+1. **One more verification round before integration.** The stages the
+   stopped skeptic never ran — scalability at n≥3200, zero-knob vs
+   hand-picked equivalence — must complete first.
+2. **Stage-4 research track opened** for genuinely non-linear metric
+   adaptation (the only route past the ~100:1 locally-linear ceiling), in
+   addition to pre-registering the measured limit. Post-v1, no timeline.
+3. **Optimize the O(n²d²) cost before integrating.** Sequencing note: the
+   optimization lands *before* the verification round, so scalability is
+   measured on the code that will actually ship; the round must also verify
+   the optimized implementation is numerically equivalent to the version
+   that produced §8's evidence.
+4. **Lorenz-via-Takens is pre-registered as expecting UNDECIDED** — the
+   suite's anisotropy negative control, scoring as a valid abstention like
+   Cantor dust. The 15/15 containment evidence lives in certificate
+   diagnostics, not the score.
+
+Critical path is now: optimize → verification round → integrate (§8.4) →
+Core-10 → Stage-3 report → v1 + rename.
