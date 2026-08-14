@@ -11,7 +11,7 @@ three questions, in order, and refuses to report the third if the first fails:
           path inlined below -- not against the shipped function calling
           itself, which would be circular. Bit-for-bit, not approximately.
           Every traditional-method number already recorded in
-          docs/POLY_ALGEBRAIC_BENCHMARK.md was produced with the window off.
+          docs/MENSURA_BENCHMARK.md was produced with the window off.
 
   STEP 1  On the actual round-2 trajectory clouds (Lorenz dt=0.005 and
           Rossler, both full un-subsampled time-ordered trajectories -- the

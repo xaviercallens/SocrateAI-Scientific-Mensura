@@ -5,7 +5,7 @@ WHAT THIS SCRIPT IS FOR
 Round 2 scored problem 05 as a NON-WIN and was right to: the traditional
 Grassberger-Procaccia baseline never converges on this cloud, and standing
 rule 2 forbids banking a baseline failure as a poly-algebraic win. Finding
-R2-F9 (docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.5) recorded that this is
+R2-F9 (docs/MENSURA_BENCHMARK.md Sec. 10.5) recorded that this is
 nevertheless the place where the shell-growth estimator is most clearly and
 NON-DEGENERATELY better than the baseline -- and that criterion (a) is
 structurally incapable of scoring it. H3 added

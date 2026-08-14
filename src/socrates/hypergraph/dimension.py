@@ -34,7 +34,7 @@ from .core import Hypergraph, Node
 
 # --- Near-constant ("low dynamic range") shell-sequence gate -------------------
 #
-# See docs/POLY_ALGEBRAIC_BENCHMARK.md findings R2-F4 (§9.5), §10.3 and next
+# See docs/MENSURA_BENCHMARK.md findings R2-F4 (§9.5), §10.3 and next
 # step N8. R^2 is a *fraction of variance explained*. A shell sequence that is
 # nearly -- but not exactly -- constant has almost no variance to explain, so
 # R^2 collapses on its own merits even when the fit is excellent and the
@@ -160,7 +160,7 @@ from .core import Hypergraph, Node
 #       (13,17,13,13,17,15), dimension 1.0587 against a truth of 2, moves the
 #       sampled mean 1.8434 -> 1.6864, i.e. from inside the +/-0.3 tolerance to
 #       outside it, and moves `poly_algebraic_min_n` from 400 to 800 -- the
-#       value docs/POLY_ALGEBRAIC_BENCHMARK.md records for that problem. Its
+#       value docs/MENSURA_BENCHMARK.md records for that problem. Its
 #       window is length 6, the same length as the anchor this gate exists to
 #       keep, so no length threshold can remove it without removing the thing
 #       the gate is for. Round-2 problem 05 was checked the same way and is
@@ -234,7 +234,7 @@ from .core import Hypergraph, Node
 #      longer fires there. That is the intended reading of the word consensus
 #      -- 4 flat windows out of 32 is not "this structure is low-dynamic-
 #      range" -- and it restores both problems to the pre-N8
-#      `poly_algebraic_min_n` of 64 that docs/POLY_ALGEBRAIC_BENCHMARK.md
+#      `poly_algebraic_min_n` of 64 that docs/MENSURA_BENCHMARK.md
 #      10.2 records (the node-local gate had silently moved both to 32).
 #
 #      WHAT THIS FIXES, END TO END. Across all ten round-2 problems at
@@ -264,6 +264,31 @@ from .core import Hypergraph, Node
 NEAR_CONSTANT_CV = 0.15
 NEAR_CONSTANT_SLOPE_BOUND = 0.25
 NEAR_CONSTANT_MIN_FIT_LENGTH = 5
+
+# Minimum fit-window length for `r_squared` to carry any information at all.
+#
+# A least-squares line fitted to m points has m - 2 residual degrees of
+# freedom, so at m = 2 the residual is identically zero and r_squared is 1.0
+# for EVERY input -- the line passes through both points by construction. The
+# R^2 acceptance branch is therefore not merely weak at m = 2, it is inert:
+# it certifies whatever slope those two points happen to imply.
+#
+# This is not hypothetical. On a k-NN graph that has fragmented into small
+# components (a lacunar support such as Cantor dust, or a connected support
+# carrying a sufficiently concentrated measure -- both measured, finding N9),
+# most sampled nodes exhaust their component within 2-3 hops and land in
+# exactly this regime, where the estimator returns CONFIDENT nonsense:
+# volumes (19, 27) -> 0.51, (28, 31) -> 0.15, (10, 50) -> 2.32, and negative
+# dimensions on real Cantor-dust samples, every one of them reporting
+# r_squared = 1.000000 with `degenerate` and `near_degenerate` both False.
+#
+# 3 is the smallest window with a nonzero residual dof, i.e. the smallest at
+# which r_squared can fail. Note this defect is the same *class* as N8 (a
+# fit-quality gate certifying an input it cannot actually judge) and that
+# N8's own NEAR_CONSTANT_MIN_FIT_LENGTH floor guards only the near-constant
+# branch -- a fix applied to one branch of a shared weakness and not the
+# other. See docs/LL.md lessons 8 and 9.
+MIN_RSQUARED_FIT_LENGTH = 3
 NEAR_CONSTANT_CONSENSUS_TOLERANCE = 0.25
 NEAR_CONSTANT_CONSENSUS_FRACTION = 0.5
 
@@ -374,6 +399,7 @@ class _FitResult:
     near_degenerate: bool = False
     shell_cv: float = 0.0
     slope_bound: float = 0.0
+    underdetermined: bool = False
 
 
 @dataclass(frozen=True)
@@ -386,7 +412,7 @@ class DimensionEstimate:
     `r_squared=1.0` is a *sentinel* meaning "the input had no variation to
     fit," not a measurement of fit quality on a diverse shell sequence. This
     distinction exists because a 10-problem physics benchmark
-    (docs/POLY_ALGEBRAIC_BENCHMARK.md, finding F1/N2) found that 6 of 10
+    (docs/MENSURA_BENCHMARK.md, finding F1/N2) found that 6 of 10
     "passes" were exactly this case, misread by the estimator's own API as
     a perfect fit -- `is_well_fit()` alone could not distinguish them.
 
@@ -415,6 +441,17 @@ class DimensionEstimate:
     quality." `is_well_fit` accepts them when the graph consents (the
     dimension value is sound); `is_genuinely_well_fit` rejects them outright
     (the fit-quality number is not evidence).
+
+    `underdetermined=True` means the fit window held fewer than
+    `MIN_RSQUARED_FIT_LENGTH` radii, so the least-squares line has zero
+    residual degrees of freedom and `r_squared` is 1.0 *by algebra* rather
+    than by fit quality -- a straight line through two points passes through
+    both exactly, whatever they are. This is a third way for `r_squared` to
+    be uninformative, and unlike the other two it produces confident nonsense
+    rather than a sentinel: measured examples from a fragmented k-NN graph
+    include volumes (19, 27) -> dimension 0.51 and (10, 50) -> dimension 2.32,
+    both reporting `r_squared = 1.000000` with both other flags False (finding
+    N9). `is_well_fit` therefore refuses the R^2 branch here.
     """
 
     source: Node
@@ -426,6 +463,7 @@ class DimensionEstimate:
     near_degenerate: bool = False
     shell_cv: float = 0.0
     slope_bound: float = 0.0
+    underdetermined: bool = False
 
     def is_well_fit(self, threshold: float = 0.95, *, near_constant_consensus: bool = True) -> bool:
         """Is this node's dimension estimate usable?
@@ -453,6 +491,14 @@ class DimensionEstimate:
         measuring a structure whose dimension is not ~1 should prefer
         `is_genuinely_well_fit`, which refuses this branch outright.
         """
+        if self.underdetermined:
+            # Zero residual degrees of freedom: r_squared is 1.0 by algebra,
+            # so the R^2 branch cannot fire here on any input. The
+            # near-constant branch is unreachable too (it demands a window of
+            # at least NEAR_CONSTANT_MIN_FIT_LENGTH > MIN_RSQUARED_FIT_LENGTH),
+            # so this node is simply not usable -- which is the honest verdict,
+            # not a lost measurement.
+            return False
         if self.r_squared >= threshold:
             return True
         return self.near_degenerate and near_constant_consensus
@@ -472,6 +518,7 @@ class DimensionEstimate:
 def _log_log_fit(xs: list[float], ys: list[float]) -> _FitResult:
     """Least-squares slope, R^2, and degeneracy flags for log(ys) vs log(xs)."""
     n = len(xs)
+    underdetermined = n < MIN_RSQUARED_FIT_LENGTH
     log_x = [math.log(x) for x in xs]
     log_y = [math.log(y) for y in ys]
     mean_x = sum(log_x) / n
@@ -479,7 +526,7 @@ def _log_log_fit(xs: list[float], ys: list[float]) -> _FitResult:
     cov = sum((x - mean_x) * (y - mean_y) for x, y in zip(log_x, log_y, strict=True))
     var_x = sum((x - mean_x) ** 2 for x in log_x)
     if var_x == 0:
-        return _FitResult(0.0, 0.0, True)
+        return _FitResult(0.0, 0.0, True, underdetermined=underdetermined)
     slope = cov / var_x
     intercept = mean_y - slope * mean_x
     ss_tot = sum((y - mean_y) ** 2 for y in log_y)
@@ -514,7 +561,9 @@ def _log_log_fit(xs: list[float], ys: list[float]) -> _FitResult:
         and shell_cv <= NEAR_CONSTANT_CV
         and slope_bound <= NEAR_CONSTANT_SLOPE_BOUND
     )
-    return _FitResult(slope, r_squared, degenerate, near_degenerate, shell_cv, slope_bound)
+    return _FitResult(
+        slope, r_squared, degenerate, near_degenerate, shell_cv, slope_bound, underdetermined
+    )
 
 
 def near_constant_consensus(
@@ -664,6 +713,7 @@ def local_dimension(
             dimension=0.0,
             r_squared=0.0,
             degenerate=False,
+            underdetermined=True,
         )
 
     fit = _log_log_fit([float(r) for r in fit_radii], [float(s) for s in fit_shells])
@@ -677,6 +727,7 @@ def local_dimension(
         near_degenerate=fit.near_degenerate,
         shell_cv=fit.shell_cv,
         slope_bound=fit.slope_bound,
+        underdetermined=fit.underdetermined,
     )
 
 
@@ -708,7 +759,7 @@ def mean_dimension(
     dimension value is still correct, only their r_squared is a sentinel
     (see `DimensionEstimate.degenerate`). Callers who need to distinguish a
     genuine measurement from a degenerate one (e.g. before citing accuracy,
-    per docs/POLY_ALGEBRAIC_BENCHMARK.md finding F1) should call
+    per docs/MENSURA_BENCHMARK.md finding F1) should call
     `local_dimension` directly and check `.degenerate` themselves; this
     convenience wrapper answers "what does the estimator say", not "is that
     answer informative."

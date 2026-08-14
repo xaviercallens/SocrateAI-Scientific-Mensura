@@ -424,7 +424,7 @@ def minimum_points_for_target_accuracy(
     """Smallest n in `n_grid` (a prefix of `points`) whose correlation-dimension
     estimate is within `tolerance` of `true_dimension` AND stays within tolerance
     at every larger n tested (guards against a lucky single crossing, the exact
-    failure mode docs/POLY_ALGEBRAIC_BENCHMARK.md findings F4/F4b documented for
+    failure mode docs/MENSURA_BENCHMARK.md findings F4/F4b documented for
     the shell-growth estimator -- the traditional method needs the same
     convergence discipline applied to it, not a pass).
 

@@ -17,9 +17,9 @@ is for the sharp, falsifiable measurements: W1 (Sym² lock vs. Hypothesis U),
 and by extension W2-W4 in `docs/IMPLEMENTATION_PLAN.md` once they reach their
 own decisive-measurement stage.
 
-For the *separate* Poly-Algebraic Calculus / hypergraph-physics initiative
+For the *separate* MENSURA / hypergraph-physics initiative
 (`src/socrates/hypergraph/`, unrelated to the T-dual work above), see
-`.claude/skills/poly-algebraic-calculus/SKILL.md` — it uses this same
+`.claude/skills/mensura/SKILL.md` — it uses this same
 six-phase shape but adds module-specific failure modes a real benchmark run
 already found (degenerate fits, unconverged fractal estimates, duplicate-point
 corruption). Read this skill for the *orchestration pattern*; read that one
@@ -77,8 +77,8 @@ before touching that module's code.
    top-line conclusion.** Confirmed twice independently — once in this
    project's own W1 round 2 (a repair report's self-disclosed "weakest
    untested assumption" predicted almost exactly what the skeptic later
-   found), and once in the separate Poly-Algebraic Calculus benchmark
-   (`docs/POLY_ALGEBRAIC_BENCHMARK.md`), where an Opus auditor wrote a
+   found), and once in the separate MENSURA benchmark
+   (`docs/MENSURA_BENCHMARK.md`), where an Opus auditor wrote a
    detailed, multi-finding ledger that correctly identified real problems
    in the original agents' work — and a second skeptic tasked specifically
    with checking *that ledger* found three real errors in the auditor's
@@ -94,8 +94,8 @@ before touching that module's code.
    the adjudicator's positive/confirming claims as hard as its negative
    ones.
 
-   **A third, sharper instance of the same failure (Poly-Algebraic
-   Calculus improvement loop, `docs/POLY_ALGEBRAIC_BENCHMARK.md` §10.10 /
+   **A third, sharper instance of the same failure (MENSURA
+   improvement loop, `docs/MENSURA_BENCHMARK.md` §10.10 /
    `docs/LL.md` lesson 8):** the reviewer correctly diagnosed a methodology
    flaw, stated the right fix, and applied it to *some* of the
    measurements it governed — then scored the rest with the old, already
@@ -108,7 +108,7 @@ before touching that module's code.
    methodology principle partway through.
 
    **A fourth instance, in the same benchmark's round 3
-   (`docs/POLY_ALGEBRAIC_BENCHMARK.md` §11.4-§11.6 / `docs/LL.md` lesson
+   (`docs/MENSURA_BENCHMARK.md` §11.4-§11.6 / `docs/LL.md` lesson
    9), was the same gap wearing a more convincing disguise:** the
    adjudicator discovered a genuine fairness problem (a hard-coded,
    materially misconfigured baseline) and fixed it — but only for the

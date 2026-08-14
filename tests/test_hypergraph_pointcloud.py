@@ -79,7 +79,7 @@ def test_boundary_points_of_a_cube_underestimate_dimension():
 
 
 def test_knn_hypergraph_raises_on_multi_period_duplicate_clusters():
-    # Regression test for docs/POLY_ALGEBRAIC_BENCHMARK.md finding F3: sampling
+    # Regression test for docs/MENSURA_BENCHMARK.md finding F3: sampling
     # multiple periods of a closed orbit produces near-exact duplicate points
     # at ~1e-9 separation, which corrupted 3 of the 10 benchmark problems
     # silently. Reproduces the exact defect (3 period-copies of a circle,
@@ -126,7 +126,7 @@ def test_knn_hypergraph_does_not_false_positive_on_dense_genuine_sampling():
 def test_knn_hypergraph_handles_large_point_clouds():
     # The O(n^2) brute-force construction this module started with made
     # n=15000 impractical (the binding constraint on the two chaotic-
-    # attractor benchmark problems, docs/POLY_ALGEBRAIC_BENCHMARK.md finding
+    # attractor benchmark problems, docs/MENSURA_BENCHMARK.md finding
     # N5). The scipy.spatial.cKDTree-based construction must handle it
     # directly -- this test is a scale smoke test, not a timing assertion
     # (no wall-clock bound is asserted, since CI hardware varies), but it

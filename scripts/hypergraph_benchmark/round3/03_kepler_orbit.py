@@ -3,7 +3,7 @@ against the CURRENT library state (post N8, H1, H3, and the AutoResearch H2 loop
 
 WHY THIS SCRIPT EXISTS AND WHAT IT DELIBERATELY DOES DIFFERENTLY
 ---------------------------------------------------------------
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.10 records that the round-2 measurement
+docs/MENSURA_BENCHMARK.md Sec. 10.10 records that the round-2 measurement
 of this problem (and of problem 04) was made on a TIME-ORDERED prefix of the
 trajectory: `compare()` evaluates `points[:n]`, so with a time-ordered cloud the
 n=100 grid point is the first ~1% of a single Kepler period -- a short, smooth,
@@ -34,7 +34,7 @@ Two independent whole-orbit constructions are measured, not one:
 
 HYPERPARAMETERS: k=6, max_radius=6 -- the module defaults, and also problem 03's
 round-2 production values (scripts/hypergraph_benchmark/round2/03_kepler_orbit.py
-K=6, MAX_RADIUS=6). NO deviation. docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 9.4
+K=6, MAX_RADIUS=6). NO deviation. docs/MENSURA_BENCHMARK.md Sec. 9.4
 (R2-F3) traced a false round-2 win to an undisclosed non-default `max_radius`;
 nothing here is swept in search of a better answer. `theiler_window` and
 `max_ball_fraction` are reported at their DEFAULTS (0 and 1.0) as the headline,
@@ -73,7 +73,7 @@ bar") fails too. Two independent reasons; neither is close.
 That F1 caveat also qualifies the criterion-(a) win and is not cancelled by it:
 poly reaches tolerance 4x sooner because a ring lattice answers 1.0 structurally
 and the orbit really is 1-D, not because a fit measured 1.0 from data. This is
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.10's "same win, four times over"; it is
+docs/MENSURA_BENCHMARK.md Sec. 10.10's "same win, four times over"; it is
 recorded here rather than left for a reader to rediscover.
 
 WHY `theiler_window` STAYS AT ITS DEFAULT 0 HERE (measured, not assumed)
@@ -362,7 +362,7 @@ def section_1(state) -> None:
     print(
         "\n  => the time-ordered prefix is a perihelion arc, not an orbit; both\n"
         "     whole-orbit constructions cover the full radial and angular range at\n"
-        "     every n. This is docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.10's finding,\n"
+        "     every n. This is docs/MENSURA_BENCHMARK.md Sec. 10.10's finding,\n"
         "     re-derived here rather than quoted."
     )
 

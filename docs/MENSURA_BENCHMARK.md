@@ -1,4 +1,4 @@
-# Poly-Algebraic Calculus dimension estimator — physics benchmark ledger
+# MENSURA dimension estimator — physics benchmark ledger
 
 Audit of a 10-problem benchmark run in which the shell-growth dimension
 estimator (`socrates.hypergraph.dimension.local_dimension` / `mean_dimension`)
@@ -31,7 +31,7 @@ errors) are findings, not things to smooth over.
 statistic of a specific finite point-cloud graph, computed by code that does
 what it says. Nothing here is Tier A (nothing is kernel-checked). Any
 statement about what these results mean for hypergraph physics, emergent
-spacetime, or "Poly-Algebraic Calculus" as a research programme is **Tier C**
+spacetime, or "MENSURA" as a research programme is **Tier C**
 and is confined to the explicitly-labelled section at the end.
 
 ---
@@ -667,6 +667,14 @@ improvement-loop rounds that is a real, actionable defect in shipped code
 methodology — fix by gating on relative shell spread in addition to R²,
 with known-answer regression tests before any re-run of problem 01 (§10.8).
 
+**N9 — ✅ DONE (§12.3). A 2-radius fit window scores R²=1.0 by algebra.**
+Distinct from both N1 and N8, and the one that produced *confident* nonsense
+rather than a sentinel: at fit length 2 the least-squares residual is
+identically zero, so `r_squared` is 1.0 for every input and the R² branch
+certifies whatever slope those two points imply — including negative
+dimensions on fragmented graphs. Fixed via `MIN_RSQUARED_FIT_LENGTH = 3`
+plus a `DimensionEstimate.underdetermined` flag that `is_well_fit` refuses.
+
 **Closed in round 3, after two refuted attempts (§11.1):** a per-node
 CV+slope-bound gate looked correct but had a real, measured collateral-
 damage defect; a follow-up minimum-fit-length gate fixed that case but
@@ -721,7 +729,7 @@ untracked addition is `scripts/hypergraph_benchmark/`.
 Everything above is Tier B. The following is **Tier C** and nothing in this
 repository should depend on it:
 
-- This run does **not** validate "Poly-Algebraic Calculus" as a physical theory,
+- This run does **not** validate "MENSURA" as a physical theory,
   and does not bear on the Wolfram Physics Project's hypothesis. It measures a
   graph statistic on point clouds sampled from ODE solutions. The concept-level
   triage in `HYPERGRAPH_NOTES.md` §"Triage of the four brainstormed concepts"
@@ -747,7 +755,7 @@ repository should depend on it:
 # Round 2, phase 1 — audit of the "beat the traditional method" run (2026-08-13)
 
 Ten agents re-ran the benchmark against a stated goal: demonstrate, on **at
-least 8 of 10** problems, that the shell-growth ("Poly-Algebraic") estimator
+least 8 of 10** problems, that the shell-growth (MENSURA) estimator
 beats the classical Grassberger–Procaccia baseline
 (`socrates.hypergraph.baseline`) by either
 
@@ -1915,3 +1923,143 @@ now demonstrated, not merely argued, that "verify the auditor" has to
 include auditing the fairness of the instrument the auditor built to do
 the auditing, and that a review which corrects an asymmetry in one
 direction and not the other can look more rigorous than it is.
+
+---
+
+## 12.0 F3/F4 diagnostic — an external review, verified
+
+Following round 3 an external reviewer argued that the blocker was the
+*scoreboard*, not the estimator, and raised two findings this ledger had not
+seen. Both were tested and independently verified. The design consequences
+live in `docs/MENSURA_BENCH_V2.md`; this section records what was measured.
+
+## 12.1 F3 — the chaotic targets were circular. CONFIRMED and fixed.
+
+Problems 08/09 were scored against D₂ ≈ 2.05 (Lorenz) and ≈ 2.01 (Rössler),
+attributed in §2 to **[GP83] — the original paper of the baseline method
+itself**. The benchmark was grading the new estimator against the
+competitor's own historical output.
+
+Replaced with method-independent Kaplan–Yorke targets computed in-house from
+Lyapunov spectra (Benettin, C implementation, 8 ICs × 3 dt × 2 reorth
+intervals per system):
+
+| | D_KY | published |
+|---|---|---|
+| Lorenz (σ=10, ρ=28, β=8/3) | **2.062152 ± 0.000024** | 2.062 |
+| Rössler (a=b=0.2, c=5.7) | **2.013242 ± 0.000059** | 2.0132 |
+
+The solver was validated on an 8-case known-answer battery *before* being
+pointed at the targets (Hénon λ₁ vs published 0.41922 → 0.419588; Hénon
+Σλ = ln 0.3 → err 1.6e−14; exact linear flows → 5e−13). The analytic
+divergence identity holds across all 96 runs: Lorenz Σλ vs −(σ+1+β) to
+6.2e−06, Rössler Σλ vs a−c+⟨x⟩ to 7.4e−06.
+
+**Caveat the reviewer did not state, and it matters more than the fix:**
+`D_KY` is the **information dimension D₁** under the Kaplan–Yorke conjecture
+— not D₀, not D₂. Given F4 below, substituting KY for GP83 removes the
+circularity but would introduce a *type* error. KY is the independent anchor
+**for D₁ only**; every `INDEPENDENT` target must carry its dimension type.
+
+## 12.2 F4 — the two methods estimate different dimensions. CONFIRMED.
+
+Grassberger–Procaccia estimates D₂ by construction. The shell-growth
+estimator counts ball volume, and **tracks D₀**. Verified independently:
+target theory re-derived from the multifractal formalism to ≤4.4e−16,
+sampling confirmed drawn from the invariant measure (max cylinder mass
+matches max(p)^m, 40–60× above the uniform-on-support value), and two
+targets rebuilt from scratch.
+
+The decisive evidence is an invariance test: **hold the support fixed, sweep
+the measure so true D₂ moves by 1.057.** GP moves 0.97–1.06 (1:1). Shell
+moves a median of 0.09–0.32. Per-configuration, 12/12 of the "matched"
+targets are closer to D₀ than D₂, and the result survives with the R² filter
+disabled.
+
+**Consequence:** stop describing the shell estimator as a competitor to the
+correlation dimension, and stop validating it against literature D₂ values.
+It is a support/box-dimension estimator and must be calibrated as one.
+
+**But F4 changes no recorded verdict.** On these two attractors D₀−D₂ is
+bounded by the Lyapunov dimension (D₂ ≤ D₁ ≤ D₀ ≤ D_L): **≤0.0117 (Lorenz),
+≤0.0041 (Rössler)**. Re-deriving the min_n verdicts while sweeping the
+scoring target shows them **invariant over [1.90, 2.18] (Lorenz) and
+[1.99, 2.04] (Rössler)** — bands 10–25× wider than the gap. F4 explains
+**none** of the recorded "shell needs 2–4× more points" result, and the
+direction runs against the estimator anyway, since D₀ ≥ D₂ raises the bar
+for an estimator converging from below.
+
+**A mechanism claim of this ledger's own was refuted in passing.** The
+Cantor-dust breakdown was first attributed (by the orchestrator) to
+"totally disconnected support". False: at contraction ratio r=0.49 the set
+*is* totally disconnected and the estimator works fine (+0.12). Sweeping r
+so connectivity flips discontinuously while D₀ varies smoothly shows the
+controlling variable is the scale-invariant **lacunarity ratio (1−2r)/r**,
+with breakdown setting in around 0.2–0.5. It also fires on a **connected**
+support when the measure is concentrated enough (Sierpinski gasket,
+p=0.8/0.1/0.1, k=8: 60 graph components, estimate 0.685 against D₀=1.585).
+It is a property of the sample's k-NN graph, not the set's topology.
+
+## 12.3 N9 (NEW, real, fixed) — a 2-radius fit window scores R²=1.0 by algebra
+
+The most consequential thing the diagnostic found, and it is a shipped code
+defect rather than a methodology dispute.
+
+A least-squares line through m points has m−2 residual degrees of freedom.
+At m=2 the residual is identically zero, so **`r_squared` is 1.0 for every
+input** — the line passes through both points by construction. The R²
+acceptance branch is not weak there; it is *inert*, certifying whatever
+slope the two points imply. Measured examples, all with
+`degenerate=False`, `near_degenerate=False`, all admitted by
+`is_well_fit(0.9)`:
+
+| volumes | dimension | r_squared |
+|---|---|---|
+| (19, 27) | 0.51 | 1.000000 |
+| (28, 31) | 0.15 | 1.000000 |
+| (10, 50) | 2.32 | 1.000000 |
+| (40, 8) | **negative** | 1.000000 |
+
+This is the mechanism behind the *confident negative dimensions* on Cantor
+dust: the graph fragments into hundreds of components (639 at n=12800,
+largest 56–94 nodes), most sampled nodes exhaust their component in 2–4
+hops, and every such window was admitted.
+
+**Fixed** by `MIN_RSQUARED_FIT_LENGTH = 3` (the shortest window in which R²
+can fail at all) and a `DimensionEstimate.underdetermined` flag that
+`is_well_fit` refuses outright. Six regression tests in
+`tests/test_hypergraph_dimension_underdetermined.py`, including an
+end-to-end fragmented graph that now honestly returns `nan` instead of
+averaging noise. Full suite 252 passed.
+
+**This is the same class of defect as N8, and the same scope failure as
+lessons 8/9:** N8's `NEAR_CONSTANT_MIN_FIT_LENGTH = 5` floor guarded the
+near-constant branch of a shared weakness and left the R² branch open.
+Note also that round 3's AutoResearch loop *proposed exactly this fix*
+(AR3, "residual-degrees-of-freedom floor") and **rejected it**, because it
+made Rössler's convergence-speed number worse. Under the v1 scoreboard that
+was the correct call; under the v2 Certified Interval Criterion, admitting
+confident garbage is a calibration violation — the one unforgivable
+outcome. A correct fix was discarded because the metric could not see its
+value, which is the reviewer's central thesis demonstrated inside this
+repository's own history.
+
+## 12.4 Second defect, open
+
+Even on a plain uniform sample of the unit square (true dimension exactly
+2), the shell estimator's error runs **+0.02 to +0.17** depending on
+(k, `max_radius`) — larger than the entire D₀−D₂ gap on both chaotic
+attractors. Under CIC this is an interval-width and calibration question,
+not a win-rate question. Tracked as an input to MENSURA-BENCH v2's
+zero-knob requirement (`docs/MENSURA_BENCH_V2.md` §2.2).
+
+## 12.5 Provenance flag — unverified, needs an LL-6 pass
+
+A literature sub-agent reported that **[GP83] Table I does not contain
+Rössler at all** (its systems being Hénon, Kaplan–Yorke map, logistic,
+Lorenz, Rabinovich–Fabrikant, Zaslavskii), and that the nearest genuine
+published value is Sprott's 1.991 ± 0.065. §2's attribution of the Rössler
+target to [GP83] may therefore be wrong at the citation level as well as
+circular in principle. **This was not verified against the paper and must
+not be treated as established** until someone reads GP83 directly. Recorded
+here so the claim is not silently inherited by the v2 truth taxonomy.

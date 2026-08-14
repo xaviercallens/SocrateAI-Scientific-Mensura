@@ -12,7 +12,7 @@ for the benchmark's honesty:
 
 1. The correction is OFF by default, and "off" means bit-for-bit identical to
    the pre-H1 estimator -- not "close enough". Every number already recorded
-   in docs/POLY_ALGEBRAIC_BENCHMARK.md was produced with the window off and
+   in docs/MENSURA_BENCHMARK.md was produced with the window off and
    must still reproduce exactly.
 2. The correction makes the TRADITIONAL method better, i.e. a harder baseline
    for the shell-growth estimator to beat. `test_theiler_window_makes_the_

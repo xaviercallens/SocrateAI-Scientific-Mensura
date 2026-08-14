@@ -2,7 +2,7 @@
 
 FINDING BEING FIXED
 -------------------
-docs/POLY_ALGEBRAIC_BENCHMARK.md finding R2-F4 (§9.5), replicated in §10.3,
+docs/MENSURA_BENCHMARK.md finding R2-F4 (§9.5), replicated in §10.3,
 carried as next step N8. Round 1's N1 fixed *exactly* constant shell sequences
 (ss_tot within floating-point noise of zero -> r_squared sentinel 1.0). A
 distinct defect sat immediately next to it: a shell sequence that is *nearly*

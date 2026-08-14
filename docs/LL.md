@@ -1,7 +1,7 @@
-# Lessons learned: building and benchmarking the Poly-Algebraic Calculus
+# Lessons learned: building and benchmarking the MENSURA
 
 Distilled from building `src/socrates/hypergraph/` and running it against 10
-known physics problems (`docs/POLY_ALGEBRAIC_BENCHMARK.md`). Written so the
+known physics problems (`docs/MENSURA_BENCHMARK.md`). Written so the
 *next* module in this repository — or the next round of this one — starts
 from these lessons instead of rediscovering them. Each entry states what
 happened, why it matters beyond this one module, and what to do about it.
@@ -193,7 +193,7 @@ cancellation, the adjacency performance bug) were fixed the same session
 they were found, each with a regression test that reproduces the *exact*
 case the benchmark surfaced (not a generic "does it work" test), and each
 fix is referenced from the finding that motivated it
-(`docs/POLY_ALGEBRAIC_BENCHMARK.md`'s N1/N5 entries updated to "✅ DONE" in
+(`docs/MENSURA_BENCHMARK.md`'s N1/N5 entries updated to "✅ DONE" in
 place, not left as permanently-open TODOs once actually resolved).
 
 **Why it generalizes.** A benchmark that finds real bugs and doesn't lead

@@ -20,7 +20,7 @@ socrates.hypergraph.comparison, on two axes:
 
 DIFFERENCES FROM ROUND 1 (scripts/hypergraph_benchmark/03_kepler_orbit.py):
   - SINGLE PERIOD only (round 1 sampled 3 periods then subsampled to 360
-    points). Per docs/POLY_ALGEBRAIC_BENCHMARK.md finding F3/N4/N7: sampling
+    points). Per docs/MENSURA_BENCHMARK.md finding F3/N4/N7: sampling
     multiple periods of a closed orbit produces near-duplicate point
     clusters (the orbit exactly retraces itself), which corrupts a k-NN
     graph. A single period cannot have that problem by construction (the
@@ -223,7 +223,7 @@ def main() -> None:
 
         hg_density = knn_hypergraph(density_points, k=K, dedupe=True)
         poly_dim = mean_dimension(hg_density, samples=40, max_radius=MAX_RADIUS)
-        # Finding F1 (docs/POLY_ALGEBRAIC_BENCHMARK.md): on a closed 1D curve,
+        # Finding F1 (docs/MENSURA_BENCHMARK.md): on a closed 1D curve,
         # a k-NN graph is close to a ring lattice, so most/all local shell
         # sequences are CONSTANT (2 new nodes per radius until saturation) --
         # a "degenerate" sentinel fit, not a genuine measurement, even though

@@ -6,7 +6,7 @@ WHAT CHANGED SINCE ROUND 2 AND WHY THIS SCRIPT EXISTS
 Round 2's own script (scripts/hypergraph_benchmark/round2/04_mars_horizons.py)
 measured this problem on a *time-ordered* prefix of the trajectory: `points[:n]`
 was the first n/6400 of one Mars year, i.e. a short smooth ARC, not the orbit.
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.10 records that this is the wrong
+docs/MENSURA_BENCHMARK.md Sec. 10.10 records that this is the wrong
 prefix construction for a closed orbit, and that the round-2 skeptic, re-running
 04 on the *whole-orbit-covering* prefix construction that Sec. 10.4 / R2-F8
 endorses (and that problems 01, 02 and 10 already used), found poly `min_n`=64

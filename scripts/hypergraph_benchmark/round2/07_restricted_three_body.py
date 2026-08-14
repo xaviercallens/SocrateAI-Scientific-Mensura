@@ -55,7 +55,7 @@ DIFFERENCES FROM ROUND 1:
   - ax_amplitude = 0.02 (round 1: 0.005) -- chosen for a genuine close lunar
     approach, per above.
   - SINGLE PERIOD only (round 1 sampled 3 periods then subsampled to 400
-    points). Per docs/POLY_ALGEBRAIC_BENCHMARK.md finding F3/N4/N7 and
+    points). Per docs/MENSURA_BENCHMARK.md finding F3/N4/N7 and
     round-2 instruction N4: sampling multiple periods of a closed orbit
     produces near-duplicate point clusters, which corrupts a k-NN graph. A
     single period cannot have that problem by construction; the tail is

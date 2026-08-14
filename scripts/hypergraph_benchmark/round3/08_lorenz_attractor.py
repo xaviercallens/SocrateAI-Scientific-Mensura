@@ -35,7 +35,7 @@ UNDISCLOSED non-default `max_radius`.  So, explicitly:
   k = 10           -- a DELIBERATE, DISCLOSED deviation from the module default
                       k=6.  Reason: 10 is problem 08's PRODUCTION setting, fixed
                       in round 1 and used by every recorded 08 number
-                      (docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 9.4 table row 08,
+                      (docs/MENSURA_BENCHMARK.md Sec. 9.4 table row 08,
                       round2/08_lorenz_attractor.py `K = 10`, and
                       round3/n8d_clouds.py `CloudSpec("08", ..., 10, 6, ...)`).
                       Re-measuring the baselines of record at a different k

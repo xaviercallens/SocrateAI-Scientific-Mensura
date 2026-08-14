@@ -22,7 +22,7 @@ entirely and has NEVER been measured on this problem. It is measured here.
 
 HYPERPARAMETERS AND THE R2-F3 GUARD
 -----------------------------------
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 9.4 (finding R2-F3) traced a false round-2
+docs/MENSURA_BENCHMARK.md Sec. 9.4 (finding R2-F3) traced a false round-2
 win to an UNDISCLOSED non-default `max_radius`. This script therefore takes the
 module defaults as the headline and discloses every deviation:
 

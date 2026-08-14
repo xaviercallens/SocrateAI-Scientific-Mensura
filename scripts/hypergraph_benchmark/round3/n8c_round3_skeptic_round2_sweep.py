@@ -1,7 +1,7 @@
 """Round-3 independent skeptic, part 4: do any RECORDED round-2 headline
 numbers move in the current tree?
 
-docs/POLY_ALGEBRAIC_BENCHMARK.md records `poly_algebraic_min_n = 400` for both
+docs/MENSURA_BENCHMARK.md records `poly_algebraic_min_n = 400` for both
 problem 05 (quasiperiodic torus) and problem 06 (Brownian). Both run
 `compare()` at max_radius=6, i.e. fit windows of length 6, where the
 near-constant branch is LIVE (length 6 >= NEAR_CONSTANT_MIN_FIT_LENGTH = 5).
@@ -64,7 +64,7 @@ def report(name: str, recorded: int | None, builder) -> bool:
         f"  cloud {len(pts)} points, k={k}, max_radius=6 (compare() default), "
         f"true_dim={truth}, tolerance={tol}"
     )
-    print(f"  RECORDED in docs/POLY_ALGEBRAIC_BENCHMARK.md: poly_algebraic_min_n = {recorded}")
+    print(f"  RECORDED in docs/MENSURA_BENCHMARK.md: poly_algebraic_min_n = {recorded}")
 
     got = {}
     for mode in MODES:

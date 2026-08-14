@@ -29,7 +29,7 @@ sample of the WHOLE closed orbit rather than a truncated arc.
 PARAMETERS: MODULE DEFAULTS, NO DEVIATION
 -----------------------------------------
 k=6, max_radius=6, samples=40 -- all module defaults, and identical to round 2.
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 9.4 (finding R2-F3) traced a false round-2
+docs/MENSURA_BENCHMARK.md Sec. 9.4 (finding R2-F3) traced a false round-2
 win to an undisclosed non-default max_radius; there is no deviation here to
 disclose. `max_ball_fraction` is left at its default 1.0 (off) for the headline
 numbers, with the 0.5 setting reported alongside as a sensitivity check only.
@@ -66,7 +66,7 @@ node into `dimension.py`'s degenerate branch and forces the answer 1.0000. The
 criterion-(a) win is therefore a statement about HOW FEW POINTS EACH METHOD
 NEEDS TO IDENTIFY A RING (poly n=64, correlation sum n=256), not a claim that
 the shell-growth estimator is more accurate here -- exactly the narrow reading
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 9.7 already records for this problem. It
+docs/MENSURA_BENCHMARK.md Sec. 9.7 already records for this problem. It
 is not vacuous in the "would say 1.0 for anything" sense: Sec. 10.3's control
 shows poly returning 1.32-2.47 (degenerate fraction 0.000) on 2-D and 3-D
 clouds at these same n. Section 4 shows criterion (c) refusing this same cloud

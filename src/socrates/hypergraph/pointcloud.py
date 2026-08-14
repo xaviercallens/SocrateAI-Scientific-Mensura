@@ -18,7 +18,7 @@ sensitive to k and to sample density -- see the known-answer tests in
 
 Built on `scipy.spatial.cKDTree` (O(n log n) construction, O(log n) query)
 rather than the brute-force O(n^2) pairwise search this module started with
--- a 10-problem physics benchmark (docs/POLY_ALGEBRAIC_BENCHMARK.md, finding
+-- a 10-problem physics benchmark (docs/MENSURA_BENCHMARK.md, finding
 N5) found the O(n^2) cost was the binding constraint on point count for the
 two fractal (chaotic-attractor) cases, whose dimension estimates were still
 visibly unconverged at the largest n the O(n^2) cost made affordable.
@@ -81,7 +81,7 @@ from .core import Hypergraph
 class DuplicatePointsError(ValueError):
     """Raised when `knn_hypergraph` finds near-duplicate points in the input.
 
-    Fed by finding F3 of docs/POLY_ALGEBRAIC_BENCHMARK.md: sampling multiple
+    Fed by finding F3 of docs/MENSURA_BENCHMARK.md: sampling multiple
     periods of a closed orbit (or any repeated traversal of the same curve)
     produces near-exact duplicate points at ~1e-9 separation -- typically in
     clusters of size equal to the number of periods sampled, not just pairs.
@@ -201,7 +201,7 @@ def knn_hypergraph(
                 f"(mutual distance < {threshold:.3e}, {duplicate_tolerance:.0e} of "
                 f"the bounding-box diagonal {bbox_diagonal:.3e}); "
                 f"cluster sizes: {sizes[:10]}{'...' if len(sizes) > 10 else ''}. "
-                f"This is the exact failure mode docs/POLY_ALGEBRAIC_BENCHMARK.md "
+                f"This is the exact failure mode docs/MENSURA_BENCHMARK.md "
                 f"finding F3 documents (e.g. sampling multiple periods of a closed "
                 f"orbit) -- pass dedupe=True to drop duplicates automatically, or "
                 f"resample your point cloud without repeated traversals."

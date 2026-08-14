@@ -242,7 +242,7 @@ def test_degenerate_fraction_distinguishes_path_from_grid():
     # N2: a path's shell sequence is constant everywhere sampled -> fully
     # degenerate. A grid's shell sequence genuinely varies (4,8,12,16) ->
     # not degenerate. This is exactly the distinction finding F1 of
-    # docs/POLY_ALGEBRAIC_BENCHMARK.md showed is missing from a bare
+    # docs/MENSURA_BENCHMARK.md showed is missing from a bare
     # r_squared reading.
     from socrates.hypergraph.dimension import degenerate_fraction
 
@@ -273,7 +273,7 @@ def test_dimension_of_disconnected_singleton_edge_is_poorly_fit():
 
 def test_log_log_fit_r_squared_does_not_collapse_on_constant_shells():
     # Regression test for a bug found by the 10-problem physics benchmark
-    # (docs/POLY_ALGEBRAIC_BENCHMARK.md, finding F2): for a perfectly constant
+    # (docs/MENSURA_BENCHMARK.md, finding F2): for a perfectly constant
     # shell sequence, ss_tot should be exactly 0, but floating-point rounding
     # in mean_y = sum(log_y)/n can leave it at ~1e-31 instead, taking the
     # `ss_tot > 0` general branch and collapsing r_squared to ~0 by pure
@@ -322,7 +322,7 @@ def test_circle_at_k6_is_well_fit_at_the_default_max_radius():
 
 # ---- N8 / R2-F4: near-constant (not exactly-constant) shell sequences --------
 #
-# docs/POLY_ALGEBRAIC_BENCHMARK.md §9.5 (finding R2-F4), §10.3 and next step N8.
+# docs/MENSURA_BENCHMARK.md §9.5 (finding R2-F4), §10.3 and next step N8.
 # N1 fixed *exactly* constant shell sequences. Immediately adjacent sat a
 # distinct defect: a shell sequence that is nearly but not exactly constant has
 # genuinely tiny ss_tot, so N1's relative-tolerance branch does not fire, and
@@ -944,7 +944,7 @@ def test_n8d_broadened_calibration_driven_pendulum_n32_is_below_consensus():
     once the calibration set is broadened (2D Rossler at n=100 also has no
     confident node, at a fraction of 0.325). The consequence is that problem
     10's `poly_algebraic_min_n` is 64, which is the value
-    docs/POLY_ALGEBRAIC_BENCHMARK.md 10.2 records.
+    docs/MENSURA_BENCHMARK.md 10.2 records.
     """
     import math
 

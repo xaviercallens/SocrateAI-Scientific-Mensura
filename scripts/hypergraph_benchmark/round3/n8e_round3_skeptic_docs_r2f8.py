@@ -1,6 +1,6 @@
 """Round-3 skeptic: does N8d move the recorded R2-F8 control table (docs 10.4)?
 
-docs/POLY_ALGEBRAIC_BENCHMARK.md 10.4 records a control table of
+docs/MENSURA_BENCHMARK.md 10.4 records a control table of
 `mean_dimension(k=6, max_radius=6)` on clouds of known dimension at small n,
 and draws from it the load-bearing claim
 

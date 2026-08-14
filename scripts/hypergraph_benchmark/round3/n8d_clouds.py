@@ -202,7 +202,7 @@ def load_cloud(problem: str, *, rebuild: bool = False) -> list[tuple[float, ...]
 def anchor_cloud() -> list[tuple[float, float]]:
     """The documented R2-F4 anchor cloud: problem 01's own cloud at n=200.
 
-    docs/POLY_ALGEBRAIC_BENCHMARK.md 9.5 records the anchor shell sequence
+    docs/MENSURA_BENCHMARK.md 9.5 records the anchor shell sequence
     (6,5,5,6,6,6) at n=200, k=6, max_radius=6 -- note max_radius=6, NOT
     problem 01's production max_radius=3. Because the golden-ratio Weyl index
     sequence is a prefix property (fracs = arange(n)*phi % 1), the first 200

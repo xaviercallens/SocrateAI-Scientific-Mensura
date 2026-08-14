@@ -4,7 +4,7 @@ state (post N8, H1, H3, and the AutoResearch H2 loop).
 
 WHAT THE RECORD SAYS GOING IN
 -----------------------------
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.2 scores problem 07 as "no": a genuine
+docs/MENSURA_BENCHMARK.md Sec. 10.2 scores problem 07 as "no": a genuine
 criterion-(a) TIE, and its Sec. 10.2 correction block states the tie explicitly
 survives the whole-orbit construction that turned problems 03 and 04 from ties
 into wins ("CR3BP (07) re-measured the same way stays a genuine tie (128 vs
@@ -527,7 +527,7 @@ def section_1(state) -> None:
     print(
         "\n  => the time-ordered prefix is a short arc near x0, nowhere near the Moon;\n"
         "     both whole-orbit constructions cover the full loop at every n. This is\n"
-        "     docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.10's finding, re-derived rather\n"
+        "     docs/MENSURA_BENCHMARK.md Sec. 10.10's finding, re-derived rather\n"
         "     than quoted."
     )
 

@@ -2,7 +2,7 @@
 
 Tier B. Two *separate* win criteria live here, and they answer different
 questions. Keeping them separate is the point of this module; conflating them
-is what docs/POLY_ALGEBRAIC_BENCHMARK.md finding R2-F9 identified as a defect
+is what docs/MENSURA_BENCHMARK.md finding R2-F9 identified as a defect
 in the benchmark's own scoreboard.
 
 **Criterion (a), sample efficiency** -- `compare()` / `ComparisonResult`.
@@ -20,7 +20,7 @@ either method converged in the criterion-(a) sense.
 
 Criterion (c) exists because criterion (a) is structurally blind to the one
 result the round-2 benchmark actually produced in poly's favour on
-non-degenerate targets (finding R2-F9, docs/POLY_ALGEBRAIC_BENCHMARK.md
+non-degenerate targets (finding R2-F9, docs/MENSURA_BENCHMARK.md
 Sec. 10.5). On the quasiperiodic torus and on planar Brownian motion -- the two
 2-dimensional, non-degenerate targets in the suite -- the shell-growth
 estimator lands within 0.03-0.05 of the truth with a degenerate fraction of
@@ -105,7 +105,7 @@ def poly_algebraic_minimum_points(
 
     Requires stable convergence (within tolerance at every larger n tested
     in the grid, not just a single lucky crossing), applying the same
-    discipline docs/POLY_ALGEBRAIC_BENCHMARK.md findings F4/F4b demanded.
+    discipline docs/MENSURA_BENCHMARK.md findings F4/F4b demanded.
     Duplicate point clusters are auto-deduplicated (`dedupe=True`) rather
     than raising, since this function is meant to run unattended over many
     (n, k) combinations.
@@ -259,7 +259,7 @@ def compare(
 # calls neither `poly_algebraic_minimum_points` nor
 # `minimum_points_for_target_accuracy`, uses no n_grid, and never asks whether
 # a method "converged". That independence is deliberate and is the whole point
-# of finding R2-F9 (docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 10.5): the two
+# of finding R2-F9 (docs/MENSURA_BENCHMARK.md Sec. 10.5): the two
 # non-degenerate 2D targets in the benchmark cannot be scored by criterion (a)
 # at all, because the baseline never converges there, so a criterion that is
 # merely a re-skin of the convergence search would reproduce the same blindness.

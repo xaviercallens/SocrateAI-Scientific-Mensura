@@ -54,7 +54,7 @@ precisely the discipline the rest of this repository has needed repeatedly
 
 ## Triage of the four brainstormed concepts
 
-### 1. Poly-Algebraic Calculus (higher-arity algebra) — Tier B implemented, Tier C interpretation
+### 1. Higher-arity rule search (formerly "MENSURA") — Tier B implemented, Tier C interpretation
 
 **What is real and implemented:** `rule_space` + `solve_for_rule` is a
 literal instance of "solve for an unknown structural bond": a finite,
@@ -166,7 +166,7 @@ named, and the tier stated.
 
 ## Physics benchmark
 
-`docs/POLY_ALGEBRAIC_BENCHMARK.md` applies the dimension estimator (via a
+`docs/MENSURA_BENCHMARK.md` applies the dimension estimator (via a
 new `knn_hypergraph` point-cloud bridge, `pointcloud.py`) to 10 known
 physics problems — closed orbits, a quasi-periodic torus, planar Brownian
 motion, and the Lorenz/Rössler chaotic attractors against their

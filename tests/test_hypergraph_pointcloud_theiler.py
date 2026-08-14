@@ -13,7 +13,7 @@ What these tests pin down:
 
 1. OFF BY DEFAULT MEANS BIT-FOR-BIT. `theiler_window=0`, `theiler_window=1`
    and the default all produce the identical edge set, so every graph and
-   every dimension already recorded in docs/POLY_ALGEBRAIC_BENCHMARK.md still
+   every dimension already recorded in docs/MENSURA_BENCHMARK.md still
    reproduces exactly.
 2. IT WORKS, ON A CASE WITH A KNOWN ANSWER AND A KNOWN CORRECT WINDOW. The
    `sticky_square` fixture is a genuinely 2-dimensional point SET visited by a
@@ -38,7 +38,7 @@ import math
 import numpy as np
 import pytest
 
-from socrates.hypergraph.dimension import mean_dimension
+from socrates.hypergraph.dimension import _sampled_nodes, local_dimension, mean_dimension
 from socrates.hypergraph.pointcloud import knn_hypergraph
 
 STICKY_BLOB_SIZE = 8
@@ -111,12 +111,14 @@ def test_auto_window_is_opt_in_only():
     """A cloud with strong temporal structure still gets the uncorrected graph
     unless the caller asks; otherwise 'off by default' would not be off."""
     points = sticky_square()
-    assert knn_hypergraph(points, k=STICKY_K).edges == knn_hypergraph(
-        points, k=STICKY_K, theiler_window=0
-    ).edges
-    assert knn_hypergraph(points, k=STICKY_K, theiler_window="auto").edges != knn_hypergraph(
-        points, k=STICKY_K
-    ).edges
+    assert (
+        knn_hypergraph(points, k=STICKY_K).edges
+        == knn_hypergraph(points, k=STICKY_K, theiler_window=0).edges
+    )
+    assert (
+        knn_hypergraph(points, k=STICKY_K, theiler_window="auto").edges
+        != knn_hypergraph(points, k=STICKY_K).edges
+    )
 
 
 # --------------------------------------------------------------------------
@@ -146,17 +148,46 @@ def test_window_at_the_known_blob_size_removes_every_intra_blob_edge():
 
 def test_window_recovers_dimension_two_on_the_sticky_square():
     """The known answer. The SET is 2-dimensional by construction; the
-    uncorrected graph cannot see that at all, the corrected one does."""
+    uncorrected graph cannot see that at all, the corrected one does.
+
+    "Cannot see it" is asserted as a claim about measurement SUPPORT rather
+    than about distance from 2.0. The original form of this test used
+    `abs(naive - 2.0) > 0.5` as a proxy, which finding N9 invalidated: on the
+    blob-dominated graph most sampled nodes exhaust their neighbourhood in two
+    hops, and before N9 those 2-radius windows were admitted as confident
+    fits (r_squared = 1.0 by algebra) and pooled into the naive mean. Removing
+    them moved the naive value closer to 2.0 -- not because the uncorrected
+    graph became informative, but because the garbage that was skewing it is
+    now correctly discarded. Measured at the time of writing: naive keeps
+    1/40 sampled nodes, corrected keeps 6/40. Pooling a single node is not a
+    measurement, and that is the invariant worth pinning.
+    """
     points = sticky_square()
-    naive = mean_dimension(knn_hypergraph(points, k=STICKY_K), samples=40, max_radius=6)
-    corrected = mean_dimension(
-        knn_hypergraph(points, k=STICKY_K, theiler_window=STICKY_BLOB_SIZE),
-        samples=40,
-        max_radius=6,
+    naive_hg = knn_hypergraph(points, k=STICKY_K)
+    corrected_hg = knn_hypergraph(points, k=STICKY_K, theiler_window=STICKY_BLOB_SIZE)
+
+    naive_well_fit = sum(
+        1
+        for node in _sampled_nodes(naive_hg, 40)
+        if local_dimension(naive_hg, node, max_radius=6).is_well_fit(0.9)
     )
-    assert not math.isfinite(naive) or abs(naive - 2.0) > 0.5
+    corrected_well_fit = sum(
+        1
+        for node in _sampled_nodes(corrected_hg, 40)
+        if local_dimension(corrected_hg, node, max_radius=6).is_well_fit(0.9)
+    )
+
+    # The uncorrected graph cannot support a measurement of the set at all.
+    assert naive_well_fit <= 2
+    assert corrected_well_fit >= 3 * naive_well_fit
+
+    corrected = mean_dimension(corrected_hg, samples=40, max_radius=6)
     assert math.isfinite(corrected)
     assert abs(corrected - 2.0) <= 0.3
+
+    # And the corrected answer is still materially the better of the two.
+    naive = mean_dimension(naive_hg, samples=40, max_radius=6)
+    assert not math.isfinite(naive) or abs(naive - 2.0) > abs(corrected - 2.0) + 0.2
 
 
 def test_auto_window_also_recovers_it_without_being_told_the_blob_size():
@@ -182,9 +213,7 @@ def test_graph_is_invariant_under_reordering_when_time_indices_are_supplied():
     reordered = knn_hypergraph(shuffled, k=STICKY_K, theiler_window=17, time_indices=perm.tolist())
 
     # Translate the reordered graph's edges back to original indices.
-    translated = {
-        tuple(sorted((int(perm[i]), int(perm[j])))) for i, j in reordered.edges
-    }
+    translated = {tuple(sorted((int(perm[i]), int(perm[j])))) for i, j in reordered.edges}
     assert translated == set(in_order.edges)
 
 

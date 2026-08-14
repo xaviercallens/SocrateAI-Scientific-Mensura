@@ -1,14 +1,14 @@
 ---
-name: poly-algebraic-calculus
-description: Use the hypergraph rewriting / dimension-estimation toolkit (src/socrates/hypergraph/) rigorously — building point clouds, running convergence sweeps, comparing against the traditional baseline, and avoiding the specific failure modes a 10-problem physics benchmark already found. Use when asked to apply, extend, or benchmark the "Poly-Algebraic Calculus" module, not for the T-dual/W1 dual-scale work (a separate initiative — see the decisive-experiment skill for that).
+name: mensura
+description: Use the hypergraph rewriting / dimension-estimation toolkit (src/socrates/hypergraph/) rigorously — building point clouds, running convergence sweeps, comparing against the traditional baseline, and avoiding the specific failure modes a 10-problem physics benchmark already found. Use when asked to apply, extend, or benchmark the "MENSURA" module, not for the T-dual/W1 dual-scale work (a separate initiative — see the decisive-experiment skill for that).
 ---
 
-# Poly-Algebraic Calculus: how to use it without repeating found bugs
+# MENSURA: how to use it without repeating found bugs
 
 `src/socrates/hypergraph/` is Tier C physics infrastructure with Tier B
 code (see `docs/HYPERGRAPH_NOTES.md`): hypergraph rewriting, a shell-growth
 dimension estimator, and a rule-search solver, built to test the Wolfram
-Physics Project hypothesis computationally. `docs/POLY_ALGEBRAIC_BENCHMARK.md`
+Physics Project hypothesis computationally. `docs/MENSURA_BENCHMARK.md`
 applied it to 10 known physics problems and found real bugs, real
 limitations, and — after fixes — a real comparator against the traditional
 approach. `docs/LL.md` distills the general lessons. **Read both before
@@ -40,7 +40,7 @@ time to diagnose the first time and are cheap to avoid the second.
    of a sample hit this regime — a high value means the r² column you are
    looking at is mostly sentinel. A *near*-constant (not exactly constant)
    shell sequence used to collapse R² unreliably too (two refuted repair
-   attempts before the fix that held — see `docs/POLY_ALGEBRAIC_BENCHMARK.md`
+   attempts before the fix that held — see `docs/MENSURA_BENCHMARK.md`
    §11.1); the shipped fix is a graph-level `near_degenerate_fraction`
    consensus check, backed by a proof that the pooled estimate is confined
    to `[0.75, 1.25]` whenever it fires, not a per-node heuristic — do not
@@ -144,5 +144,5 @@ points-to-converge is structurally unable to credit the one case
 converges) where the estimator has shown its clearest real advantage. As
 of round 3 it has never produced a verified win across two full attempts —
 before extending it further, treat that as a live open question about the
-criterion's definition, not only its application (`docs/POLY_ALGEBRAIC_BENCHMARK.md`
+criterion's definition, not only its application (`docs/MENSURA_BENCHMARK.md`
 §11.9, carry-forward item 6).

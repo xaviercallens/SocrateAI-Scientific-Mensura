@@ -60,7 +60,7 @@ from socrates.hypergraph.pointcloud import DuplicatePointsError, knn_hypergraph 
 CHAOTIC = ("08", "09")
 SPOT_CHECK = ("02", "10")
 
-# The numbers docs/POLY_ALGEBRAIC_BENCHMARK.md records, at DEFAULT settings.
+# The numbers docs/MENSURA_BENCHMARK.md records, at DEFAULT settings.
 RECORDED_DEFAULT_MIN_N = {
     "01": 50, "02": 64, "03": 100, "04": 100, "05": 400,
     "06": 400, "07": 100, "08": 800, "09": 1600, "10": 64,

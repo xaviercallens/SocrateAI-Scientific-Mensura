@@ -11,7 +11,7 @@ WHAT THIS RUN SETTLES
 ---------------------
 Round 2 reported 87.5% compute savings for this problem using max_radius=3
 instead of the module default 6. The round-2 skeptic's finding R2-F3
-(docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 9.4) showed that the win existed ONLY
+(docs/MENSURA_BENCHMARK.md Sec. 9.4) showed that the win existed ONLY
 below the default -- at max_radius=6 the poly side returned nan at small n and
 poly_min_n moved 50 -> 400, i.e. a tie -- and that the stated justification
 ("radius-6 balls saturate the whole graph") was factually wrong: the real

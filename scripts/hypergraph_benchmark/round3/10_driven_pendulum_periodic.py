@@ -43,7 +43,7 @@ orbit rather than a truncated arc.
 PARAMETERS: MODULE DEFAULTS, NO DEVIATION
 -----------------------------------------
 k=6, max_radius=6, samples=40 -- all module defaults, and identical to round 2.
-docs/POLY_ALGEBRAIC_BENCHMARK.md Sec. 9.4 (finding R2-F3) traced a false
+docs/MENSURA_BENCHMARK.md Sec. 9.4 (finding R2-F3) traced a false
 round-2 win to an undisclosed non-default max_radius; there is NO deviation
 here to disclose. `max_ball_fraction` is left at its default 1.0 (off) for the
 headline numbers, with 0.5 reported alongside as a sensitivity check only.

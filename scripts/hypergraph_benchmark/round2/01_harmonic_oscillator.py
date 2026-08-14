@@ -209,7 +209,7 @@ def main() -> dict[str, object]:
         "  Standing rule 4(i): a circle's k-NN graph is (locally) an exact "
         "ring lattice, so `local_dimension` can land on a constant-shell "
         "sentinel (r_squared=1.0 exactly, .degenerate=True) rather than a "
-        "genuine varied-shell fit -- docs/POLY_ALGEBRAIC_BENCHMARK.md's "
+        "genuine varied-shell fit -- docs/MENSURA_BENCHMARK.md's "
         "finding F1. Checked directly at both the min-n and max-n points:"
     )
     for n_check in (result.poly_algebraic_min_n, max(n_grid)):

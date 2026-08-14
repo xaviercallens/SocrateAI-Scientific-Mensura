@@ -466,7 +466,7 @@ def check_prob06():
     print(f"  poly_algebraic_min_n: production(shipped tree)={prod_min}")
     print(f"    my re-implementation over n<=3200: pre-N8={mine_pre} "
           f"node-local={mine_nl} shipped={mine_sh}")
-    print("  docs/POLY_ALGEBRAIC_BENCHMARK.md records 400 for problem 06.")
+    print("  docs/MENSURA_BENCHMARK.md records 400 for problem 06.")
     assert prod_min == 400 and mine_pre == 400 and mine_sh == 400 and mine_nl == 800
     print("  -> CULPRIT REJECTED by the graph verdict; recorded 400 restored.\n")
     return True
