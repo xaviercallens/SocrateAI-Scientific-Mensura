@@ -308,3 +308,111 @@ discriminating — Menger sponge at D=2.7268 MEASURED and containing truth,
 while Cantor dust, two clusters, D≥4 uniforms and n≤150 all abstain), and the
 known-answer battery. What must land first is a decision on §7.2 and an
 affine-invariance requirement in the validation battery.
+
+---
+
+## 8. Scale-aware prototype: skeptic verdict (from salvaged artifacts)
+
+Two prototype rounds built a local-Mahalanobis scale-aware neighbor/metric
+selection (scratch code, `scripts/hypergraph_benchmark/v2/scale_aware_v2.py`).
+An independent skeptic was launched against its seven claims and was stopped
+by the owner mid-run — but its incremental JSON artifacts
+(`skeptic_*.json`, written to disk per the E6 discipline) are sufficient to
+finish the verdict without re-running anything.
+
+### 8.1 A calibration violation was found — production-readiness REFUTED
+
+On the pure-rescale family (uniform square, truth 2.0), the prototype's own
+bracket construction:
+
+| rescale of one axis | shell | gp_local | bracket | contains 2.0 |
+|---|---|---|---|---|
+| identity | 2.061 | 1.652 | [1.318, 2.396] | yes |
+| ×0.1 (10:1) | 2.027 | 1.639 | [1.309, 2.357] | yes |
+| **×0.001 (1000:1)** | **0.995** | **1.743** | **[0.749, 1.989]** | **NO — miss by 0.011** |
+| ×0.0001 (10000:1) | 0.999 | 1.845 | [0.743, 2.101] | yes — by luck |
+
+The 0.0001 "pass" is the same failure as the 0.001 violation: in both, the
+shell arm has collapsed to the chain artifact (~1.0) and the verdict hinges
+on where gp happens to drift. One misses by 0.011, the other contains by
+0.101. This is not corrected measurement; it is accidental containment.
+
+**Structural reading.** Round 2 already documented the dilemma: loosening
+the topology ridge floor below ~0.02 breaks the shell arm via spurious
+shortcuts; keeping it at 0.05 caps anisotropy correction at 20:1. The
+skeptic's floor sweep confirms the other jaw: floors below 0.005 are inert
+(local covariance condition saturates at ~167 on the refutation case).
+**No floor value saves the shell arm beyond ~100:1 residual anisotropy** —
+the failure is structural, not a tuning shortfall.
+
+### 8.2 What is genuinely fixed, with evidence
+
+- **The refutation family up to ~100:1, rotation included.** 10:1 and 100:1
+  rescales, two-axis rescales, and rescale-then-rotate all produce MEASURED
+  brackets containing the truth. Notably, `rescale(0.1,0.001)` and
+  `rescale(0.01)∘rotate(37°)` — different transforms with the same condition
+  number 100 — produce **byte-identical** output, as do the 3-D anisotropic
+  case and its randomly-rotated twin. The construction is genuinely
+  rotation-equivariant and depends only on the anisotropy spectrum, exactly
+  as a covariance-based local metric should. This is a strength worth
+  pinning as a test.
+- **The 1-D family, generalized.** Line segment, ellipses at 20:1 and 100:1
+  aspect, and a helix in 3-D all pass ([~0.78, ~1.17] containing 1.0), all
+  self-selecting k=25 — consistent with the shell_cv gate physics on 1-D
+  supports (documented in cic.py's K_LADDER comment), i.e. principled, not
+  luck. The circle NaN root cause (k-starvation, not rank-deficiency) is
+  CONFIRMED and generalizes.
+- **Lorenz replication: 15/15 contain D_KY = 2.062152** across 5 independent
+  trajectories × 3 lags. But honestly read: the gp arm swings 2.21–3.38
+  across seeds (the prototype's own trajectory read 1.43 — the spread is
+  ±0.5+), and bracket widths run 1.2–3.1. Containment is achieved by width,
+  not accuracy. Round 2's claimed floor-split improvement on Lorenz
+  (1.27 → 1.43) is smaller than the inter-seed noise and cannot be
+  considered established.
+- **The stale-neighbor-set bug**: mechanism CONFIRMED on the original
+  trajectory (zero admissible k-rungs stale vs k=25 fresh); did NOT
+  reproduce on an independent cube or an independent Lorenz run — the
+  round-2 claim of "every 3-D case" is overstated, but the fix is correct
+  and harmless.
+
+### 8.3 The design insight that unlocks integration
+
+The 1000:1 violation exists **only because the scratch harness builds its
+bracket without the production abstention stack.** At the violating row the
+two arms disagree by 0.75 (shell 0.995 vs gp 1.743) — precisely the
+condition the production `READOUT_DIVERGENCE` signal (tightened to a 1.0
+factor in round 1: "arms must agree within one measured bias floor or
+abstain") exists to catch. Applying that gate to the salvaged numbers:
+0.75 > 0.18·max(d_mid,1) ≈ 0.25 → **UNDECIDED**, not a violation. The
+10000:1 case likewise. The Lorenz rows (arm gap ≈ 1.0) would also be
+UNDECIDED — consistent with production `certify()`'s current verdict there,
+and honest given the width-carried containment.
+
+**Composed correctly, the measured instrument becomes:**
+
+| regime | old core | scale-aware + production signal stack |
+|---|---|---|
+| isotropic known-answers | MEASURED, correct | MEASURED, correct (byte-identical isotropic control) |
+| anisotropy ≤ ~100:1, any rotation | **violation** (§7.1) | MEASURED, correct |
+| 1-D supports (circle, helix, …) | shell NaN | MEASURED, correct |
+| anisotropy ≥ ~1000:1, Takens lag=1 | **silent violation** | honest UNDECIDED |
+
+That is a defensible instrument: scale-aware selection *extends the
+measured region* from isotropic-only to ~100:1-with-rotation, and the
+existing abstention stack converts the tail from silent violations into
+honest refusals. The earlier "extend reach to 10000:1" goal is hereby
+recorded as structurally unreachable for a per-point locally-linear metric
+(§8.1), on evidence rather than preference.
+
+### 8.4 Integration requirements (blocking, in order)
+
+1. Wire scale-aware neighbor/metric selection into the A-CLOUD path of
+   `cic.py` (with `pointcloud.py`/`baseline.py` support), zero-knob, with
+   metric, floors, and iteration count recorded in the certificate.
+2. **Every bracket goes through the full production signal stack.** No
+   scratch-style raw brackets, ever — that is where the violation lived.
+3. Pin the affine battery as tests: isotropic control byte-equality;
+   10:1 and 100:1 rescale (± rotation) → MEASURED containing truth;
+   1000:1 and 10000:1 → UNDECIDED; and the exact §8.1 violating row as a
+   named regression case.
+4. Full suite + known-answer battery re-run before any Core-10 work.

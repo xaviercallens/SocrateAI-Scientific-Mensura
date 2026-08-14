@@ -1,0 +1,1418 @@
+{
+  "rows": [
+    {
+      "case": "PART0_rank_deficiency_circle",
+      "result": {
+        "k0": 30,
+        "median_cond": 4539.486330712771,
+        "max_cond": 13335.845616255541,
+        "median_min_eig": 2.4816881987828516e-07,
+        "fraction_cond_gt_1e3": 1.0,
+        "fraction_cond_gt_1e6": 0.0
+      }
+    },
+    {
+      "case": "PART0_k_only_negative_control_circle",
+      "result": {
+        "8": {
+          "mean_dimension": NaN,
+          "near_degenerate_fraction": 0.1875
+        },
+        "15": {
+          "mean_dimension": NaN,
+          "near_degenerate_fraction": 0.275
+        },
+        "25": {
+          "mean_dimension": 0.9905539830429262,
+          "near_degenerate_fraction": 0.525
+        },
+        "40": {
+          "mean_dimension": 0.9984865764605932,
+          "near_degenerate_fraction": 0.8625
+        }
+      }
+    },
+    {
+      "case": "uniform-square-2d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625954,
+        "r_squared": 0.9996782808312287
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822734,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434233
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.57469579933915,
+        "d_hi": 2.4210451753657996,
+        "hull_lo": 1.9343124870625954,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.35961668772344546,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090569,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822734,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_global_gp": true,
+      "contains_truth_local_gp": true,
+      "diagnostics": {
+        "refine": {
+          "k0": 30,
+          "rounds": [
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev": 0.9371875,
+              "median_topo_cond": 2.185573945029111
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev": 0.9494166666666668,
+              "median_topo_cond": 2.920424754262613
+            },
+            {
+              "round": 3,
+              "neighbor_set_overlap_with_prev": 0.9623541666666668,
+              "median_topo_cond": 3.612927883405294
+            },
+            {
+              "round": 4,
+              "neighbor_set_overlap_with_prev": 0.9733958333333335,
+              "median_topo_cond": 4.207555328725483
+            }
+          ],
+          "global_cov_cond": 1.0433112241042373,
+          "iterations_run": 4,
+          "converged": true,
+          "final_overlap": 0.9733958333333335,
+          "wall_time_s": 3.656091101001948,
+          "median_metric_cond": 4.207555328725483,
+          "max_metric_cond": 118.73476299765088
+        },
+        "k_selection": {
+          "rungs": [
+            {
+              "k": 4,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 3,
+              "readout": 1.9867199333295684,
+              "well_fit_fraction": 0.5
+            },
+            {
+              "k": 6,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.0957053546966793,
+              "well_fit_fraction": 0.7875
+            },
+            {
+              "k": 8,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.080457288206291,
+              "well_fit_fraction": 0.8375
+            },
+            {
+              "k": 10,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.057514924497638,
+              "well_fit_fraction": 0.75
+            },
+            {
+              "k": 15,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.038258756259912,
+              "well_fit_fraction": 0.5125
+            },
+            {
+              "k": 25,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 6,
+              "readout": 2.0557814369399514,
+              "well_fit_fraction": 0.6125
+            },
+            {
+              "k": 40,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 4,
+              "readout": 2.2384805564212567,
+              "well_fit_fraction": 0.75
+            }
+          ],
+          "admissible_k": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "k_ladder": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "selection_rule": "smallest admissible rung of cic.K_LADDER, admissibility = cic's own connectivity (largest component >= CONNECTIVITY_FRACTION) AND scaling-region (cic._shell_arm returns non-null) test, evaluated on the SCALE-AWARE Mahalanobis edge set rather than plain Euclidean -- the fix for the circle NaN.",
+          "k_selected": 4,
+          "readouts_by_k": {
+            "4": 1.9867199333295684,
+            "6": 2.0957053546966793,
+            "8": 2.080457288206291,
+            "10": 2.057514924497638,
+            "15": 2.038258756259912,
+            "25": 2.0557814369399514,
+            "40": 2.2384805564212567
+          }
+        },
+        "wall_time_s": 12.690246011014096
+      },
+      "wall_time_s": 14.581810587027576
+    },
+    {
+      "case": "circle-1d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 1.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 1,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 0.991401122833046,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.525
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.0023911874571114,
+        "r_squared": 0.9999894507165574
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 0.9639325873529621,
+        "r_squared": 0.9998801079471126,
+        "n_radii_used": 20,
+        "ref_scale": 1.4204435684419734
+      },
+      "bracket_global_gp": {
+        "d_lo": 0.811401122833046,
+        "d_hi": 1.1823911874571114,
+        "hull_lo": 0.991401122833046,
+        "hull_hi": 1.0023911874571114,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_local_gp": {
+        "d_lo": 0.7839325873529621,
+        "d_hi": 1.171401122833046,
+        "hull_lo": 0.9639325873529621,
+        "hull_hi": 0.991401122833046,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_global_gp": true,
+      "contains_truth_local_gp": true,
+      "diagnostics": {
+        "refine": {
+          "k0": 30,
+          "rounds": [
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev": 0.9997291666666667,
+              "median_topo_cond": 20.0
+            }
+          ],
+          "global_cov_cond": 1.035647698337239,
+          "iterations_run": 1,
+          "converged": true,
+          "final_overlap": 0.9997291666666667,
+          "wall_time_s": 1.6874900600523688,
+          "median_metric_cond": 1000.0000000000001,
+          "max_metric_cond": 1000.0000000001875
+        },
+        "k_selection": {
+          "rungs": [
+            {
+              "k": 4,
+              "n_components": 41,
+              "largest_component_fraction": 0.065625,
+              "admissible": false,
+              "reason": "FRAGMENTATION"
+            },
+            {
+              "k": 6,
+              "n_components": 11,
+              "largest_component_fraction": 0.181875,
+              "admissible": false,
+              "reason": "FRAGMENTATION"
+            },
+            {
+              "k": 8,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 10,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 15,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 25,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 0.9961510383662461,
+              "well_fit_fraction": 0.55
+            },
+            {
+              "k": 40,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 0.9958353636302645,
+              "well_fit_fraction": 0.825
+            }
+          ],
+          "admissible_k": [
+            25,
+            40
+          ],
+          "k_ladder": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "selection_rule": "smallest admissible rung of cic.K_LADDER, admissibility = cic's own connectivity (largest component >= CONNECTIVITY_FRACTION) AND scaling-region (cic._shell_arm returns non-null) test, evaluated on the SCALE-AWARE Mahalanobis edge set rather than plain Euclidean -- the fix for the circle NaN.",
+          "k_selected": 25,
+          "readouts_by_k": {
+            "25": 0.9961510383662461,
+            "40": 0.9958353636302645
+          }
+        },
+        "wall_time_s": 6.787218093988486
+      },
+      "wall_time_s": 11.584099181985948
+    },
+    {
+      "case": "uniform-cube-3d/n=1600/seed=11",
+      "n": 1600,
+      "d": 3,
+      "truth": 3.0,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 5,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.7237519107916164,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 2.9034532648775278,
+        "r_squared": 0.9994156051615884
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 2.8169972377371812,
+        "r_squared": 0.9867922502297279,
+        "n_radii_used": 15,
+        "ref_scale": 1.5924096100914307
+      },
+      "bracket_global_gp": {
+        "d_lo": 2.2173034449813933,
+        "d_hi": 3.409901730687751,
+        "hull_lo": 2.7237519107916164,
+        "hull_hi": 2.9034532648775278,
+        "allowance": 0.506448465810223,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_local_gp": {
+        "d_lo": 2.2250844874240245,
+        "d_hi": 3.315664661104773,
+        "hull_lo": 2.7237519107916164,
+        "hull_hi": 2.8169972377371812,
+        "allowance": 0.4986674233675918,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_global_gp": true,
+      "contains_truth_local_gp": true,
+      "diagnostics": {
+        "refine": {
+          "k0": 60,
+          "rounds": [
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev": 0.89959375,
+              "median_topo_cond": 3.3456959200800824
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev": 0.9226249999999999,
+              "median_topo_cond": 4.73859979566992
+            },
+            {
+              "round": 3,
+              "neighbor_set_overlap_with_prev": 0.9480416666666666,
+              "median_topo_cond": 6.179528031680518
+            },
+            {
+              "round": 4,
+              "neighbor_set_overlap_with_prev": 0.9664479166666666,
+              "median_topo_cond": 7.76302158903754
+            },
+            {
+              "round": 5,
+              "neighbor_set_overlap_with_prev": 0.9751041666666665,
+              "median_topo_cond": 9.365173673998099
+            }
+          ],
+          "global_cov_cond": 1.1141134478473684,
+          "iterations_run": 5,
+          "converged": true,
+          "final_overlap": 0.9751041666666665,
+          "wall_time_s": 5.7287760530016385,
+          "median_metric_cond": 9.365173673998099,
+          "max_metric_cond": 78.52961771130093
+        },
+        "k_selection": {
+          "rungs": [
+            {
+              "k": 4,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.731937414882011,
+              "well_fit_fraction": 0.95
+            },
+            {
+              "k": 6,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.7060616055926294,
+              "well_fit_fraction": 0.9875
+            },
+            {
+              "k": 8,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 7,
+              "readout": 2.7204560649033613,
+              "well_fit_fraction": 1.0
+            },
+            {
+              "k": 10,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 6,
+              "readout": 2.793720227004466,
+              "well_fit_fraction": 1.0
+            },
+            {
+              "k": 15,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 5,
+              "readout": 2.8521155770318467,
+              "well_fit_fraction": 1.0
+            },
+            {
+              "k": 25,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 4,
+              "readout": 2.903169420902072,
+              "well_fit_fraction": 1.0
+            },
+            {
+              "k": 40,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 4,
+              "readout": 2.679185737823833,
+              "well_fit_fraction": 0.5
+            }
+          ],
+          "admissible_k": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "k_ladder": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "selection_rule": "smallest admissible rung of cic.K_LADDER, admissibility = cic's own connectivity (largest component >= CONNECTIVITY_FRACTION) AND scaling-region (cic._shell_arm returns non-null) test, evaluated on the SCALE-AWARE Mahalanobis edge set rather than plain Euclidean -- the fix for the circle NaN.",
+          "k_selected": 4,
+          "readouts_by_k": {
+            "4": 2.731937414882011,
+            "6": 2.7060616055926294,
+            "8": 2.7204560649033613,
+            "10": 2.793720227004466,
+            "15": 2.8521155770318467,
+            "25": 2.903169420902072,
+            "40": 2.679185737823833
+          }
+        },
+        "wall_time_s": 18.72081294399686
+      },
+      "wall_time_s": 21.792439333046786
+    },
+    {
+      "case": "A = uniform_square(1600,11)",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625954,
+        "r_squared": 0.9996782808312287
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822734,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434233
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.57469579933915,
+        "d_hi": 2.4210451753657996,
+        "hull_lo": 1.9343124870625954,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.35961668772344546,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090569,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822734,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_global_gp": true,
+      "contains_truth_local_gp": true,
+      "diagnostics": {
+        "refine": {
+          "k0": 30,
+          "rounds": [
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev": 0.9371875,
+              "median_topo_cond": 2.185573945029111
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev": 0.9494166666666668,
+              "median_topo_cond": 2.920424754262613
+            },
+            {
+              "round": 3,
+              "neighbor_set_overlap_with_prev": 0.9623541666666668,
+              "median_topo_cond": 3.612927883405294
+            },
+            {
+              "round": 4,
+              "neighbor_set_overlap_with_prev": 0.9733958333333335,
+              "median_topo_cond": 4.207555328725483
+            }
+          ],
+          "global_cov_cond": 1.0433112241042373,
+          "iterations_run": 4,
+          "converged": true,
+          "final_overlap": 0.9733958333333335,
+          "wall_time_s": 4.649381851020735,
+          "median_metric_cond": 4.207555328725483,
+          "max_metric_cond": 118.73476299765088
+        },
+        "k_selection": {
+          "rungs": [
+            {
+              "k": 4,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 3,
+              "readout": 1.9867199333295684,
+              "well_fit_fraction": 0.5
+            },
+            {
+              "k": 6,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.0957053546966793,
+              "well_fit_fraction": 0.7875
+            },
+            {
+              "k": 8,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.080457288206291,
+              "well_fit_fraction": 0.8375
+            },
+            {
+              "k": 10,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.057514924497638,
+              "well_fit_fraction": 0.75
+            },
+            {
+              "k": 15,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.038258756259912,
+              "well_fit_fraction": 0.5125
+            },
+            {
+              "k": 25,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 6,
+              "readout": 2.0557814369399514,
+              "well_fit_fraction": 0.6125
+            },
+            {
+              "k": 40,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 4,
+              "readout": 2.2384805564212567,
+              "well_fit_fraction": 0.75
+            }
+          ],
+          "admissible_k": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "k_ladder": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "selection_rule": "smallest admissible rung of cic.K_LADDER, admissibility = cic's own connectivity (largest component >= CONNECTIVITY_FRACTION) AND scaling-region (cic._shell_arm returns non-null) test, evaluated on the SCALE-AWARE Mahalanobis edge set rather than plain Euclidean -- the fix for the circle NaN.",
+          "k_selected": 4,
+          "readouts_by_k": {
+            "4": 1.9867199333295684,
+            "6": 2.0957053546966793,
+            "8": 2.080457288206291,
+            "10": 2.057514924497638,
+            "15": 2.038258756259912,
+            "25": 2.0557814369399514,
+            "40": 2.2384805564212567
+          }
+        },
+        "wall_time_s": 19.365493428951595
+      },
+      "wall_time_s": 22.36976762500126
+    },
+    {
+      "case": "A @ diag(100,100) [isotropic control]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625958,
+        "r_squared": 0.9996782808312287
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822732,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434229
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.5746957993391504,
+        "d_hi": 2.4210451753658,
+        "hull_lo": 1.9343124870625958,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3596166877234455,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090566,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822732,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_global_gp": true,
+      "contains_truth_local_gp": true,
+      "diagnostics": {
+        "refine": {
+          "k0": 30,
+          "rounds": [
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev": 0.9371875,
+              "median_topo_cond": 2.185573945029111
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev": 0.9494166666666668,
+              "median_topo_cond": 2.9204247542626116
+            },
+            {
+              "round": 3,
+              "neighbor_set_overlap_with_prev": 0.9623541666666668,
+              "median_topo_cond": 3.612927883405293
+            },
+            {
+              "round": 4,
+              "neighbor_set_overlap_with_prev": 0.9733958333333335,
+              "median_topo_cond": 4.207555328725484
+            }
+          ],
+          "global_cov_cond": 1.043311224104237,
+          "iterations_run": 4,
+          "converged": true,
+          "final_overlap": 0.9733958333333335,
+          "wall_time_s": 5.537334998021834,
+          "median_metric_cond": 4.207555328725484,
+          "max_metric_cond": 118.73476299765089
+        },
+        "k_selection": {
+          "rungs": [
+            {
+              "k": 4,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 3,
+              "readout": 1.9867199333295684,
+              "well_fit_fraction": 0.5
+            },
+            {
+              "k": 6,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.0957053546966793,
+              "well_fit_fraction": 0.7875
+            },
+            {
+              "k": 8,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.080457288206291,
+              "well_fit_fraction": 0.8375
+            },
+            {
+              "k": 10,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.057514924497638,
+              "well_fit_fraction": 0.75
+            },
+            {
+              "k": 15,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 8,
+              "readout": 2.038258756259912,
+              "well_fit_fraction": 0.5125
+            },
+            {
+              "k": 25,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 6,
+              "readout": 2.0557814369399514,
+              "well_fit_fraction": 0.6125
+            },
+            {
+              "k": 40,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 4,
+              "readout": 2.2384805564212567,
+              "well_fit_fraction": 0.75
+            }
+          ],
+          "admissible_k": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "k_ladder": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "selection_rule": "smallest admissible rung of cic.K_LADDER, admissibility = cic's own connectivity (largest component >= CONNECTIVITY_FRACTION) AND scaling-region (cic._shell_arm returns non-null) test, evaluated on the SCALE-AWARE Mahalanobis edge set rather than plain Euclidean -- the fix for the circle NaN.",
+          "k_selected": 4,
+          "readouts_by_k": {
+            "4": 1.9867199333295684,
+            "6": 2.0957053546966793,
+            "8": 2.080457288206291,
+            "10": 2.057514924497638,
+            "15": 2.038258756259912,
+            "25": 2.0557814369399514,
+            "40": 2.2384805564212567
+          }
+        },
+        "wall_time_s": 22.807982061989605
+      },
+      "wall_time_s": 25.501951313985046
+    },
+    {
+      "case": "A @ diag(1,0.01) [refutation: y in km]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 10,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 1.728801493954081,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9338605036553762,
+        "r_squared": 0.9996815175053769
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.7215119634093952,
+        "r_squared": 0.9922579206249287,
+        "n_radii_used": 20,
+        "ref_scale": 1.7147221038322806
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.39916191416923,
+        "d_hi": 2.2635000834402272,
+        "hull_lo": 1.728801493954081,
+        "hull_hi": 1.9338605036553762,
+        "allowance": 0.32963957978485114,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.4109837522466824,
+        "d_hi": 2.039329705116794,
+        "hull_lo": 1.7215119634093952,
+        "hull_hi": 1.728801493954081,
+        "allowance": 0.31052821116271284,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_global_gp": true,
+      "contains_truth_local_gp": true,
+      "diagnostics": {
+        "refine": {
+          "k0": 30,
+          "rounds": [
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev": 0.29102083333333334,
+              "median_topo_cond": 19.999999999999996
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev": 0.9726458333333333,
+              "median_topo_cond": 19.999999999999996
+            }
+          ],
+          "global_cov_cond": 9869.34772468424,
+          "iterations_run": 2,
+          "converged": true,
+          "final_overlap": 0.9726458333333333,
+          "wall_time_s": 3.1835993679706007,
+          "median_metric_cond": 31.89543895943681,
+          "max_metric_cond": 167.04721052558915
+        },
+        "k_selection": {
+          "rungs": [
+            {
+              "k": 4,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 6,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 8,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 10,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 3,
+              "readout": 1.8272514708055783,
+              "well_fit_fraction": 0.65
+            },
+            {
+              "k": 15,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 3,
+              "readout": 1.8687504521553615,
+              "well_fit_fraction": 0.5375
+            },
+            {
+              "k": 25,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 40,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            }
+          ],
+          "admissible_k": [
+            10,
+            15
+          ],
+          "k_ladder": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "selection_rule": "smallest admissible rung of cic.K_LADDER, admissibility = cic's own connectivity (largest component >= CONNECTIVITY_FRACTION) AND scaling-region (cic._shell_arm returns non-null) test, evaluated on the SCALE-AWARE Mahalanobis edge set rather than plain Euclidean -- the fix for the circle NaN.",
+          "k_selected": 10,
+          "readouts_by_k": {
+            "10": 1.8272514708055783,
+            "15": 1.8687504521553615
+          }
+        },
+        "wall_time_s": 12.236174029996619
+      },
+      "wall_time_s": 16.37662748299772
+    },
+    {
+      "case": "REFUTATION_VERDICT_V2",
+      "result": {
+        "after_v2_local_gp_compatible": true,
+        "ident": {
+          "d_lo": 1.3182289680090569,
+          "d_hi": 2.395680323915571,
+          "hull_lo": 1.6524808042822734,
+          "hull_hi": 2.0614284876423543,
+          "allowance": 0.3342518362732165,
+          "basis": "bracket(shell,gp)"
+        },
+        "aniso": {
+          "d_lo": 1.4109837522466824,
+          "d_hi": 2.039329705116794,
+          "hull_lo": 1.7215119634093952,
+          "hull_hi": 1.728801493954081,
+          "allowance": 0.31052821116271284,
+          "basis": "bracket(shell,gp)"
+        }
+      }
+    },
+    {
+      "case": "Lorenz-x Takens embedding, tau=1, m=3, n=1600",
+      "n": 1600,
+      "d": 3,
+      "truth": 2.06,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 1.8336385600430847,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.1
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.462744829872631,
+        "r_squared": 0.9999510750063902
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.4254530462358974,
+        "r_squared": 0.9893340333647833,
+        "n_radii_used": 20,
+        "ref_scale": 1.1871509632203459
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.1660703247802167,
+        "d_hi": 2.130313065135499,
+        "hull_lo": 1.462744829872631,
+        "hull_hi": 1.8336385600430847,
+        "allowance": 0.2966745050924144,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.132134801670789,
+        "d_hi": 2.1269568046081933,
+        "hull_lo": 1.4254530462358974,
+        "hull_hi": 1.8336385600430847,
+        "allowance": 0.2933182445651084,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_global_gp": true,
+      "contains_truth_local_gp": true,
+      "diagnostics": {
+        "refine": {
+          "k0": 60,
+          "rounds": [
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev": 0.6131145833333332,
+              "median_topo_cond": 20.000000000000007
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev": 0.9749166666666668,
+              "median_topo_cond": 20.000000000000007
+            }
+          ],
+          "global_cov_cond": 19442588.578489125,
+          "iterations_run": 2,
+          "converged": true,
+          "final_overlap": 0.9749166666666668,
+          "wall_time_s": 3.3082175430026837,
+          "median_metric_cond": 1000.0000000000031,
+          "max_metric_cond": 1000.0000000001664
+        },
+        "k_selection": {
+          "rungs": [
+            {
+              "k": 4,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 6,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 8,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 10,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 15,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            },
+            {
+              "k": 25,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": true,
+              "max_radius": 3,
+              "readout": 1.7131703646525904,
+              "well_fit_fraction": 0.5
+            },
+            {
+              "k": 40,
+              "n_components": 1,
+              "largest_component_fraction": 1.0,
+              "admissible": false,
+              "reason": "NO_SCALING_REGION"
+            }
+          ],
+          "admissible_k": [
+            25
+          ],
+          "k_ladder": [
+            4,
+            6,
+            8,
+            10,
+            15,
+            25,
+            40
+          ],
+          "selection_rule": "smallest admissible rung of cic.K_LADDER, admissibility = cic's own connectivity (largest component >= CONNECTIVITY_FRACTION) AND scaling-region (cic._shell_arm returns non-null) test, evaluated on the SCALE-AWARE Mahalanobis edge set rather than plain Euclidean -- the fix for the circle NaN.",
+          "k_selected": 25,
+          "readouts_by_k": {
+            "25": 1.7131703646525904
+          }
+        },
+        "wall_time_s": 11.523811610997654
+      },
+      "wall_time_s": 19.237437704985496
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_point",
+      "result": {
+        "metric_floor": 0.05,
+        "k_selected": 25,
+        "shell": 1.7902087463010032,
+        "gp_local": 1.279911840722697,
+        "iterations_run": 2
+      }
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_point",
+      "result": {
+        "metric_floor": 0.02,
+        "k_selected": 25,
+        "shell": 1.7902087463010032,
+        "gp_local": 1.2988974741627337,
+        "iterations_run": 2
+      }
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_point",
+      "result": {
+        "metric_floor": 0.01,
+        "k_selected": 25,
+        "shell": 1.7902087463010032,
+        "gp_local": 1.3138891398099275,
+        "iterations_run": 2
+      }
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_point",
+      "result": {
+        "metric_floor": 0.005,
+        "k_selected": 25,
+        "shell": 1.7902087463010032,
+        "gp_local": 1.3471419094325372,
+        "iterations_run": 2
+      }
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_point",
+      "result": {
+        "metric_floor": 0.002,
+        "k_selected": 25,
+        "shell": 1.7902087463010032,
+        "gp_local": 1.387503593581758,
+        "iterations_run": 2
+      }
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_point",
+      "result": {
+        "metric_floor": 0.001,
+        "k_selected": 25,
+        "shell": 1.7902087463010032,
+        "gp_local": 1.4254530462358974,
+        "iterations_run": 2
+      }
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_point",
+      "result": {
+        "metric_floor": 0.0005,
+        "k_selected": 25,
+        "shell": 1.7902087463010032,
+        "gp_local": 1.4403688544740243,
+        "iterations_run": 2
+      }
+    },
+    {
+      "case": "PART3_lorenz_floor_sweep_summary",
+      "result": [
+        {
+          "metric_floor": 0.05,
+          "k_selected": 25,
+          "shell": 1.7902087463010032,
+          "gp_local": 1.279911840722697,
+          "iterations_run": 2
+        },
+        {
+          "metric_floor": 0.02,
+          "k_selected": 25,
+          "shell": 1.7902087463010032,
+          "gp_local": 1.2988974741627337,
+          "iterations_run": 2
+        },
+        {
+          "metric_floor": 0.01,
+          "k_selected": 25,
+          "shell": 1.7902087463010032,
+          "gp_local": 1.3138891398099275,
+          "iterations_run": 2
+        },
+        {
+          "metric_floor": 0.005,
+          "k_selected": 25,
+          "shell": 1.7902087463010032,
+          "gp_local": 1.3471419094325372,
+          "iterations_run": 2
+        },
+        {
+          "metric_floor": 0.002,
+          "k_selected": 25,
+          "shell": 1.7902087463010032,
+          "gp_local": 1.387503593581758,
+          "iterations_run": 2
+        },
+        {
+          "metric_floor": 0.001,
+          "k_selected": 25,
+          "shell": 1.7902087463010032,
+          "gp_local": 1.4254530462358974,
+          "iterations_run": 2
+        },
+        {
+          "metric_floor": 0.0005,
+          "k_selected": 25,
+          "shell": 1.7902087463010032,
+          "gp_local": 1.4403688544740243,
+          "iterations_run": 2
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,921 @@
+{
+  "rows": [
+    {
+      "case": "uniform-square-2d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "global"
+      },
+      "before_official_certify": {
+        "verdict": "MEASURED",
+        "d_lo": 1.5859211096922787,
+        "d_hi": 2.282224932555988,
+        "shell": 1.9340542534946226,
+        "gp": 1.9340917887536437,
+        "signals": [],
+        "k_selected": 6
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": 1.961069869513481,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp": {
+          "dimension": 1.9340917887536437,
+          "r_squared": 0.9996894770728738
+        },
+        "bracket": {
+          "d_lo": 1.5835272395096025,
+          "d_hi": 2.311634418757522,
+          "hull_lo": 1.9340917887536437,
+          "hull_hi": 1.961069869513481,
+          "allowance": 0.35056454924404123,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": true
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": 2.0199465960289853,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 1.9343124870625954,
+          "r_squared": 0.9996782808312287
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 1.6601841460727917,
+          "r_squared": 0.9861117950035821,
+          "n_radii_used": 20,
+          "ref_scale": 1.6626889470100017
+        },
+        "bracket_global_gp": {
+          "d_lo": 1.578429169584353,
+          "d_hi": 2.3758299135072276,
+          "hull_lo": 1.9343124870625954,
+          "hull_hi": 2.0199465960289853,
+          "allowance": 0.35588331747824226,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 1.3289723792836319,
+          "d_hi": 2.351158362818145,
+          "hull_lo": 1.6601841460727917,
+          "hull_hi": 2.0199465960289853,
+          "allowance": 0.3312117667891599,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": true,
+        "contains_truth_local_gp": true,
+        "diagnostics": {
+          "bootstrap": "global",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.9371875,
+              "median_local_cond_number": 1.5524845497099389,
+              "max_local_cond_number": 6.569455175195264
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 0.9494166666666668,
+              "median_local_cond_number": 2.185573945029111,
+              "max_local_cond_number": 20.0
+            }
+          ],
+          "bootstrap_cov_eigs": [
+            0.080257926422868,
+            0.0837339954603102
+          ],
+          "round0_euclidean_local_cond_median": 1.5498304947441328,
+          "round0_euclidean_local_cond_max": 6.569455175195262,
+          "wall_time_s": 2.68601067198324,
+          "final_cond_number_median": 2.920424754262613,
+          "final_cond_number_max": 20.00000000000002,
+          "dominant_axis_angle_std_rad": 0.9135051197142878
+        }
+      },
+      "wall_time_s": 16.26392590798787
+    },
+    {
+      "case": "circle-1d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 1.0,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "global"
+      },
+      "before_official_certify": {
+        "verdict": "MEASURED",
+        "d_lo": 0.6522082214108029,
+        "d_hi": 1.3477917785891969,
+        "shell": 0.9968334763319777,
+        "gp": 1.0024986735889052,
+        "signals": [],
+        "k_selected": 25
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": NaN,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.1875
+        },
+        "gp": {
+          "dimension": 1.0023679049795784,
+          "r_squared": 0.9999899015324897
+        },
+        "bracket": {
+          "d_lo": 0.0,
+          "d_hi": NaN,
+          "hull_lo": NaN,
+          "hull_hi": NaN,
+          "allowance": NaN,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": false
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": NaN,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.1875
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 1.0023911874571114,
+          "r_squared": 0.9999894507165574
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 0.9754236044009497,
+          "r_squared": 0.9999099245162916,
+          "n_radii_used": 20,
+          "ref_scale": 1.2054996333687176
+        },
+        "bracket_global_gp": {
+          "d_lo": 0.0,
+          "d_hi": NaN,
+          "hull_lo": NaN,
+          "hull_hi": NaN,
+          "allowance": NaN,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 0.0,
+          "d_hi": NaN,
+          "hull_lo": NaN,
+          "hull_hi": NaN,
+          "allowance": NaN,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": false,
+        "contains_truth_local_gp": false,
+        "diagnostics": {
+          "bootstrap": "global",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.9997291666666667,
+              "median_local_cond_number": 20.0,
+              "max_local_cond_number": 20.00000000000008
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 1.0,
+              "median_local_cond_number": 20.0,
+              "max_local_cond_number": 20.00000000000008
+            }
+          ],
+          "bootstrap_cov_eigs": [
+            0.4910874882677633,
+            0.5085936269067248
+          ],
+          "round0_euclidean_local_cond_median": 20.0,
+          "round0_euclidean_local_cond_max": 20.00000000000008,
+          "wall_time_s": 2.954118783993181,
+          "final_cond_number_median": 20.0,
+          "final_cond_number_max": 20.00000000000008,
+          "dominant_axis_angle_std_rad": 0.9156513057091225
+        }
+      },
+      "wall_time_s": 13.192911585007096
+    },
+    {
+      "case": "uniform-cube-3d/n=1600/seed=11",
+      "n": 1600,
+      "d": 3,
+      "truth": 3.0,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "global"
+      },
+      "before_official_certify": {
+        "verdict": "MEASURED",
+        "d_lo": 2.0235390293179347,
+        "d_hi": 3.388715937118142,
+        "shell": 2.5106419762971814,
+        "gp": 2.9016129901388954,
+        "signals": [],
+        "k_selected": 4
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": 2.612828769276001,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp": {
+          "dimension": 2.9016129901388954,
+          "r_squared": 0.9993941245951278
+        },
+        "bracket": {
+          "d_lo": 2.1165290109286605,
+          "d_hi": 3.397912748486236,
+          "hull_lo": 2.612828769276001,
+          "hull_hi": 2.9016129901388954,
+          "allowance": 0.4962997583473407,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": true
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": 2.7565177399001524,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 2.9034532648775278,
+          "r_squared": 0.9994156051615884
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 2.695882207286372,
+          "r_squared": 0.9666776391377481,
+          "n_radii_used": 16,
+          "ref_scale": 1.9846409221138088
+        },
+        "bracket_global_gp": {
+          "d_lo": 2.247120349470161,
+          "d_hi": 3.412850655307519,
+          "hull_lo": 2.7565177399001524,
+          "hull_hi": 2.9034532648775278,
+          "allowance": 0.5093973904299912,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 2.205166212039585,
+          "d_hi": 3.2472337351469394,
+          "hull_lo": 2.695882207286372,
+          "hull_hi": 2.7565177399001524,
+          "allowance": 0.4907159952467872,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": true,
+        "contains_truth_local_gp": true,
+        "diagnostics": {
+          "bootstrap": "global",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.8919583333333334,
+              "median_local_cond_number": 2.3397545823848223,
+              "max_local_cond_number": 10.619564403334177
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 0.9178958333333336,
+              "median_local_cond_number": 4.160808861239378,
+              "max_local_cond_number": 20.00000000000002
+            }
+          ],
+          "bootstrap_cov_eigs": [
+            0.07737036497225619,
+            0.08048991054583872,
+            0.08619936408044963
+          ],
+          "round0_euclidean_local_cond_median": 2.318540802116617,
+          "round0_euclidean_local_cond_max": 8.727679085382404,
+          "wall_time_s": 3.1822822019748855,
+          "final_cond_number_median": 6.2909803436600455,
+          "final_cond_number_max": 20.000000000000036
+        }
+      },
+      "wall_time_s": 20.401783364010043
+    },
+    {
+      "case": "A = uniform_square(1600,11)",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "global"
+      },
+      "before_official_certify": {
+        "verdict": "MEASURED",
+        "d_lo": 1.5859211096922787,
+        "d_hi": 2.282224932555988,
+        "shell": 1.9340542534946226,
+        "gp": 1.9340917887536437,
+        "signals": [],
+        "k_selected": 6
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": 1.961069869513481,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp": {
+          "dimension": 1.9340917887536437,
+          "r_squared": 0.9996894770728738
+        },
+        "bracket": {
+          "d_lo": 1.5835272395096025,
+          "d_hi": 2.311634418757522,
+          "hull_lo": 1.9340917887536437,
+          "hull_hi": 1.961069869513481,
+          "allowance": 0.35056454924404123,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": true
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": 2.0199465960289853,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 1.9343124870625954,
+          "r_squared": 0.9996782808312287
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 1.6601841460727917,
+          "r_squared": 0.9861117950035821,
+          "n_radii_used": 20,
+          "ref_scale": 1.6626889470100017
+        },
+        "bracket_global_gp": {
+          "d_lo": 1.578429169584353,
+          "d_hi": 2.3758299135072276,
+          "hull_lo": 1.9343124870625954,
+          "hull_hi": 2.0199465960289853,
+          "allowance": 0.35588331747824226,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 1.3289723792836319,
+          "d_hi": 2.351158362818145,
+          "hull_lo": 1.6601841460727917,
+          "hull_hi": 2.0199465960289853,
+          "allowance": 0.3312117667891599,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": true,
+        "contains_truth_local_gp": true,
+        "diagnostics": {
+          "bootstrap": "global",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.9371875,
+              "median_local_cond_number": 1.5524845497099389,
+              "max_local_cond_number": 6.569455175195264
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 0.9494166666666668,
+              "median_local_cond_number": 2.185573945029111,
+              "max_local_cond_number": 20.0
+            }
+          ],
+          "bootstrap_cov_eigs": [
+            0.080257926422868,
+            0.0837339954603102
+          ],
+          "round0_euclidean_local_cond_median": 1.5498304947441328,
+          "round0_euclidean_local_cond_max": 6.569455175195262,
+          "wall_time_s": 2.720324652007548,
+          "final_cond_number_median": 2.920424754262613,
+          "final_cond_number_max": 20.00000000000002,
+          "dominant_axis_angle_std_rad": 0.9135051197142878
+        }
+      },
+      "wall_time_s": 17.7861162800109
+    },
+    {
+      "case": "A @ diag(100,100) [isotropic control]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "global"
+      },
+      "before_official_certify": {
+        "verdict": "MEASURED",
+        "d_lo": 1.5859211096922787,
+        "d_hi": 2.2822249325559874,
+        "shell": 1.9340542534946226,
+        "gp": 1.9340917887536435,
+        "signals": [],
+        "k_selected": 6
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": 1.961069869513481,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp": {
+          "dimension": 1.9340917887536435,
+          "r_squared": 0.9996894770728738
+        },
+        "bracket": {
+          "d_lo": 1.5835272395096023,
+          "d_hi": 2.311634418757522,
+          "hull_lo": 1.9340917887536435,
+          "hull_hi": 1.961069869513481,
+          "allowance": 0.3505645492440412,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": true
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": 2.0199465960289853,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 1.9343124870625958,
+          "r_squared": 0.9996782808312287
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 1.660184146072792,
+          "r_squared": 0.9861117950035821,
+          "n_radii_used": 20,
+          "ref_scale": 1.6626889470100006
+        },
+        "bracket_global_gp": {
+          "d_lo": 1.5784291695843535,
+          "d_hi": 2.3758299135072276,
+          "hull_lo": 1.9343124870625958,
+          "hull_hi": 2.0199465960289853,
+          "allowance": 0.3558833174782423,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 1.3289723792836319,
+          "d_hi": 2.351158362818145,
+          "hull_lo": 1.660184146072792,
+          "hull_hi": 2.0199465960289853,
+          "allowance": 0.33121176678916,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": true,
+        "contains_truth_local_gp": true,
+        "diagnostics": {
+          "bootstrap": "global",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.9371875,
+              "median_local_cond_number": 1.5524845497099378,
+              "max_local_cond_number": 6.5694551751952615
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 0.9494166666666668,
+              "median_local_cond_number": 2.185573945029111,
+              "max_local_cond_number": 20.000000000000007
+            }
+          ],
+          "bootstrap_cov_eigs": [
+            802.5792642286797,
+            837.3399546031018
+          ],
+          "round0_euclidean_local_cond_median": 1.5498304947441315,
+          "round0_euclidean_local_cond_max": 6.5694551751952615,
+          "wall_time_s": 2.383034796017455,
+          "final_cond_number_median": 2.9204247542626116,
+          "final_cond_number_max": 20.000000000000014,
+          "dominant_axis_angle_std_rad": 0.9135051197142878
+        }
+      },
+      "wall_time_s": 16.09756248499616
+    },
+    {
+      "case": "A @ diag(1,0.01) [refutation: y in km]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "global"
+      },
+      "before_official_certify": {
+        "verdict": "MEASURED",
+        "d_lo": 0.6374236790672463,
+        "d_hi": 1.3625763209327537,
+        "shell": 1.0152664614837084,
+        "gp": 0.9932200062404001,
+        "signals": [],
+        "k_selected": 25
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": NaN,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0375
+        },
+        "gp": {
+          "dimension": 0.9932200062404001,
+          "r_squared": 0.9992092776385606
+        },
+        "bracket": {
+          "d_lo": 0.0,
+          "d_hi": NaN,
+          "hull_lo": NaN,
+          "hull_hi": NaN,
+          "allowance": NaN,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": false
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": 1.790579105408697,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 1.9338605036553762,
+          "r_squared": 0.9996815175053769
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 1.7671523365987007,
+          "r_squared": 0.9907910155037559,
+          "n_radii_used": 20,
+          "ref_scale": 1.5866083496753365
+        },
+        "bracket_global_gp": {
+          "d_lo": 1.4553795405929304,
+          "d_hi": 2.2690600684711426,
+          "hull_lo": 1.790579105408697,
+          "hull_hi": 1.9338605036553762,
+          "allowance": 0.33519956481576657,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 1.446956506818035,
+          "d_hi": 2.110774935189363,
+          "hull_lo": 1.7671523365987007,
+          "hull_hi": 1.790579105408697,
+          "allowance": 0.3201958297806658,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": true,
+        "contains_truth_local_gp": true,
+        "diagnostics": {
+          "bootstrap": "global",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.29102083333333334,
+              "median_local_cond_number": 20.0,
+              "max_local_cond_number": 20.000000000000014
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 0.9726458333333333,
+              "median_local_cond_number": 19.999999999999996,
+              "max_local_cond_number": 20.000000000000014
+            }
+          ],
+          "bootstrap_cov_eigs": [
+            8.25183716573076e-06,
+            0.08144025035606972
+          ],
+          "round0_euclidean_local_cond_median": 4.061724102854281,
+          "round0_euclidean_local_cond_max": 13.107360065339654,
+          "wall_time_s": 2.500048375019105,
+          "final_cond_number_median": 19.999999999999996,
+          "final_cond_number_max": 20.000000000000014,
+          "dominant_axis_angle_std_rad": 1.530486714788171
+        }
+      },
+      "wall_time_s": 12.930418204981834
+    },
+    {
+      "case": "REFUTATION_VERDICT_SUMMARY",
+      "result": {
+        "before_disjoint": true,
+        "after_local_gp_compatible": true,
+        "ident_after_local": {
+          "d_lo": 1.3289723792836319,
+          "d_hi": 2.351158362818145,
+          "hull_lo": 1.6601841460727917,
+          "hull_hi": 2.0199465960289853,
+          "allowance": 0.3312117667891599,
+          "basis": "bracket(shell,gp)"
+        },
+        "aniso_after_local": {
+          "d_lo": 1.446956506818035,
+          "d_hi": 2.110774935189363,
+          "hull_lo": 1.7671523365987007,
+          "hull_hi": 1.790579105408697,
+          "allowance": 0.3201958297806658,
+          "basis": "bracket(shell,gp)"
+        }
+      }
+    },
+    {
+      "case": "A @ diag(1,0.01), bootstrap=euclidean (negative control)",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "euclidean"
+      },
+      "before_official_certify": {
+        "verdict": "MEASURED",
+        "d_lo": 0.6374236790672463,
+        "d_hi": 1.3625763209327537,
+        "shell": 1.0152664614837084,
+        "gp": 0.9932200062404001,
+        "signals": [],
+        "k_selected": 25
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": NaN,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0375
+        },
+        "gp": {
+          "dimension": 0.9932200062404001,
+          "r_squared": 0.9992092776385606
+        },
+        "bracket": {
+          "d_lo": 0.0,
+          "d_hi": NaN,
+          "hull_lo": NaN,
+          "hull_hi": NaN,
+          "allowance": NaN,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": false
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": 1.697206901452002,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.0
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 1.9338605036553762,
+          "r_squared": 0.9996815175053769
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 1.8109649357568753,
+          "r_squared": 0.9928507329778975,
+          "n_radii_used": 20,
+          "ref_scale": 1.6484067894684407
+        },
+        "bracket_global_gp": {
+          "d_lo": 1.3704108349923378,
+          "d_hi": 2.26065657011504,
+          "hull_lo": 1.697206901452002,
+          "hull_hi": 1.9338605036553762,
+          "allowance": 0.326796066459664,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 1.381471436103203,
+          "d_hi": 2.1267004011056745,
+          "hull_lo": 1.697206901452002,
+          "hull_hi": 1.8109649357568753,
+          "allowance": 0.3157354653487989,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": true,
+        "contains_truth_local_gp": true,
+        "diagnostics": {
+          "bootstrap": "euclidean",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.9052083333333334,
+              "median_local_cond_number": 8.043144111906763,
+              "max_local_cond_number": 20.00000000000001
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 0.9463125000000001,
+              "median_local_cond_number": 14.552739273014682,
+              "max_local_cond_number": 20.000000000000014
+            }
+          ],
+          "round0_euclidean_local_cond_median": 4.061724102854281,
+          "round0_euclidean_local_cond_max": 13.107360065339654,
+          "wall_time_s": 2.876501285005361,
+          "final_cond_number_median": 19.99999999999999,
+          "final_cond_number_max": 20.000000000000018,
+          "dominant_axis_angle_std_rad": 1.4895923907317767
+        }
+      },
+      "wall_time_s": 14.499095286999363
+    },
+    {
+      "case": "Lorenz-x Takens embedding, tau=1, m=3, n=1600",
+      "n": 1600,
+      "d": 3,
+      "truth": 2.06,
+      "settings": {
+        "k": 8,
+        "k0": 30,
+        "iterations": 2,
+        "max_radius": 6,
+        "samples": 80,
+        "bootstrap": "global"
+      },
+      "before_official_certify": {
+        "verdict": "UNDECIDED",
+        "d_lo": null,
+        "d_hi": null,
+        "shell": 1.04101538204665,
+        "gp": 0.9936864097770994,
+        "signals": [
+          "INSUFFICIENT_ENSEMBLE"
+        ],
+        "k_selected": 40
+      },
+      "before_fixed_euclidean": {
+        "shell": {
+          "mean_dimension": 1.6384451627598853,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.1125
+        },
+        "gp": {
+          "dimension": 0.9925513607972263,
+          "r_squared": 0.9974858140391166
+        },
+        "bracket": {
+          "d_lo": 0.7557616736770862,
+          "d_hi": 1.8752348498800253,
+          "hull_lo": 0.9925513607972263,
+          "hull_hi": 1.6384451627598853,
+          "allowance": 0.23678968712014004,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth": false
+      },
+      "after_scale_aware": {
+        "shell": {
+          "mean_dimension": 1.5775429451946437,
+          "degenerate_fraction": 0.0,
+          "near_degenerate_fraction": 0.2375
+        },
+        "gp_global_mahalanobis": {
+          "dimension": 1.462744829872631,
+          "r_squared": 0.9999510750063902
+        },
+        "gp_local_mahalanobis": {
+          "dimension": 1.273785573886503,
+          "r_squared": 0.9804005106388048,
+          "n_radii_used": 20,
+          "ref_scale": 1.401354687610656
+        },
+        "bracket_global_gp": {
+          "d_lo": 1.1891189301165763,
+          "d_hi": 1.8511688449506984,
+          "hull_lo": 1.462744829872631,
+          "hull_hi": 1.5775429451946437,
+          "allowance": 0.2736258997560547,
+          "basis": "bracket(shell,gp)"
+        },
+        "bracket_local_gp": {
+          "d_lo": 1.0171660071691997,
+          "d_hi": 1.834162511911947,
+          "hull_lo": 1.273785573886503,
+          "hull_hi": 1.5775429451946437,
+          "allowance": 0.2566195667173032,
+          "basis": "bracket(shell,gp)"
+        },
+        "contains_truth_global_gp": false,
+        "contains_truth_local_gp": false,
+        "diagnostics": {
+          "bootstrap": "global",
+          "k": 8,
+          "k0": 30,
+          "iterations": 2,
+          "rounds": [
+            {
+              "round": 0
+            },
+            {
+              "round": 1,
+              "neighbor_set_overlap_with_prev_fraction": 0.5947500000000001,
+              "median_local_cond_number": 20.000000000000007,
+              "max_local_cond_number": 20.000000000000096
+            },
+            {
+              "round": 2,
+              "neighbor_set_overlap_with_prev_fraction": 0.9741458333333334,
+              "median_local_cond_number": 20.000000000000007,
+              "max_local_cond_number": 20.000000000000078
+            }
+          ],
+          "bootstrap_cov_eigs": [
+            1.0372728560165214e-08,
+            7.760369103515187e-05,
+            0.20167269334313742
+          ],
+          "round0_euclidean_local_cond_median": 20.0,
+          "round0_euclidean_local_cond_max": 20.000000000000085,
+          "wall_time_s": 2.9978973349789158,
+          "final_cond_number_median": 20.000000000000007,
+          "final_cond_number_max": 20.00000000000008
+        }
+      },
+      "wall_time_s": 12.979429819009965
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "rows": [
+    {
+      "case": "line_segment_1d",
+      "truth": 1.0,
+      "n": 1600,
+      "d": 2,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 1,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 0.9925231765216358,
+      "shell_near_degenerate_fraction": 0.5875,
+      "gp_local_dimension": 0.9658310043875794,
+      "gp_local_r_squared": 0.9997605953040584,
+      "bracket": {
+        "d_lo": 0.7858310043875794,
+        "d_hi": 1.1725231765216357,
+        "hull_lo": 0.9658310043875794,
+        "hull_hi": 0.9925231765216358,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 22.37666165898554,
+      "diagnostics_summary": {
+        "iterations_run": 1,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth": true
+    },
+    {
+      "case": "elongated_ellipse_aspect_0.05",
+      "truth": 1.0,
+      "n": 1600,
+      "d": 2,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 1,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 0.996782138091868,
+      "shell_near_degenerate_fraction": 0.5875,
+      "gp_local_dimension": 0.9627465094359943,
+      "gp_local_r_squared": 0.9996792273196006,
+      "bracket": {
+        "d_lo": 0.7827465094359942,
+        "d_hi": 1.176782138091868,
+        "hull_lo": 0.9627465094359943,
+        "hull_hi": 0.996782138091868,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 19.24417501699645,
+      "diagnostics_summary": {
+        "iterations_run": 1,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth": true
+    },
+    {
+      "case": "elongated_ellipse_aspect_0.01",
+      "truth": 1.0,
+      "n": 1600,
+      "d": 2,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 0.9908848513745392,
+      "shell_near_degenerate_fraction": 0.525,
+      "gp_local_dimension": 0.9650300318391329,
+      "gp_local_r_squared": 0.9997261783855157,
+      "bracket": {
+        "d_lo": 0.785030031839133,
+        "d_hi": 1.1708848513745391,
+        "hull_lo": 0.9650300318391329,
+        "hull_hi": 0.9908848513745392,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 19.27670999901602,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth": true
+    },
+    {
+      "case": "helix_1d_in_3d",
+      "truth": 1.0,
+      "n": 1600,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 1,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 0.9889093469491861,
+      "shell_near_degenerate_fraction": 0.65,
+      "gp_local_dimension": 0.9568334836773759,
+      "gp_local_r_squared": 0.9998844645318783,
+      "bracket": {
+        "d_lo": 0.7768334836773758,
+        "d_hi": 1.168909346949186,
+        "hull_lo": 0.9568334836773759,
+        "hull_hi": 0.9889093469491861,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 15.25407299096696,
+      "diagnostics_summary": {
+        "iterations_run": 1,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth": true
+    }
+  ],
+  "status": "done"
+}

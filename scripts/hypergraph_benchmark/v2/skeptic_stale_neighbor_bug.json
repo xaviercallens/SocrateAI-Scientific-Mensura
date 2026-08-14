@@ -1,0 +1,59 @@
+{
+  "rows": [
+    {
+      "case": "uniform-cube-3d/n=1600/seed=11",
+      "n": 1600,
+      "d": 3,
+      "k0": 60,
+      "k0_ge_max_rung": true,
+      "refine_iterations_run": 5,
+      "refine_final_overlap": 0.9751041666666665,
+      "stale_admissible_k": [
+        4,
+        6,
+        8,
+        10,
+        15,
+        25,
+        40
+      ],
+      "stale_k_selected": 4,
+      "fresh_admissible_k": [
+        4,
+        6,
+        8,
+        10,
+        15,
+        25,
+        40
+      ],
+      "fresh_k_selected": 4,
+      "stale_vs_fresh_neighbor_overlap_fraction": 0.9810104166666664,
+      "bug_confirmed_this_case": false
+    },
+    {
+      "case": "lorenz-independent-seed=777-tau=1",
+      "n": 1600,
+      "d": 3,
+      "k0": 60,
+      "k0_ge_max_rung": true,
+      "refine_iterations_run": 2,
+      "refine_final_overlap": 0.9784687499999998,
+      "stale_admissible_k": [
+        4,
+        6,
+        10,
+        15
+      ],
+      "stale_k_selected": 4,
+      "fresh_admissible_k": [
+        4,
+        15
+      ],
+      "fresh_k_selected": 4,
+      "stale_vs_fresh_neighbor_overlap_fraction": 0.9903229166666665,
+      "bug_confirmed_this_case": false
+    }
+  ],
+  "status": "done"
+}

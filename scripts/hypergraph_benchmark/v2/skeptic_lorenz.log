@@ -1,0 +1,37 @@
+====================================================================================================
+STAGE A -- independent Lorenz replication: seeds=[101, 202, 303, 404, 505] lags=[1, 2, 5] n=1600
+====================================================================================================
+  [written skeptic_lorenz.json]
+  [written skeptic_lorenz.json]
+  seed=101 lag=1: k0=60 k=4 shell=1.6926 gp_loc=2.2116 -> [1.341,2.563] contains_D_KY=True wall=16.5s
+  [written skeptic_lorenz.json]
+  seed=101 lag=2: k0=60 k=4 shell=1.5176 gp_loc=2.5544 -> [1.151,2.921] contains_D_KY=True wall=15.8s
+  [written skeptic_lorenz.json]
+  seed=101 lag=5: k0=60 k=4 shell=1.3255 gp_loc=2.5226 -> [0.979,2.869] contains_D_KY=True wall=14.6s
+  [written skeptic_lorenz.json]
+  seed=202 lag=1: k0=60 k=4 shell=1.7237 gp_loc=2.8811 -> [1.309,3.296] contains_D_KY=True wall=15.5s
+  [written skeptic_lorenz.json]
+  seed=202 lag=2: k0=60 k=4 shell=1.5578 gp_loc=2.6046 -> [1.183,2.979] contains_D_KY=True wall=18.7s
+  [written skeptic_lorenz.json]
+  seed=202 lag=5: k0=60 k=4 shell=1.3185 gp_loc=2.7220 -> [0.955,3.086] contains_D_KY=True wall=20.7s
+  [written skeptic_lorenz.json]
+  seed=303 lag=1: k0=60 k=4 shell=1.6143 gp_loc=2.2884 -> [1.263,2.640] contains_D_KY=True wall=17.4s
+  [written skeptic_lorenz.json]
+  seed=303 lag=2: k0=60 k=4 shell=1.4574 gp_loc=2.4673 -> [1.104,2.820] contains_D_KY=True wall=18.4s
+  [written skeptic_lorenz.json]
+  seed=303 lag=5: k0=60 k=4 shell=1.2033 gp_loc=2.5216 -> [0.868,2.857] contains_D_KY=True wall=16.9s
+  [written skeptic_lorenz.json]
+  seed=404 lag=1: k0=60 k=4 shell=1.5141 gp_loc=2.4720 -> [1.155,2.831] contains_D_KY=True wall=14.4s
+  [written skeptic_lorenz.json]
+  seed=404 lag=2: k0=60 k=4 shell=1.4600 gp_loc=2.8670 -> [1.071,3.256] contains_D_KY=True wall=14.7s
+  [written skeptic_lorenz.json]
+  seed=404 lag=5: k0=60 k=4 shell=1.0876 gp_loc=3.3839 -> [0.685,3.786] contains_D_KY=True wall=22.6s
+  [written skeptic_lorenz.json]
+  seed=505 lag=1: k0=60 k=4 shell=1.5639 gp_loc=2.5004 -> [1.198,2.866] contains_D_KY=True wall=21.9s
+  [written skeptic_lorenz.json]
+  seed=505 lag=2: k0=60 k=4 shell=1.4159 gp_loc=2.4447 -> [1.068,2.792] contains_D_KY=True wall=18.6s
+  [written skeptic_lorenz.json]
+  seed=505 lag=5: k0=60 k=4 shell=1.0827 gp_loc=2.5652 -> [0.754,2.893] contains_D_KY=True wall=19.1s
+  [written skeptic_lorenz.json]
+
+STAGE A SUMMARY: 15/15 (seed,lag) combinations contain D_KY=2.062152

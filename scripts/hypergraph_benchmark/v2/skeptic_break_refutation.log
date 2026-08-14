@@ -1,0 +1,23 @@
+====================================================================================================
+STAGE B -- adversarial rescale/rotation cases the prototype did not try
+====================================================================================================
+  [written skeptic_rescale_battery.json]
+  [written skeptic_rescale_battery.json]
+  IDENT: shell=2.0614 gp=1.6525 -> [1.318,2.396]
+  [written skeptic_rescale_battery.json]
+  rescale_y_factor=0.1                   shell=2.0274 gp=1.6390 -> [1.309,2.357] contains_truth=True overlaps_ident=True wall=16.1s
+  [written skeptic_rescale_battery.json]
+  rescale_y_factor=0.001                 shell=0.9951 gp=1.7425 -> [0.749,1.989] contains_truth=False overlaps_ident=True wall=16.8s
+  [written skeptic_rescale_battery.json]
+  rescale_y_factor=0.0001                shell=0.9988 gp=1.8455 -> [0.743,2.101] contains_truth=True overlaps_ident=True wall=21.7s
+  [written skeptic_rescale_battery.json]
+  two_axis_different_rescale_0.1_0.001   shell=1.7288 gp=1.7215 -> [1.411,2.039] contains_truth=True overlaps_ident=True wall=20.9s
+  [written skeptic_rescale_battery.json]
+  rescale_0.01_then_rotate_37deg         shell=1.7288 gp=1.7215 -> [1.411,2.039] contains_truth=True overlaps_ident=True wall=21.7s
+  [written skeptic_rescale_battery.json]
+  3d_anisotropic_diag(1,0.01,0.0001)     shell=1.7954 gp=2.6083 -> [1.399,3.005] contains_truth=True overlaps_ident=None wall=21.5s
+  [written skeptic_rescale_battery.json]
+  3d_anisotropic_then_random_rotation    shell=1.7954 gp=2.6083 -> [1.399,3.005] contains_truth=True overlaps_ident=None wall=17.4s
+  [written skeptic_rescale_battery.json]
+
+STAGE B SUMMARY: 7/8 adversarial rescale/rotation cases contain truth

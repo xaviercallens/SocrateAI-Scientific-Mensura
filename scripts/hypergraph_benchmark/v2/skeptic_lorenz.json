@@ -1,0 +1,680 @@
+{
+  "rows": [
+    {
+      "seed": 101,
+      "lag": 1,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.692595462017063,
+      "shell_near_degenerate_fraction": 0.075,
+      "gp_local_dimension": 2.2116070731760535,
+      "gp_local_r_squared": 0.9949172816035674,
+      "bracket": {
+        "d_lo": 1.3412172338496824,
+        "d_hi": 2.562985301343434,
+        "hull_lo": 1.692595462017063,
+        "hull_hi": 2.2116070731760535,
+        "allowance": 0.35137822816738046,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 16.53387681901222,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 101,
+      "lag": 2,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.517635732252651,
+      "shell_near_degenerate_fraction": 0.05,
+      "gp_local_dimension": 2.5544327917463705,
+      "gp_local_r_squared": 0.9769185644028315,
+      "bracket": {
+        "d_lo": 1.151149565092739,
+        "d_hi": 2.9209189589062823,
+        "hull_lo": 1.517635732252651,
+        "hull_hi": 2.5544327917463705,
+        "allowance": 0.36648616715991195,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 15.79545204603346,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 101,
+      "lag": 5,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.3255025840031467,
+      "shell_near_degenerate_fraction": 0.0375,
+      "gp_local_dimension": 2.5225657062417692,
+      "gp_local_r_squared": 0.9706597569532002,
+      "bracket": {
+        "d_lo": 0.9791764378811043,
+        "d_hi": 2.8688918523638116,
+        "hull_lo": 1.3255025840031467,
+        "hull_hi": 2.5225657062417692,
+        "allowance": 0.3463261461220424,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 14.624935357947834,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 202,
+      "lag": 1,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.7236777550565354,
+      "shell_near_degenerate_fraction": 0.125,
+      "gp_local_dimension": 2.8810875047313913,
+      "gp_local_r_squared": 0.9495702041454802,
+      "bracket": {
+        "d_lo": 1.309248881675622,
+        "d_hi": 3.2955163781123047,
+        "hull_lo": 1.7236777550565354,
+        "hull_hi": 2.8810875047313913,
+        "allowance": 0.4144288733809134,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 15.506258694978897,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 202,
+      "lag": 2,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.5577721589266342,
+      "shell_near_degenerate_fraction": 0.1125,
+      "gp_local_dimension": 2.604603469238435,
+      "gp_local_r_squared": 0.9665801782811956,
+      "bracket": {
+        "d_lo": 1.1831583523917781,
+        "d_hi": 2.9792172757732915,
+        "hull_lo": 1.5577721589266342,
+        "hull_hi": 2.604603469238435,
+        "allowance": 0.3746138065348562,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 18.70409984496655,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 202,
+      "lag": 5,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.3185377474193978,
+      "shell_near_degenerate_fraction": 0.125,
+      "gp_local_dimension": 2.721977469673425,
+      "gp_local_r_squared": 0.9351318788488352,
+      "bracket": {
+        "d_lo": 0.9548913778810437,
+        "d_hi": 3.085623839211779,
+        "hull_lo": 1.3185377474193978,
+        "hull_hi": 2.721977469673425,
+        "allowance": 0.36364636953835405,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 20.672309980960563,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 303,
+      "lag": 1,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.6143109837324798,
+      "shell_near_degenerate_fraction": 0.075,
+      "gp_local_dimension": 2.288389552563497,
+      "gp_local_r_squared": 0.9954293331393558,
+      "bracket": {
+        "d_lo": 1.263067935465842,
+        "d_hi": 2.639632600830135,
+        "hull_lo": 1.6143109837324798,
+        "hull_hi": 2.288389552563497,
+        "allowance": 0.3512430482666379,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 17.35066262196051,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 303,
+      "lag": 2,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.45741592690201,
+      "shell_near_degenerate_fraction": 0.05,
+      "gp_local_dimension": 2.467270453474905,
+      "gp_local_r_squared": 0.9853378566218903,
+      "bracket": {
+        "d_lo": 1.1041941526680876,
+        "d_hi": 2.820492227708827,
+        "hull_lo": 1.45741592690201,
+        "hull_hi": 2.467270453474905,
+        "allowance": 0.3532217742339223,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 18.376876049966086,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 303,
+      "lag": 5,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.203261289594727,
+      "shell_near_degenerate_fraction": 0.0625,
+      "gp_local_dimension": 2.5215910997130466,
+      "gp_local_r_squared": 0.9756687447313829,
+      "bracket": {
+        "d_lo": 0.8680245745570274,
+        "d_hi": 2.8568278147507464,
+        "hull_lo": 1.203261289594727,
+        "hull_hi": 2.5215910997130466,
+        "allowance": 0.33523671503769964,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 16.943654114962555,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 404,
+      "lag": 1,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.514079873831651,
+      "shell_near_degenerate_fraction": 0.125,
+      "gp_local_dimension": 2.471950044036022,
+      "gp_local_r_squared": 0.9876897649461588,
+      "bracket": {
+        "d_lo": 1.1553371812235604,
+        "d_hi": 2.830692736644113,
+        "hull_lo": 1.514079873831651,
+        "hull_hi": 2.471950044036022,
+        "allowance": 0.35874269260809055,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 14.430278023995925,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": true
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 404,
+      "lag": 2,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.4600284197796127,
+      "shell_near_degenerate_fraction": 0.25,
+      "gp_local_dimension": 2.86698058662712,
+      "gp_local_r_squared": 0.9593215025247449,
+      "bracket": {
+        "d_lo": 1.0705976092030067,
+        "d_hi": 3.256411397203726,
+        "hull_lo": 1.4600284197796127,
+        "hull_hi": 2.86698058662712,
+        "allowance": 0.389430810576606,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 14.732118896965403,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": true
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 404,
+      "lag": 5,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.0875864019476884,
+      "shell_near_degenerate_fraction": 0.2125,
+      "gp_local_dimension": 3.383895870393575,
+      "gp_local_r_squared": 0.92065744321345,
+      "bracket": {
+        "d_lo": 0.6851529974369748,
+        "d_hi": 3.7863292749042885,
+        "hull_lo": 1.0875864019476884,
+        "hull_hi": 3.383895870393575,
+        "allowance": 0.4024334045107137,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 22.55275748099666,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 505,
+      "lag": 1,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.5638627507929057,
+      "shell_near_degenerate_fraction": 0.0875,
+      "gp_local_dimension": 2.500408574887352,
+      "gp_local_r_squared": 0.9868201723546,
+      "bracket": {
+        "d_lo": 1.1980783314816825,
+        "d_hi": 2.8661929941985753,
+        "hull_lo": 1.5638627507929057,
+        "hull_hi": 2.500408574887352,
+        "allowance": 0.3657844193112232,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 21.92820727400249,
+      "diagnostics_summary": {
+        "iterations_run": 2,
+        "converged": true,
+        "k_selection_failed": true
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 505,
+      "lag": 2,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.41588440973124,
+      "shell_near_degenerate_fraction": 0.125,
+      "gp_local_dimension": 2.4446840462515866,
+      "gp_local_r_squared": 0.9896275702523103,
+      "bracket": {
+        "d_lo": 1.0684332486927857,
+        "d_hi": 2.792135207290041,
+        "hull_lo": 1.41588440973124,
+        "hull_hi": 2.4446840462515866,
+        "allowance": 0.34745116103845436,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 18.60242574097356,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    },
+    {
+      "seed": 505,
+      "lag": 5,
+      "n": 1600,
+      "truth_D_KY": 2.062152,
+      "d": 3,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 3,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell_mean_dimension": 1.0827360123360463,
+      "shell_near_degenerate_fraction": 0.0875,
+      "gp_local_dimension": 2.5651706268579066,
+      "gp_local_r_squared": 0.977901856289873,
+      "bracket": {
+        "d_lo": 0.7544244148085906,
+        "d_hi": 2.8934822243853624,
+        "hull_lo": 1.0827360123360463,
+        "hull_hi": 2.5651706268579066,
+        "allowance": 0.32831159752745576,
+        "basis": "bracket(shell,gp)"
+      },
+      "wall_time_s": 19.142464238975663,
+      "diagnostics_summary": {
+        "iterations_run": 3,
+        "converged": true,
+        "k_selection_failed": false
+      },
+      "contains_truth_independent_check": true
+    }
+  ],
+  "status": "done"
+}

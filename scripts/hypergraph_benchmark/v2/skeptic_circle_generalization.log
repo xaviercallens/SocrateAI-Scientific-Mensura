@@ -1,0 +1,15 @@
+====================================================================================================
+STAGE C -- k-starvation fix generalization: line, elongated ellipse, helix
+====================================================================================================
+  [written skeptic_circle_generalization.json]
+  [written skeptic_circle_generalization.json]
+  line_segment_1d                  k0=30 k=25 shell=0.9925 gp=0.9658 -> [0.786,1.173] contains=True wall=22.4s
+  [written skeptic_circle_generalization.json]
+  elongated_ellipse_aspect_0.05    k0=30 k=25 shell=0.9968 gp=0.9627 -> [0.783,1.177] contains=True wall=19.2s
+  [written skeptic_circle_generalization.json]
+  elongated_ellipse_aspect_0.01    k0=30 k=25 shell=0.9909 gp=0.9650 -> [0.785,1.171] contains=True wall=19.3s
+  [written skeptic_circle_generalization.json]
+  helix_1d_in_3d                   k0=60 k=25 shell=0.9889 gp=0.9568 -> [0.777,1.169] contains=True wall=15.3s
+  [written skeptic_circle_generalization.json]
+
+STAGE C SUMMARY: 4/4 low-dimension generalization cases contain truth
