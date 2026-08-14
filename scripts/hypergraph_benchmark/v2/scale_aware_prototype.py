@@ -105,6 +105,75 @@ RESULTS_PATH = OUT_DIR / "scale_aware_prototype.json"
 SWEEP_PATH = OUT_DIR / "scale_aware_prototype_sweep.json"
 
 # --------------------------------------------------------------------------
+# OPTIMIZATION PASS (owner decision 8.5 item 3) -- pure memoization of
+# immutable Hypergraph instances.
+#
+# PROFILING FINDING (cProfile, uniform-square n=1600, 44.9s total): the
+# dominant cost was NOT the O(n^2 d^2) Mahalanobis distances (6.4s) but
+# production `Hypergraph.nodes` -- an UNCACHED property rebuilding a
+# frozenset over all edges on every call (25.1s across 824 calls from
+# `dimension.local_dimension` via `ball()`), plus the dataclass-generated
+# `__hash__` re-hashing the full ~20k-edge tuple on every `adjacency()`
+# lru_cache lookup (2.0s).
+#
+# Production files must not be edited (task constraint), so this scratch
+# module installs runtime-only per-instance caches on the (frozen, immutable)
+# class at import time. This is PURE MEMOIZATION: the cached value is exactly
+# the value the original code computes, computed once. `Hypergraph` is a
+# frozen dataclass, so nothing can mutate `edges` after construction and no
+# cache can ever go stale. Numerical output is byte-identical by
+# construction; the full-battery equivalence check (optimize_results.json)
+# verifies it end to end.
+# --------------------------------------------------------------------------
+
+_CHUNK = 256  # row-chunk size for batched pairwise Mahalanobis computations
+
+
+def _install_hypergraph_caches() -> None:
+    if getattr(Hypergraph, "_scratch_caches_installed", False):
+        return
+
+    orig_nodes = Hypergraph.nodes.fget
+
+    def _nodes(self: Hypergraph) -> frozenset[int]:
+        try:
+            return object.__getattribute__(self, "_cache_nodes")
+        except AttributeError:
+            val = orig_nodes(self)
+            object.__setattr__(self, "_cache_nodes", val)
+            return val
+
+    Hypergraph.nodes = property(_nodes)
+
+    orig_hash = Hypergraph.__hash__
+
+    def _hash(self: Hypergraph) -> int:
+        try:
+            return object.__getattribute__(self, "_cache_hash")
+        except AttributeError:
+            val = orig_hash(self)
+            object.__setattr__(self, "_cache_hash", val)
+            return val
+
+    Hypergraph.__hash__ = _hash
+
+    orig_adjacency = Hypergraph.adjacency
+
+    def _adjacency(self: Hypergraph) -> dict:
+        try:
+            return object.__getattribute__(self, "_cache_adj")
+        except AttributeError:
+            val = orig_adjacency(self)  # still goes through the module lru_cache,
+            object.__setattr__(self, "_cache_adj", val)  # preserving shared-dict semantics
+            return val
+
+    Hypergraph.adjacency = _adjacency
+    Hypergraph._scratch_caches_installed = True
+
+
+_install_hypergraph_caches()
+
+# --------------------------------------------------------------------------
 # Local covariance estimation (Roweis & Saul 2000 local-linear-patch step).
 # --------------------------------------------------------------------------
 
@@ -168,6 +237,23 @@ def regularize_covariance(cov: np.ndarray, floor_frac: float) -> np.ndarray:
     return (evecs * evals) @ evecs.T
 
 
+def regularize_covariance_batch(covs: np.ndarray, floor_frac: float) -> np.ndarray:
+    """Batched `regularize_covariance` over a (n, d, d) stack.
+
+    OPTIMIZATION (8.5 item 3): replaces n separate `np.linalg.eigh` calls
+    (per-call overhead dominated the arithmetic at d=2-3) with one batched
+    gufunc call. Bit-identical to the scalar version: batched `eigh` runs the
+    same LAPACK routine per slice (verified `np.array_equal` on the full
+    battery inputs), `evals[..., -1]` is the max eigenvalue because eigh
+    returns ascending order, and the reconstruction `(evecs * evals) @
+    evecs.T` is the same contraction per slice.
+    """
+    evals, evecs = np.linalg.eigh(covs)
+    floor = np.maximum(evals[..., -1], 1e-300) * floor_frac
+    evals = np.maximum(evals, floor[..., None])
+    return np.matmul(evecs * evals[..., None, :], np.swapaxes(evecs, -1, -2))
+
+
 def global_covariance(arr: np.ndarray, *, floor_frac: float = GLOBAL_RIDGE_FLOOR_FRAC) -> np.ndarray:
     """The whole cloud's covariance -- needs no neighbour selection at all,
     which is exactly why it is safe to use as a bootstrap (see module
@@ -180,13 +266,29 @@ def global_covariance(arr: np.ndarray, *, floor_frac: float = GLOBAL_RIDGE_FLOOR
 def local_covariances(
     arr: np.ndarray, neighbor_idx: list[np.ndarray], *, floor_frac: float = LOCAL_RIDGE_FLOOR_FRAC
 ) -> np.ndarray:
-    """Per-point local covariance from each point's current neighbour set."""
+    """Per-point local covariance from each point's current neighbour set.
+
+    OPTIMIZATION (8.5 item 3): when every neighbour row has the same length
+    (the only case the pipeline produces -- `mahalanobis_knn_full` and
+    `euclidean_knn` return exactly k indices per point), the gather, the
+    centering and the (d,k)@(k,d) products are batched. Verified bit-identical
+    to the original per-point loop (`np.array_equal` on battery inputs):
+    `mean(axis=1)` reduces each row in the same order as the original
+    per-row `mean(axis=0)`, and batched `matmul` runs the same product per
+    slice. The ragged case keeps the original loop.
+    """
     n, d = arr.shape
+    if len({len(ix) for ix in neighbor_idx}) == 1:
+        idx = np.asarray(neighbor_idx)
+        pts = arr[idx]  # (n, k, d)
+        centered = pts - pts.mean(axis=1, keepdims=True)
+        covs = np.matmul(centered.transpose(0, 2, 1), centered) / idx.shape[1]
+        return regularize_covariance_batch(covs, floor_frac)
     covs = np.empty((n, d, d))
-    for i, idx in enumerate(neighbor_idx):
-        pts = arr[idx]
+    for i, idx_row in enumerate(neighbor_idx):
+        pts = arr[idx_row]
         centered = pts - pts.mean(axis=0)
-        cov = (centered.T @ centered) / len(idx)
+        cov = (centered.T @ centered) / len(idx_row)
         covs[i] = regularize_covariance(cov, floor_frac)
     return covs
 
@@ -226,18 +328,35 @@ def mahalanobis_knn_full(arr: np.ndarray, sigma_inv: np.ndarray, k: int) -> list
     `sigma_inv` is either one (d, d) matrix (broadcast to every point, the
     GLOBAL-bootstrap case) or one (n, d, d) matrix per point (the per-point
     LOCAL case).
+
+    OPTIMIZATION (8.5 item 3): the per-point quadratic form is computed for
+    _CHUNK query points at a time with one batched einsum instead of one
+    einsum call per point (the per-call einsum overhead, not the flops,
+    dominated at d=2-3). The einsum subscripts contract over the same (d, e)
+    index order as the original per-point call, and the chunked result was
+    verified `np.array_equal` (bit-identical) against the per-point loop on
+    the full battery inputs, global and per-point sigma both. Neighbour
+    SELECTION (inf-ing the diagonal, argpartition, argsort of the top-k) is
+    the original per-row code operating on the identical d2 row.
     """
     n = len(arr)
     per_point = sigma_inv.ndim == 3
-    out: list[np.ndarray] = []
-    for i in range(n):
-        diffs = arr - arr[i]
-        s = sigma_inv[i] if per_point else sigma_inv
-        d2 = np.einsum("nd,de,ne->n", diffs, s, diffs)
-        d2[i] = np.inf
-        idx = np.argpartition(d2, k)[:k]
-        idx = idx[np.argsort(d2[idx])]
-        out.append(idx)
+    out: list[np.ndarray] = [np.empty(0, dtype=np.intp)] * n
+    for start in range(0, n, _CHUNK):
+        end = min(start + _CHUNK, n)
+        diffs = arr[None, :, :] - arr[start:end, None, :]  # (c, n, d)
+        if per_point:
+            s = sigma_inv[start:end]
+        else:
+            s = np.broadcast_to(sigma_inv, (end - start, *sigma_inv.shape))
+        d2c = np.einsum("cnd,cde,cne->cn", diffs, s, diffs)
+        for ci in range(end - start):
+            i = start + ci
+            d2 = d2c[ci]
+            d2[i] = np.inf
+            idx = np.argpartition(d2, k)[:k]
+            idx = idx[np.argsort(d2[idx])]
+            out[i] = idx
     return out
 
 
@@ -355,6 +474,21 @@ def scale_aware_neighbors(
 
 
 def build_hypergraph(neighbor_idx: list[np.ndarray]) -> Hypergraph:
+    """OPTIMIZATION (8.5 item 3): the Python set-of-tuples loop is replaced by
+    a vectorized min/max + `np.unique(axis=0)` when all rows have equal
+    length. `np.unique` returns lexicographically sorted unique rows, which is
+    exactly `sorted(set(...))` over (lo, hi) int pairs -- the resulting edge
+    tuple (Python ints via `.tolist()`) is identical, so the Hypergraph
+    compares and hashes equal. Verified on the full battery. Ragged rows keep
+    the original loop."""
+    if len({len(r) for r in neighbor_idx}) == 1:
+        n = len(neighbor_idx)
+        rows = np.asarray(neighbor_idx, dtype=np.int64)
+        i_col = np.repeat(np.arange(n, dtype=np.int64), rows.shape[1])
+        j_col = rows.reshape(-1)
+        lo, hi = np.minimum(i_col, j_col), np.maximum(i_col, j_col)
+        pairs = np.unique(np.stack([lo, hi], axis=1), axis=0)
+        return Hypergraph(tuple(map(tuple, pairs.tolist())))
     edges: set[tuple[int, int]] = set()
     for i, row in enumerate(neighbor_idx):
         for j in row:
@@ -433,28 +567,39 @@ def gp_local_mahalanobis(
     also the module's most expensive routine: O(n^2 d^2) for the distance
     computation, and the reported wall time should be read as a real,
     measured cost, not a rough guess.
+
+    OPTIMIZATION (8.5 item 3): one chunked-einsum pass computes each row's
+    squared distances (bit-identical to the per-point einsum, see
+    `mahalanobis_knn_full`), sorted once per row and reused for both the
+    reference-scale pass and the counting pass (the original recomputed the
+    identical d2 row in each pass). Equivalences, each verified
+    `np.array_equal` on the full battery: the kth order statistic of d2 ==
+    `np.partition(d2, kth)[kth]`; sqrt is monotone so sorting d2 then taking
+    sqrt gives the sorted d values elementwise; `np.searchsorted(sorted_d,
+    r, side="left")` == `np.count_nonzero(d < r)` (an INTEGER, so summation
+    order cannot matter -- counts stay exact int64 until the original's
+    single float division).
     """
     n = len(arr)
-    ref_dists = np.empty(n)
-    for i in range(n):
-        diffs = arr - arr[i]
-        d2 = np.einsum("nd,de,ne->n", diffs, sigma_inv[i], diffs)
-        d2[i] = np.inf
-        kth = min(ref_neighbors, n - 2)
-        ref_dists[i] = math.sqrt(float(np.partition(d2, kth)[kth]))
+    kth = min(ref_neighbors, n - 2)
+    d2_sorted = np.empty((n, n))
+    for start in range(0, n, _CHUNK):
+        end = min(start + _CHUNK, n)
+        diffs = arr[None, :, :] - arr[start:end, None, :]
+        d2c = np.einsum("cnd,cde,cne->cn", diffs, sigma_inv[start:end], diffs)
+        d2c[np.arange(end - start), np.arange(start, end)] = np.inf
+        d2_sorted[start:end] = np.sort(d2c, axis=1)
+    ref_dists = np.array([math.sqrt(float(d2_sorted[i, kth])) for i in range(n)])
     ref_scale = float(np.median(ref_dists))
     if ref_scale <= 0:
         return {"dimension": float("nan"), "r_squared": 0.0, "n_radii_used": 0, "ref_scale": ref_scale}
 
     radii = np.logspace(math.log10(r_min_frac * ref_scale), math.log10(r_max_frac * ref_scale), n_radii)
-    counts = np.zeros(n_radii)
+    d_sorted = np.sqrt(d2_sorted, out=d2_sorted)  # in place; d2_sorted not reused below
+    counts_int = np.zeros(n_radii, dtype=np.int64)
     for i in range(n):
-        diffs = arr - arr[i]
-        d2 = np.einsum("nd,de,ne->n", diffs, sigma_inv[i], diffs)
-        d2[i] = np.inf
-        d = np.sqrt(d2)
-        for ri, r in enumerate(radii):
-            counts[ri] += np.count_nonzero(d < r)
+        counts_int += np.searchsorted(d_sorted[i], radii, side="left")
+    counts = counts_int.astype(float)
     c = counts / (n * (n - 1))
 
     log_r, log_c = [], []

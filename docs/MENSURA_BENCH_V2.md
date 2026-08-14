@@ -437,3 +437,26 @@ recorded as structurally unreachable for a per-point locally-linear metric
 
 Critical path is now: optimize → verification round → integrate (§8.4) →
 Core-10 → Stage-3 report → v1 + rename.
+
+### 8.6 Optimization pass (§8.5 item 3): done, bit-identical, and the cost story corrected
+
+The optimized prototype reproduces **all 462 non-timing fields across the
+9-case battery bitwise identically** — including the pinned §8.1 violation
+row to the last digit — so the §8 evidence chain remains valid without
+re-running the skeptic. Overall speedup 2.38× (per-case 2.0–3.6×); every
+n=3200 case now runs in under a minute, making the verification round
+tractable.
+
+**The profile refuted §8's own cost attribution.** The "~100× O(n²d²)
+Mahalanobis arithmetic" framing was wrong: of a 44.9s uniform-square run,
+**25.1s was the production `Hypergraph.nodes` property rebuilding its
+frozenset from ~20k edges on every one of 824 calls** (20.4M generator
+steps), plus 2.0s of dataclass `__hash__` re-hashing the full edge tuple on
+each `adjacency()` cache lookup. The Mahalanobis arithmetic is ~30% of
+runtime post-fix. The scratch module installs pure per-instance memoization
+(`nodes`, `__hash__`, `adjacency`) without touching production sources.
+
+**Integration note (carries into §8.4):** this memoization belongs in
+production `core.py` at integration time — it is a pure cache on a frozen
+dataclass, separately testable, and benefits every caller, not just the
+scale-aware path.

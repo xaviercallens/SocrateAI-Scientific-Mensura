@@ -1,0 +1,1662 @@
+{
+  "before": {
+    "uniform-square-2d/n=1600/seed=11": {
+      "case": "uniform-square-2d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822734,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434233
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625954,
+        "r_squared": 0.9996782808312287
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090569,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822734,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.57469579933915,
+        "d_hi": 2.4210451753657996,
+        "hull_lo": 1.9343124870625954,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.35961668772344546,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9371875,
+          "median_topo_cond": 2.185573945029111
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9494166666666668,
+          "median_topo_cond": 2.920424754262613
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9623541666666668,
+          "median_topo_cond": 3.612927883405294
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9733958333333335,
+          "median_topo_cond": 4.207555328725483
+        }
+      ],
+      "wall_time_s": 29.1312122909585,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 25.426697754999623,
+        "shell_estimate": 1.4583748700097203,
+        "gp_local": 2.007973346975632,
+        "gp_global": 0.2177618920104578
+      }
+    },
+    "circle-1d/n=1600/seed=11": {
+      "case": "circle-1d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 1.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 1,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 0.991401122833046,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.525
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 0.9639325873529621,
+        "r_squared": 0.9998801079471126,
+        "n_radii_used": 20,
+        "ref_scale": 1.4204435684419734
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.0023911874571114,
+        "r_squared": 0.9999894507165574
+      },
+      "bracket_local_gp": {
+        "d_lo": 0.7839325873529621,
+        "d_hi": 1.171401122833046,
+        "hull_lo": 0.9639325873529621,
+        "hull_hi": 0.991401122833046,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 0.811401122833046,
+        "d_hi": 1.1823911874571114,
+        "hull_lo": 0.991401122833046,
+        "hull_hi": 1.0023911874571114,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9997291666666667,
+          "median_topo_cond": 20.0
+        }
+      ],
+      "wall_time_s": 21.706859997007996,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 11.587727663049009,
+        "shell_estimate": 8.092468886985444,
+        "gp_local": 1.7228103009983897,
+        "gp_global": 0.17902365903137252
+      }
+    },
+    "uniform-cube-3d/n=1600/seed=11": {
+      "case": "uniform-cube-3d/n=1600/seed=11",
+      "n": 1600,
+      "d": 3,
+      "truth": 3.0,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 5,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.7237519107916164,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 2.8169972377371812,
+        "r_squared": 0.9867922502297279,
+        "n_radii_used": 15,
+        "ref_scale": 1.5924096100914307
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 2.9034532648775278,
+        "r_squared": 0.9994156051615884
+      },
+      "bracket_local_gp": {
+        "d_lo": 2.2250844874240245,
+        "d_hi": 3.315664661104773,
+        "hull_lo": 2.7237519107916164,
+        "hull_hi": 2.8169972377371812,
+        "allowance": 0.4986674233675918,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 2.2173034449813933,
+        "d_hi": 3.409901730687751,
+        "hull_lo": 2.7237519107916164,
+        "hull_hi": 2.9034532648775278,
+        "allowance": 0.506448465810223,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.89959375,
+          "median_topo_cond": 3.3456959200800824
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9226249999999999,
+          "median_topo_cond": 4.73859979566992
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9480416666666666,
+          "median_topo_cond": 6.179528031680518
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9664479166666666,
+          "median_topo_cond": 7.76302158903754
+        },
+        {
+          "round": 5,
+          "neighbor_set_overlap_with_prev": 0.9751041666666665,
+          "median_topo_cond": 9.365173673998099
+        }
+      ],
+      "wall_time_s": 39.01022128597833,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 34.09326008398784,
+        "shell_estimate": 2.3567147969733924,
+        "gp_local": 2.2355810250155628,
+        "gp_global": 0.2629410839872435
+      }
+    },
+    "A = uniform_square(1600,11)": {
+      "case": "A = uniform_square(1600,11)",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822734,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434233
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625954,
+        "r_squared": 0.9996782808312287
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090569,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822734,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.57469579933915,
+        "d_hi": 2.4210451753657996,
+        "hull_lo": 1.9343124870625954,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.35961668772344546,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9371875,
+          "median_topo_cond": 2.185573945029111
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9494166666666668,
+          "median_topo_cond": 2.920424754262613
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9623541666666668,
+          "median_topo_cond": 3.612927883405294
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9733958333333335,
+          "median_topo_cond": 4.207555328725483
+        }
+      ],
+      "wall_time_s": 18.99051206500735,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 17.12627122097183,
+        "shell_estimate": 0.7283271069754846,
+        "gp_local": 0.9971736040315591,
+        "gp_global": 0.1264028720324859
+      }
+    },
+    "A @ diag(1,0.01) [refutation: y in km]": {
+      "case": "A @ diag(1,0.01) [refutation: y in km]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 10,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 1.728801493954081,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.7215119634093952,
+        "r_squared": 0.9922579206249287,
+        "n_radii_used": 20,
+        "ref_scale": 1.7147221038322806
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9338605036553762,
+        "r_squared": 0.9996815175053769
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.4109837522466824,
+        "d_hi": 2.039329705116794,
+        "hull_lo": 1.7215119634093952,
+        "hull_hi": 1.728801493954081,
+        "allowance": 0.31052821116271284,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.39916191416923,
+        "d_hi": 2.2635000834402272,
+        "hull_lo": 1.728801493954081,
+        "hull_hi": 1.9338605036553762,
+        "allowance": 0.32963957978485114,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.29102083333333334,
+          "median_topo_cond": 19.999999999999996
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9726458333333333,
+          "median_topo_cond": 19.999999999999996
+        }
+      ],
+      "wall_time_s": 12.646002769004554,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 9.669153422000818,
+        "shell_estimate": 1.6777376469690353,
+        "gp_local": 1.134877033997327,
+        "gp_global": 0.11876899900380522
+      }
+    },
+    "A @ diag(100,100) [isotropic control]": {
+      "case": "A @ diag(100,100) [isotropic control]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822732,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434229
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625958,
+        "r_squared": 0.9996782808312287
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090566,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822732,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.5746957993391504,
+        "d_hi": 2.4210451753658,
+        "hull_lo": 1.9343124870625958,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3596166877234455,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9371875,
+          "median_topo_cond": 2.185573945029111
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9494166666666668,
+          "median_topo_cond": 2.9204247542626116
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9623541666666668,
+          "median_topo_cond": 3.612927883405293
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9733958333333335,
+          "median_topo_cond": 4.207555328725484
+        }
+      ],
+      "wall_time_s": 15.620382349996362,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 13.71838352800114,
+        "shell_estimate": 0.7328623090288602,
+        "gp_local": 1.0480364760151133,
+        "gp_global": 0.10763793700607494
+      }
+    },
+    "rescale_y_factor=0.001 [pinned 8.1 violation row]": {
+      "case": "rescale_y_factor=0.001 [pinned 8.1 violation row]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 0.99511347818449,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.6
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.7425096641044415,
+        "r_squared": 0.9956542746784136,
+        "n_radii_used": 20,
+        "ref_scale": 1.8452060382167839
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9338494190654607,
+        "r_squared": 0.9996806095264966
+      },
+      "bracket_local_gp": {
+        "d_lo": 0.7487273953784862,
+        "d_hi": 1.9888957469104454,
+        "hull_lo": 0.99511347818449,
+        "hull_hi": 1.7425096641044415,
+        "allowance": 0.24638608280600383,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 0.7315068174319945,
+        "d_hi": 2.197456079817956,
+        "hull_lo": 0.99511347818449,
+        "hull_hi": 1.9338494190654607,
+        "allowance": 0.26360666075249556,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": false,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.15327083333333336,
+          "median_topo_cond": 20.0
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9974583333333333,
+          "median_topo_cond": 20.0
+        }
+      ],
+      "wall_time_s": 12.638031722977757,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 7.995111724012531,
+        "shell_estimate": 3.393052536994219,
+        "gp_local": 1.0187326179584488,
+        "gp_global": 0.12498333101393655
+      }
+    },
+    "uniform-square-2d/n=3200/seed=555": {
+      "case": "uniform-square-2d/n=3200/seed=555",
+      "n": 3200,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 6,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.171990840104303,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 2.2329626271539165,
+        "r_squared": 0.991061834269572,
+        "n_radii_used": 19,
+        "ref_scale": 1.659754437608222
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9237634434404494,
+        "r_squared": 0.9997281747281975
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.7755450280510634,
+        "d_hi": 2.629408439207156,
+        "hull_lo": 2.171990840104303,
+        "hull_hi": 2.2329626271539165,
+        "allowance": 0.39644581205323975,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.5551455579214217,
+        "d_hi": 2.540608725623331,
+        "hull_lo": 1.9237634434404494,
+        "hull_hi": 2.171990840104303,
+        "allowance": 0.3686178855190277,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9405000000000001,
+          "median_topo_cond": 2.1000551614657885
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9534791666666667,
+          "median_topo_cond": 2.759768269742645
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9653229166666668,
+          "median_topo_cond": 3.4243737311995543
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9759791666666667,
+          "median_topo_cond": 3.9953070750180584
+        }
+      ],
+      "wall_time_s": 33.700671969971154,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 27.82372458896134,
+        "shell_estimate": 2.042773336987011,
+        "gp_local": 3.5009647900005803,
+        "gp_global": 0.26866446901112795
+      }
+    },
+    "uniform-cube-3d/n=3200/seed=555": {
+      "case": "uniform-cube-3d/n=3200/seed=555",
+      "n": 3200,
+      "d": 3,
+      "truth": 3.0,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 5,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.7328155752889187,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 2.879252970481593,
+        "r_squared": 0.9981237985873154,
+        "n_radii_used": 15,
+        "ref_scale": 1.5878020413195242
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 2.872355750569741,
+        "r_squared": 0.9997148686484935
+      },
+      "bracket_local_gp": {
+        "d_lo": 2.2277294061695727,
+        "d_hi": 3.384339139600939,
+        "hull_lo": 2.7328155752889187,
+        "hull_hi": 2.879252970481593,
+        "allowance": 0.5050861691193461,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 2.2283501559616394,
+        "d_hi": 3.37682116989702,
+        "hull_lo": 2.7328155752889187,
+        "hull_hi": 2.872355750569741,
+        "allowance": 0.5044654193272793,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9009999999999999,
+          "median_topo_cond": 3.12083690327517
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9213437499999999,
+          "median_topo_cond": 4.479957065320759
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9455312499999999,
+          "median_topo_cond": 6.032213640871441
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9628177083333332,
+          "median_topo_cond": 7.679048386644714
+        },
+        {
+          "round": 5,
+          "neighbor_set_overlap_with_prev": 0.9722135416666666,
+          "median_topo_cond": 9.388028751946214
+        }
+      ],
+      "wall_time_s": 44.54303375899326,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 37.8999792879913,
+        "shell_estimate": 1.4785815899958834,
+        "gp_local": 4.694700560008641,
+        "gp_global": 0.41848888201639056
+      }
+    }
+  },
+  "after": {
+    "uniform-square-2d/n=1600/seed=11": {
+      "case": "uniform-square-2d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822734,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434233
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625954,
+        "r_squared": 0.9996782808312287
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090569,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822734,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.57469579933915,
+        "d_hi": 2.4210451753657996,
+        "hull_lo": 1.9343124870625954,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.35961668772344546,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9371875,
+          "median_topo_cond": 2.185573945029111
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9494166666666668,
+          "median_topo_cond": 2.920424754262613
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9623541666666668,
+          "median_topo_cond": 3.612927883405294
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9733958333333335,
+          "median_topo_cond": 4.207555328725483
+        }
+      ],
+      "wall_time_s": 10.044253471016418,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 9.19087040197337,
+        "shell_estimate": 0.09514047496486455,
+        "gp_local": 0.6078690439462662,
+        "gp_global": 0.13464112300425768
+      }
+    },
+    "circle-1d/n=1600/seed=11": {
+      "case": "circle-1d/n=1600/seed=11",
+      "n": 1600,
+      "d": 2,
+      "truth": 1.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 1,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 0.991401122833046,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.525
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 0.9639325873529621,
+        "r_squared": 0.9998801079471126,
+        "n_radii_used": 20,
+        "ref_scale": 1.4204435684419734
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.0023911874571114,
+        "r_squared": 0.9999894507165574
+      },
+      "bracket_local_gp": {
+        "d_lo": 0.7839325873529621,
+        "d_hi": 1.171401122833046,
+        "hull_lo": 0.9639325873529621,
+        "hull_hi": 0.991401122833046,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 0.811401122833046,
+        "d_hi": 1.1823911874571114,
+        "hull_lo": 0.991401122833046,
+        "hull_hi": 1.0023911874571114,
+        "allowance": 0.18,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9997291666666667,
+          "median_topo_cond": 20.0
+        }
+      ],
+      "wall_time_s": 4.206388899998274,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 3.140263531997334,
+        "shell_estimate": 0.18610352801624686,
+        "gp_local": 0.5755860580247827,
+        "gp_global": 0.13069372699828818
+      }
+    },
+    "uniform-cube-3d/n=1600/seed=11": {
+      "case": "uniform-cube-3d/n=1600/seed=11",
+      "n": 1600,
+      "d": 3,
+      "truth": 3.0,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 5,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.7237519107916164,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 2.8169972377371812,
+        "r_squared": 0.9867922502297279,
+        "n_radii_used": 15,
+        "ref_scale": 1.5924096100914307
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 2.9034532648775278,
+        "r_squared": 0.9994156051615884
+      },
+      "bracket_local_gp": {
+        "d_lo": 2.2250844874240245,
+        "d_hi": 3.315664661104773,
+        "hull_lo": 2.7237519107916164,
+        "hull_hi": 2.8169972377371812,
+        "allowance": 0.4986674233675918,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 2.2173034449813933,
+        "d_hi": 3.409901730687751,
+        "hull_lo": 2.7237519107916164,
+        "hull_hi": 2.9034532648775278,
+        "allowance": 0.506448465810223,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.89959375,
+          "median_topo_cond": 3.3456959200800824
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9226249999999999,
+          "median_topo_cond": 4.73859979566992
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9480416666666666,
+          "median_topo_cond": 6.179528031680518
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9664479166666666,
+          "median_topo_cond": 7.76302158903754
+        },
+        {
+          "round": 5,
+          "neighbor_set_overlap_with_prev": 0.9751041666666665,
+          "median_topo_cond": 9.365173673998099
+        }
+      ],
+      "wall_time_s": 12.273105882981326,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 11.114287134027109,
+        "shell_estimate": 0.14290185802383348,
+        "gp_local": 0.7659174730069935,
+        "gp_global": 0.1918236730271019
+      }
+    },
+    "A = uniform_square(1600,11)": {
+      "case": "A = uniform_square(1600,11)",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822734,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434233
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625954,
+        "r_squared": 0.9996782808312287
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090569,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822734,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.57469579933915,
+        "d_hi": 2.4210451753657996,
+        "hull_lo": 1.9343124870625954,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.35961668772344546,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9371875,
+          "median_topo_cond": 2.185573945029111
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9494166666666668,
+          "median_topo_cond": 2.920424754262613
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9623541666666668,
+          "median_topo_cond": 3.612927883405294
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9733958333333335,
+          "median_topo_cond": 4.207555328725483
+        }
+      ],
+      "wall_time_s": 7.760364242014475,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 7.0057144010206684,
+        "shell_estimate": 0.071895883011166,
+        "gp_local": 0.5269919540151022,
+        "gp_global": 0.13838472700444981
+      }
+    },
+    "A @ diag(1,0.01) [refutation: y in km]": {
+      "case": "A @ diag(1,0.01) [refutation: y in km]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 10,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 1.728801493954081,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.7215119634093952,
+        "r_squared": 0.9922579206249287,
+        "n_radii_used": 20,
+        "ref_scale": 1.7147221038322806
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9338605036553762,
+        "r_squared": 0.9996815175053769
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.4109837522466824,
+        "d_hi": 2.039329705116794,
+        "hull_lo": 1.7215119634093952,
+        "hull_hi": 1.728801493954081,
+        "allowance": 0.31052821116271284,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.39916191416923,
+        "d_hi": 2.2635000834402272,
+        "hull_lo": 1.728801493954081,
+        "hull_hi": 1.9338605036553762,
+        "allowance": 0.32963957978485114,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.29102083333333334,
+          "median_topo_cond": 19.999999999999996
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9726458333333333,
+          "median_topo_cond": 19.999999999999996
+        }
+      ],
+      "wall_time_s": 5.810094818996731,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 4.904857955989428,
+        "shell_estimate": 0.1772719289874658,
+        "gp_local": 0.5510816829628311,
+        "gp_global": 0.12516126199625432
+      }
+    },
+    "A @ diag(100,100) [isotropic control]": {
+      "case": "A @ diag(100,100) [isotropic control]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.0614284876423543,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.6524808042822732,
+        "r_squared": 0.9846675370108101,
+        "n_radii_used": 20,
+        "ref_scale": 1.6583539268434229
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9343124870625958,
+        "r_squared": 0.9996782808312287
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.3182289680090566,
+        "d_hi": 2.395680323915571,
+        "hull_lo": 1.6524808042822732,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3342518362732165,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.5746957993391504,
+        "d_hi": 2.4210451753658,
+        "hull_lo": 1.9343124870625958,
+        "hull_hi": 2.0614284876423543,
+        "allowance": 0.3596166877234455,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9371875,
+          "median_topo_cond": 2.185573945029111
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9494166666666668,
+          "median_topo_cond": 2.9204247542626116
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9623541666666668,
+          "median_topo_cond": 3.612927883405293
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9733958333333335,
+          "median_topo_cond": 4.207555328725484
+        }
+      ],
+      "wall_time_s": 9.529724222957157,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 8.582963823981117,
+        "shell_estimate": 0.11675426998408511,
+        "gp_local": 0.6599678630009294,
+        "gp_global": 0.14463644596980885
+      }
+    },
+    "rescale_y_factor=0.001 [pinned 8.1 violation row]": {
+      "case": "rescale_y_factor=0.001 [pinned 8.1 violation row]",
+      "n": 1600,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 25,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 2,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 0.99511347818449,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.6
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 1.7425096641044415,
+        "r_squared": 0.9956542746784136,
+        "n_radii_used": 20,
+        "ref_scale": 1.8452060382167839
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9338494190654607,
+        "r_squared": 0.9996806095264966
+      },
+      "bracket_local_gp": {
+        "d_lo": 0.7487273953784862,
+        "d_hi": 1.9888957469104454,
+        "hull_lo": 0.99511347818449,
+        "hull_hi": 1.7425096641044415,
+        "allowance": 0.24638608280600383,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 0.7315068174319945,
+        "d_hi": 2.197456079817956,
+        "hull_lo": 0.99511347818449,
+        "hull_hi": 1.9338494190654607,
+        "allowance": 0.26360666075249556,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": false,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.15327083333333336,
+          "median_topo_cond": 20.0
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9974583333333333,
+          "median_topo_cond": 20.0
+        }
+      ],
+      "wall_time_s": 5.695398545998614,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 4.52216233802028,
+        "shell_estimate": 0.2958158999681473,
+        "gp_local": 0.5767554370104335,
+        "gp_global": 0.14360201201634482
+      }
+    },
+    "uniform-square-2d/n=3200/seed=555": {
+      "case": "uniform-square-2d/n=3200/seed=555",
+      "n": 3200,
+      "d": 2,
+      "truth": 2.0,
+      "settings_auto": {
+        "k0": 30,
+        "k_selected": 6,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 4,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.171990840104303,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 2.2329626271539165,
+        "r_squared": 0.991061834269572,
+        "n_radii_used": 19,
+        "ref_scale": 1.659754437608222
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 1.9237634434404494,
+        "r_squared": 0.9997281747281975
+      },
+      "bracket_local_gp": {
+        "d_lo": 1.7755450280510634,
+        "d_hi": 2.629408439207156,
+        "hull_lo": 2.171990840104303,
+        "hull_hi": 2.2329626271539165,
+        "allowance": 0.39644581205323975,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 1.5551455579214217,
+        "d_hi": 2.540608725623331,
+        "hull_lo": 1.9237634434404494,
+        "hull_hi": 2.171990840104303,
+        "allowance": 0.3686178855190277,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9405000000000001,
+          "median_topo_cond": 2.1000551614657885
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9534791666666667,
+          "median_topo_cond": 2.759768269742645
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9653229166666668,
+          "median_topo_cond": 3.4243737311995543
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9759791666666667,
+          "median_topo_cond": 3.9953070750180584
+        }
+      ],
+      "wall_time_s": 21.495191744004842,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 18.841184051998425,
+        "shell_estimate": 0.16606038599275053,
+        "gp_local": 2.052992301003542,
+        "gp_global": 0.32210173399653286
+      }
+    },
+    "uniform-cube-3d/n=3200/seed=555": {
+      "case": "uniform-cube-3d/n=3200/seed=555",
+      "n": 3200,
+      "d": 3,
+      "truth": 3.0,
+      "settings_auto": {
+        "k0": 60,
+        "k_selected": 4,
+        "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+        "topology_ridge_floor_frac": 0.05,
+        "metric_ridge_floor_frac": 0.001,
+        "global_ridge_floor_frac": 1e-09,
+        "iterations_run": 5,
+        "converged": true,
+        "k_ladder": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "shell": {
+        "mean_dimension": 2.7328155752889187,
+        "degenerate_fraction": 0.0,
+        "near_degenerate_fraction": 0.0
+      },
+      "gp_local_mahalanobis": {
+        "dimension": 2.879252970481593,
+        "r_squared": 0.9981237985873154,
+        "n_radii_used": 15,
+        "ref_scale": 1.5878020413195242
+      },
+      "gp_global_mahalanobis": {
+        "dimension": 2.872355750569741,
+        "r_squared": 0.9997148686484935
+      },
+      "bracket_local_gp": {
+        "d_lo": 2.2277294061695727,
+        "d_hi": 3.384339139600939,
+        "hull_lo": 2.7328155752889187,
+        "hull_hi": 2.879252970481593,
+        "allowance": 0.5050861691193461,
+        "basis": "bracket(shell,gp)"
+      },
+      "bracket_global_gp": {
+        "d_lo": 2.2283501559616394,
+        "d_hi": 3.37682116989702,
+        "hull_lo": 2.7328155752889187,
+        "hull_hi": 2.872355750569741,
+        "allowance": 0.5044654193272793,
+        "basis": "bracket(shell,gp)"
+      },
+      "contains_truth_local_gp": true,
+      "refine_rounds": [
+        {
+          "round": 1,
+          "neighbor_set_overlap_with_prev": 0.9009999999999999,
+          "median_topo_cond": 3.12083690327517
+        },
+        {
+          "round": 2,
+          "neighbor_set_overlap_with_prev": 0.9213437499999999,
+          "median_topo_cond": 4.479957065320759
+        },
+        {
+          "round": 3,
+          "neighbor_set_overlap_with_prev": 0.9455312499999999,
+          "median_topo_cond": 6.032213640871441
+        },
+        {
+          "round": 4,
+          "neighbor_set_overlap_with_prev": 0.9628177083333332,
+          "median_topo_cond": 7.679048386644714
+        },
+        {
+          "round": 5,
+          "neighbor_set_overlap_with_prev": 0.9722135416666666,
+          "median_topo_cond": 9.388028751946214
+        }
+      ],
+      "wall_time_s": 32.13496726099402,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 28.83984683395829,
+        "shell_estimate": 0.16376502404455096,
+        "gp_local": 2.5300074849510565,
+        "gp_global": 0.503521260980051
+      }
+    }
+  },
+  "comparison": {
+    "protocol": "every non-timing field compared for exact equality (floats: bitwise; nan==nan); wall_time fields excluded",
+    "total_fields_compared": 462,
+    "max_rel_dev_overall": 0.0,
+    "per_case": {
+      "uniform-square-2d/n=1600/seed=11": {
+        "n_compared_fields": 53,
+        "n_identical": 53,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "circle-1d/n=1600/seed=11": {
+        "n_compared_fields": 44,
+        "n_identical": 44,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "uniform-cube-3d/n=1600/seed=11": {
+        "n_compared_fields": 56,
+        "n_identical": 56,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "A = uniform_square(1600,11)": {
+        "n_compared_fields": 53,
+        "n_identical": 53,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "A @ diag(1,0.01) [refutation: y in km]": {
+        "n_compared_fields": 47,
+        "n_identical": 47,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "A @ diag(100,100) [isotropic control]": {
+        "n_compared_fields": 53,
+        "n_identical": 53,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "rescale_y_factor=0.001 [pinned 8.1 violation row]": {
+        "n_compared_fields": 47,
+        "n_identical": 47,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "uniform-square-2d/n=3200/seed=555": {
+        "n_compared_fields": 53,
+        "n_identical": 53,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      },
+      "uniform-cube-3d/n=3200/seed=555": {
+        "n_compared_fields": 56,
+        "n_identical": 56,
+        "n_mismatched": 0,
+        "max_rel_dev": 0.0,
+        "mismatches": []
+      }
+    },
+    "overall_speedup": 2.0925929081111554
+  },
+  "interleaved_clean_timing": {
+    "method": "A/B interleaved per case (original then optimized, sequential subprocesses) to cancel background machine load; wall measured inside the process around the full pipeline (scale_aware_v2 + build_hypergraph + shell_estimate + gp_local + bracket), imports excluded. Machine carried unrelated user load (~6-10 loadavg on 8 cores) during ALL measurements, so absolute times are inflated but ratios are comparable.",
+    "per_case": {
+      "square1600": {
+        "original_wall_s": 33.56985473801615,
+        "optimized_wall_s": 16.077088814985473,
+        "speedup": 2.088055563064729,
+        "outputs_identical": true
+      },
+      "circle1600": {
+        "original_wall_s": 23.05513792904094,
+        "optimized_wall_s": 6.33082925202325,
+        "speedup": 3.641724805904822,
+        "outputs_identical": true
+      },
+      "cube1600": {
+        "original_wall_s": 43.894706642022356,
+        "optimized_wall_s": 21.131989755958784,
+        "speedup": 2.0771686504175477,
+        "outputs_identical": true
+      },
+      "rescale01": {
+        "original_wall_s": 26.76095940399682,
+        "optimized_wall_s": 9.422072506975383,
+        "speedup": 2.8402412934293437,
+        "outputs_identical": true
+      },
+      "iso100": {
+        "original_wall_s": 30.179912598978262,
+        "optimized_wall_s": 14.980915437976364,
+        "speedup": 2.014557302851647,
+        "outputs_identical": true
+      },
+      "rescale0001": {
+        "original_wall_s": 30.49038255296182,
+        "optimized_wall_s": 9.72378438099986,
+        "speedup": 3.13564980035341,
+        "outputs_identical": true
+      },
+      "square3200": {
+        "original_wall_s": 74.14121356001124,
+        "optimized_wall_s": 29.32503050303785,
+        "speedup": 2.528256997118239,
+        "outputs_identical": true
+      },
+      "cube3200": {
+        "original_wall_s": 114.17645025695674,
+        "optimized_wall_s": 50.876916874956805,
+        "speedup": 2.244169994372397,
+        "outputs_identical": true
+      },
+      "OVERALL": {
+        "original_wall_s": 376.2686176819843,
+        "optimized_wall_s": 157.86862752691377,
+        "speedup": 2.383428700029949
+      }
+    }
+  },
+  "profile": {
+    "before_optimization": {
+      "total_wall_s_under_profiler": 44.9,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 39.5,
+        "shell_estimate": 3.3,
+        "gp_local": 1.9,
+        "gp_global": 0.2
+      },
+      "hotspots": [
+        "auto_select_k -> cic._shell_arm -> dimension.local_dimension: 32.3s, of which UNCACHED Hypergraph.nodes property = 25.1s (frozenset rebuilt over all edges on each of 824 calls, 20.4M generator steps) and dataclass __hash__ on adjacency() lru_cache lookups = 2.0s",
+        "refine_metric: 6.4s (mahalanobis_knn_full 4.6s; 12800 per-point einsum calls 3.6s; per-point regularize_covariance eigh 1.5s)",
+        "gp_local_mahalanobis: 1.9s (two per-point einsum passes + 32000 count_nonzero calls)",
+        "build_hypergraph: 1.2s (python set-of-tuples loop, 8 calls)"
+      ],
+      "conclusion": "the assumed O(n^2 d^2) pairwise-distance dominance was WRONG: the dominant cost was python-level overhead around the production Hypergraph (uncached nodes property, per-call einsum overhead), not the arithmetic itself"
+    },
+    "after_optimization": {
+      "total_wall_s_under_profiler": 16.08,
+      "wall_breakdown_s": {
+        "scale_aware_v2": 14.72,
+        "shell_estimate": 0.21,
+        "gp_local": 0.91,
+        "gp_global": 0.2
+      },
+      "remaining_hotspots_note": "see stored pstats text",
+      "pstats_top": "         1554004 function calls (1553954 primitive calls) in 15.952 seconds\n\n   Ordered by: cumulative time\n   List reduced from 325 to 18 due to restriction <18>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.010    0.010   16.076   16.076 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/optimize_battery.py:50(run_case)\n        1    0.008    0.008   14.717   14.717 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/scale_aware_v2.py:386(scale_aware_v2)\n        1    0.024    0.024    9.194    9.194 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/scale_aware_v2.py:321(auto_select_k)\n        7    0.038    0.005    7.528    1.075 /home/xavkal/socrates-project/src/socrates/hypergraph/cic.py:787(_shell_arm)\n      800    4.863    0.006    6.632    0.008 /home/xavkal/socrates-project/src/socrates/hypergraph/dimension.py:606(local_dimension)\n        6    1.291    0.215    5.014    0.836 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/scale_aware_prototype.py:312(mahalanobis_knn_full)\n        1    0.251    0.251    4.715    4.715 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/scale_aware_v2.py:251(refine_metric)\n       49    0.001    0.000    3.303    0.067 /home/xavkal/socrates-project/.venv/lib/python3.12/site-packages/numpy/_core/einsumfunc.py:1242(einsum)\n       49    3.303    0.067    3.303    0.067 {built-in method numpy._core._multiarray_umath.c_einsum}\n        8    0.145    0.018    1.124    0.140 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/scale_aware_prototype.py:476(build_hypergraph)\n     3760    0.218    0.000    0.986    0.000 /home/xavkal/socrates-project/src/socrates/hypergraph/cic.py:655(_refit)\n     4560    0.267    0.000    0.906    0.000 /home/xavkal/socrates-project/src/socrates/hypergraph/dimension.py:518(_log_log_fit)\n        1    0.256    0.256    0.906    0.906 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/scale_aware_prototype.py:542(gp_local_mahalanobis)\n      800    0.002    0.000    0.904    0.001 /home/xavkal/socrates-project/scripts/hypergraph_benchmark/v2/scale_aware_prototype.py:162(_adjacency)\n        7    0.027    0.004    0.903    0.129 /home/xavkal/socrates-project/src/socrates/hypergraph/cic.py:492(select_max_radius)\n        8    0.001    0.000    0.901    0.113 /home/xavkal/socrates-project/src/socrates/hypergraph/core.py:68(adjacency)\n        7    0.657    0.094    0.890    0.127 /home/xavkal/socrates-project/src/socrates/hypergraph/core.py:120(_adjacency_cached)\n    20834    0.057    0.000    0.850    0.000 /home/xavkal/socrates-project/.venv/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:48(_wrapfunc)\n\n\n"
+    }
+  }
+}

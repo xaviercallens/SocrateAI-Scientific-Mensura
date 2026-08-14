@@ -81,7 +81,7 @@ from scale_aware_prototype import (  # noqa: E402
     gp_local_mahalanobis,
     lorenz_x_series,
     mahalanobis_knn_full,
-    regularize_covariance,
+    regularize_covariance_batch,
     takens_embedding,
     whiten,
 )
@@ -230,12 +230,21 @@ class ScaleAwareV2Result:
 
 
 def _raw_local_covariances(arr: np.ndarray, neighbor_idx: list[np.ndarray]) -> np.ndarray:
+    # OPTIMIZATION (8.5 item 3): batched gather/center/matmul when all rows
+    # have equal length (the only case refine_metric produces). Bit-identical
+    # to the original per-point loop -- same per-slice mean reduction and
+    # (d,k)@(k,d) product, verified np.array_equal on the full battery.
     n, d = arr.shape
+    if len({len(ix) for ix in neighbor_idx}) == 1:
+        idx = np.asarray(neighbor_idx)
+        pts = arr[idx]  # (n, k, d)
+        centered = pts - pts.mean(axis=1, keepdims=True)
+        return np.matmul(centered.transpose(0, 2, 1), centered) / idx.shape[1]
     covs = np.empty((n, d, d))
-    for i, idx in enumerate(neighbor_idx):
-        pts = arr[idx]
+    for i, idx_row in enumerate(neighbor_idx):
+        pts = arr[idx_row]
         centered = pts - pts.mean(axis=0)
-        covs[i] = (centered.T @ centered) / len(idx)
+        covs[i] = (centered.T @ centered) / len(idx_row)
     return covs
 
 
@@ -268,7 +277,9 @@ def refine_metric(
     neighbor_idx = mahalanobis_knn_full(arr, sigma_inv, k0)
     prev_sets = [set(x.tolist()) for x in neighbor_idx]
     raw = _raw_local_covariances(arr, neighbor_idx)
-    reg_topo = np.array([regularize_covariance(raw[i], topology_floor) for i in range(n)])
+    # OPTIMIZATION (8.5 item 3): regularize_covariance_batch is the batched
+    # bit-identical form of the original per-i list comprehension.
+    reg_topo = regularize_covariance_batch(raw, topology_floor)
 
     it = 0
     overlap = 0.0
@@ -279,7 +290,7 @@ def refine_metric(
         new_sets = [set(x.tolist()) for x in new_idx]
         overlap = float(np.mean([len(a & b) / k0 for a, b in zip(prev_sets, new_sets, strict=True)]))
         raw = _raw_local_covariances(arr, new_idx)
-        reg_topo = np.array([regularize_covariance(raw[i], topology_floor) for i in range(n)])
+        reg_topo = regularize_covariance_batch(raw, topology_floor)
         diag["rounds"].append(
             {
                 "round": it,
@@ -293,15 +304,17 @@ def refine_metric(
             break
 
     sigma_inv_topology = np.linalg.inv(reg_topo)
-    reg_metric = np.array([regularize_covariance(raw[i], metric_floor) for i in range(n)])
+    reg_metric = regularize_covariance_batch(raw, metric_floor)
     sigma_inv_metric = np.linalg.inv(reg_metric)
 
     diag["iterations_run"] = it
     diag["converged"] = overlap >= convergence_overlap
     diag["final_overlap"] = overlap
     diag["wall_time_s"] = time.perf_counter() - t0
-    diag["median_metric_cond"] = float(np.median(np.linalg.cond(reg_metric)))
-    diag["max_metric_cond"] = float(np.max(np.linalg.cond(reg_metric)))
+    # (computed once instead of twice -- same array, identical values)
+    metric_cond = np.linalg.cond(reg_metric)
+    diag["median_metric_cond"] = float(np.median(metric_cond))
+    diag["max_metric_cond"] = float(np.max(metric_cond))
     return neighbor_idx, sigma_inv_topology, sigma_inv_metric, diag
 
 
