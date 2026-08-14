@@ -157,7 +157,8 @@ v2 run:
 - `W_family` sharpness caps — **do not invent these**. Derive them once, from
   the median interval width the three-baseline panel produces on the `EXACT`
   uniform rows at the reference n, rounded up; then freeze. This is answer-blind
-  and defensible, where hand-chosen caps are neither.
+  and defensible, where hand-chosen caps are neither. **But see §6 first: the
+  achievable floor is now measured, and it is not small.**
 - Which Cantor construction (§3.2), and the ambient dimension of every target.
 - The dimension *type* attached to each `INDEPENDENT` truth (§4).
 - Noise ladder rows and σ values.
@@ -165,3 +166,52 @@ v2 run:
   rule that decides `UNDECIDED` (§3.1).
 - LL-6 retrieval pass on: Kaplan–Yorke published values, Myrheim–Meyer, TwoNN,
   and every `CONSENSUS` range cited.
+
+---
+
+## 6. E4 measured: the uniform-square bias, and what it costs `W_family`
+
+Decision E4 asked whether the shell estimator's +0.02…+0.17 error on a plain
+uniform square is boundary effect, finite-size effect, or variance, since that
+determines whether B3 (boundary correction) fixes it before the caps freeze.
+Measured (`scripts/hypergraph_benchmark/diagnostics/e4_uniform_square_bias.py`,
+truth exactly 2.0 by construction):
+
+**It is none of the three, and the roadmap's B3 assumption is refuted.**
+
+| hypothesis | prediction | measured |
+|---|---|---|
+| finite-size | bias shrinks with n | bias **grows**: −0.053 (n=800) → +0.107 (n=12800); interior-only flat at +0.14…+0.16 |
+| boundary | interior restriction removes it | interior restriction makes it **worse**, median \|err\| +0.046 |
+| variance | sign unstable across seeds | sign stable 6/6, mean +0.085, sd 0.025 → **bias** |
+
+The mechanism is the reverse of the assumed one: **boundary nodes are biased
+*down*, interior nodes biased *up*, and the all-node figure is a partial
+cancellation of two opposite biases.** Applying a boundary correction would
+remove the cancellation and *expose* the full interior bias of +0.14…+0.21.
+**B3 must not be applied to this estimator without re-deriving its
+justification** — as specified it would make the flagship EXACT rows worse.
+
+A follow-up tested whether the bias lives in the small-radius regime, where
+ball growth is driven by `k` rather than geometry (the bias scales with k:
++0.004 at k=6/mr=4 up to +0.21 at k=15/mr=4). Starting the fit window at
+radius 2 or 3 instead of 1 does **not** give a clean fix either: at k=6 it
+makes things markedly worse (+0.05 → +0.20 → +0.24), at k=10 it is roughly
+flat, and only at k=15 does it help (+0.076 → +0.029). No single window rule
+improves all k.
+
+**Consequence for pre-registration, which is the decision-relevant part.**
+On a target whose dimension is known *exactly*, with the estimator free to
+pick any (k, max_radius, min_radius) in the ranges tested, the achieved error
+spans roughly **+0.03 to +0.24**. Under zero-knob operation MENSURA must
+commit to one configuration in advance, so the honest expectation is an error
+of order **0.1–0.2 on EXACT 2-dimensional rows**. Therefore:
+
+- A `W_family` cap tighter than about **0.25** on EXACT 2-D rows would fail
+  MENSURA on every one of them, regardless of interval construction.
+- Reducing that floor is a genuine research task (the bias is systematic,
+  k-dependent, and not explained by boundary or finite-size effects), not a
+  correction to be slipped into Phase A.
+- The caps should still be derived from the baseline panel as planned — but
+  the panel's spread is now known to be the *optimistic* side of the story,
+  and the gap between the two is itself the first honest thing v2 will report.
