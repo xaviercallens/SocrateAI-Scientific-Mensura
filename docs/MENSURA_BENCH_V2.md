@@ -215,3 +215,96 @@ of order **0.1–0.2 on EXACT 2-dimensional rows**. Therefore:
 - The caps should still be derived from the baseline panel as planned — but
   the panel's spread is now known to be the *optimistic* side of the story,
   and the gap between the two is itself the first honest thing v2 will report.
+
+---
+
+## 7. Vertical slice, round 1: core built, REFUTED at its gate
+
+Owner decision E1 was a 3-row vertical slice; E2 was validity-first. The core
+was built (`src/socrates/hypergraph/cic.py`, 1239 lines, 32 tests, suite
+252 → 284 passed) and self-reported zero calibration violations over 84 rows.
+An independent verifier then found **22 violations across 185 rows**, and the
+slice halted before the rows were built. The gate did its job.
+
+### 7.1 The refutation: the instrument is not affine-invariant
+
+Dimension is a **bi-Lipschitz invariant** — D₀, D₁ and D₂ are all unchanged by
+an invertible linear map. So an instrument measuring dimension must be too, or
+must abstain. Taking the build's own *passing* row and rescaling one
+coordinate by 0.01 (metres → kilometres):
+
+```
+certify(A)                  -> MEASURED [1.5859, 2.2822]   signals: NONE
+certify(A @ diag(1, 0.01))  -> MEASURED [0.6374, 1.3626]   signals: NONE
+certify(A @ diag(100, 100)) -> MEASURED [1.5859, 2.2822]   isotropic control: unchanged
+```
+
+Two **disjoint** MEASURED intervals on the same set, no signal raised. One of
+them is necessarily a calibration violation, and the argument needs no
+commitment about the dimension of a thin rectangle.
+
+**Mechanism.** Under anisotropy both arms collapse toward 1 *together*: the
+shell arm because the k-NN graph degenerates into a chain, the correlation-sum
+arm because its radii are hard-coded fractions (0.01–0.2) of the bounding-box
+diagonal, which the long axis dominates. `READOUT_DIVERGENCE` fires only when
+the arms *disagree*, so it is silent exactly when they share a bias. The sole
+defence against shared bias is the 18% relative allowance; a 50% shared bias
+passes straight through.
+
+**Severity: reachable by ordinary use.** A textbook Takens delay embedding of
+the Lorenz x-series at lag τ=1 returns MEASURED [0.633, 1.367] against truth
+≈2.06 with zero signals (recovers at τ=2–20, correct at τ≥50 — so the failure
+is silent and lag-dependent, and the lag is the caller's choice). A 10:1
+aspect ratio — unremarkable in any dataset with mixed units — gives 18
+violations in 48 rows.
+
+### 7.2 The design consequence, which is bigger than the bug
+
+v2 §1 states that an adapter's assumptions are part of the certificate *"so
+universality never silently launders an assumption into a result."* **A-CLOUD
+currently launders exactly such an assumption: that the supplied coordinates
+are isotropic**, i.e. that the raw Euclidean metric is the intrinsic one. It
+is not, whenever coordinates carry different units or scales.
+
+Three candidate responses, none yet chosen:
+
+1. **Declare and normalise in the adapter.** A-CLOUD standardises coordinates
+   (whitening, or per-axis scaling) and records the transform in the
+   certificate. Cheap, but whitening a genuinely anisotropic manifold is not a
+   neutral act and must be declared as part of what was measured.
+2. **Detect and abstain.** Add an anisotropy signal (covariance condition
+   number / PCA spectrum) that forces UNDECIDED. Safest under CIC, and the
+   minimum needed for validity, but it declines a large class of real data.
+3. **Make the estimators scale-aware** — per-axis adaptive neighbourhoods.
+   Most work, and it changes what the instrument is.
+
+Whichever is chosen, **affine invariance belongs in the pre-registered
+validation battery as a hard requirement**, alongside the known-answer cases:
+`certify(X)` and `certify(X @ M)` must return compatible verdicts for any
+well-conditioned invertible `M`, or one of them must abstain.
+
+### 7.3 Two further findings from the same gate
+
+- **The two-readout bracket of §2.1 is insufficient, measured.** That
+  construction was recommended here on the strength of the F4 sweep. Under
+  zero-knob selection the raw hull contains the truth on only **31 of 45**
+  MEASURED rows — on a 3-D cube both arms read low together (shell ≈2.50,
+  GP ≈2.90, truth 3.0). The bracket is real but carries only two-thirds of the
+  interval; the measured bias floor carries the rest. §2.1's recommendation is
+  hereby corrected: build from the bracket **plus** a floor, and never from the
+  bracket alone.
+- **Zero-knob is real but under-declared.** `_sampled_nodes` strides over
+  sorted node ids, which are row indices, so settings selection is a function
+  of the input's **row order** as well as its geometry: six permutations of one
+  1600-point square moved k from 6 to 8 and `max_radius` from 3 to 8. No
+  violation resulted (all 24 permutation rows contained the truth), but the
+  certificate's selection rule currently overstates its own determinism.
+
+### 7.4 Status
+
+The harness is **not ready for Core-10**. What exists is sound and worth
+keeping: the schema, the 11-signal abstention detector (genuinely
+discriminating — Menger sponge at D=2.7268 MEASURED and containing truth,
+while Cantor dust, two clusters, D≥4 uniforms and n≤150 all abstain), and the
+known-answer battery. What must land first is a decision on §7.2 and an
+affine-invariance requirement in the validation battery.

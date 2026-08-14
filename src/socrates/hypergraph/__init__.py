@@ -8,6 +8,16 @@ do what they say), what is measured (dimension, branching), and what remains
 speculative interpretation, never load-bearing.
 """
 
+from .cic import (
+    Certificate,
+    CICResult,
+    Diagnostics,
+    SelectedSettings,
+    Signal,
+    Verdict,
+    certify,
+    select_settings,
+)
 from .core import Hypergraph, ball
 from .dimension import (
     DimensionEstimate,
@@ -30,14 +40,21 @@ from .rewriting import (
 )
 
 __all__ = [
+    "CICResult",
+    "Certificate",
+    "Diagnostics",
     "DimensionEstimate",
     "DuplicatePointsError",
     "Hypergraph",
     "MultiwaySystem",
     "RewriteRule",
     "RuleSearchResult",
+    "SelectedSettings",
+    "Signal",
+    "Verdict",
     "apply_at",
     "ball",
+    "certify",
     "degenerate_fraction",
     "dimension_profile",
     "evolve",
@@ -49,5 +66,6 @@ __all__ = [
     "near_constant_consensus",
     "near_degenerate_fraction",
     "rule_space",
+    "select_settings",
     "solve_for_rule",
 ]

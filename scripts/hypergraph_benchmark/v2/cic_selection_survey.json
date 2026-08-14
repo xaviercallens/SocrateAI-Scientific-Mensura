@@ -1,0 +1,3140 @@
+{
+  "contract_version": "cic-1.0",
+  "started": "2026-08-14T11:52:09",
+  "n": 1600,
+  "seed": 11,
+  "k_ladder": [
+    4,
+    6,
+    8,
+    10,
+    15,
+    25,
+    40
+  ],
+  "rows": [
+    {
+      "target": "uniform-square-2d",
+      "truth": 2.0,
+      "selected": {
+        "k": 6,
+        "max_radius": 3,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.3625,
+              "ball_fraction": 0.008125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.225,
+              "ball_fraction": 0.01375
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.1625,
+              "ball_fraction": 0.0221875
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.175,
+              "ball_fraction": 0.0325
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.15,
+              "ball_fraction": 0.0446875
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.125,
+              "ball_fraction": 0.0571875
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.5375,
+              "ball_fraction": 0.0125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.4875,
+              "ball_fraction": 0.0225
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.4,
+              "ball_fraction": 0.0378125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.375,
+              "ball_fraction": 0.055
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.35,
+              "ball_fraction": 0.073125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.3375,
+              "ball_fraction": 0.0959375
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.625,
+              "ball_fraction": 0.016875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.4875,
+              "ball_fraction": 0.033125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.475,
+              "ball_fraction": 0.0553125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.4625,
+              "ball_fraction": 0.07875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.45,
+              "ball_fraction": 0.110625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.4625,
+              "ball_fraction": 0.143125
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.6375,
+              "ball_fraction": 0.020625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.4875,
+              "ball_fraction": 0.0428125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.4625,
+              "ball_fraction": 0.0721875
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.5,
+              "ball_fraction": 0.1028125
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.5,
+              "ball_fraction": 0.13875
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.475,
+              "ball_fraction": 0.1815625
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.6,
+              "ball_fraction": 0.0328125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.5875,
+              "ball_fraction": 0.065
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.55,
+              "ball_fraction": 0.10375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.575,
+              "ball_fraction": 0.148125
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.5125,
+              "ball_fraction": 0.203125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.4875,
+              "ball_fraction": 0.26375
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.7125,
+              "ball_fraction": 0.0540625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.65,
+              "ball_fraction": 0.1040625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.5625,
+              "ball_fraction": 0.169375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.5375,
+              "ball_fraction": 0.2459375
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.4625,
+              "ball_fraction": 0.3228125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.35,
+              "ball_fraction": 0.4059375
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.7375,
+              "ball_fraction": 0.0853125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.7375,
+              "ball_fraction": 0.1615625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.6375,
+              "ball_fraction": 0.2615625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.4375,
+              "ball_fraction": 0.3621875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.2375,
+              "ball_fraction": 0.4634375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.25,
+              "ball_fraction": 0.57875
+            }
+          ]
+        },
+        "readout_by_k": {
+          "6": 1.9340542534946226,
+          "8": 1.9657232391993382,
+          "10": 2.0157748395069586,
+          "15": 1.9841311643791917,
+          "25": 1.9673524152064943,
+          "40": 1.9139342651015572
+        }
+      }
+    },
+    {
+      "target": "circle-1d",
+      "truth": 1.0,
+      "selected": {
+        "k": 25,
+        "max_radius": 6,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 1,
+        "duplicate_fraction": 0.00125,
+        "components_by_k": {
+          "4": {
+            "n_components": 41,
+            "largest_fraction": 0.06504065040650407
+          },
+          "6": {
+            "n_components": 11,
+            "largest_fraction": 0.1813633520950594
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.0625,
+              "ball_fraction": 0.01125703564727955
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.016885553470919325
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.0225140712945591
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.027517198248905566
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.03314571607254534
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.038461538461538464
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.1,
+              "ball_fraction": 0.013758599124452783
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.025,
+              "ball_fraction": 0.020637898686679174
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.25,
+              "ball_fraction": 0.027517198248905566
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.03439649781113196
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.04127579737335835
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.04815509693558474
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.020637898686679174
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.030644152595372107
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.04065040650406504
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.05128205128205128
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.06128830519074421
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.07129455909943715
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.125,
+              "ball_fraction": 0.03377110694183865
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.05065666041275797
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.5625,
+              "ball_fraction": 0.066916823014384
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.5125,
+              "ball_fraction": 0.08317698561601
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.10006253908692933
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.11694809255784866
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.15,
+              "ball_fraction": 0.05315822388993121
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.07942464040025016
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.85,
+              "ball_fraction": 0.10569105691056911
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.825,
+              "ball_fraction": 0.13227016885553472
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.8125,
+              "ball_fraction": 0.15884928080050031
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.8375,
+              "ball_fraction": 0.18511569731081925
+            }
+          ]
+        },
+        "readout_by_k": {
+          "25": 0.9968334763319777,
+          "40": 0.9971130138690983
+        }
+      }
+    },
+    {
+      "target": "cantor-dust-2d",
+      "truth": 1.2619,
+      "selected": {
+        "k": 0,
+        "max_radius": 0,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": []
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 149,
+            "largest_fraction": 0.016875
+          },
+          "6": {
+            "n_components": 76,
+            "largest_fraction": 0.02125
+          },
+          "8": {
+            "n_components": 64,
+            "largest_fraction": 0.024375
+          },
+          "10": {
+            "n_components": 64,
+            "largest_fraction": 0.024375
+          },
+          "15": {
+            "n_components": 50,
+            "largest_fraction": 0.0625
+          },
+          "25": {
+            "n_components": 16,
+            "largest_fraction": 0.07625
+          },
+          "40": {
+            "n_components": 16,
+            "largest_fraction": 0.07625
+          }
+        },
+        "window_trace_by_k": {},
+        "readout_by_k": {}
+      }
+    },
+    {
+      "target": "circle-1d-equispaced",
+      "truth": 1.0,
+      "selected": {
+        "k": 4,
+        "max_radius": 8,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.005625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.008125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.010625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.013125
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.015625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.018125
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.008125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.011875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.015625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.019375
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.023125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.026875
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.010625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.015625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.020625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.025625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.030625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.035625
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.013125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.019375
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.025625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.031875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.038125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.044375
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.2625,
+              "ball_fraction": 0.019375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.1125,
+              "ball_fraction": 0.02875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.038125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.0475
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.056875
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.06625
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.2875,
+              "ball_fraction": 0.031875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.175,
+              "ball_fraction": 0.0475
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.063125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.07875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.094375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.11
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.050625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.075625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.100625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.125625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.150625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.175625
+            }
+          ]
+        },
+        "readout_by_k": {
+          "4": 1.0,
+          "6": 1.0,
+          "8": 1.0,
+          "10": 1.0,
+          "15": 0.9891037284951274,
+          "25": 0.9951620290359946,
+          "40": 1.0
+        }
+      }
+    },
+    {
+      "target": "interval-1d",
+      "truth": 1.0,
+      "selected": {
+        "k": 25,
+        "max_radius": 5,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 3,
+        "duplicate_fraction": 0.00375,
+        "components_by_k": {
+          "4": {
+            "n_components": 42,
+            "largest_fraction": 0.06512210394489668
+          },
+          "6": {
+            "n_components": 12,
+            "largest_fraction": 0.18159048215403883
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.0875,
+              "ball_fraction": 0.011271133375078271
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.01628052598622417
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.022542266750156543
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.027551659361302442
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.03318722604884158
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.038196618659987476
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.1,
+              "ball_fraction": 0.013775829680651221
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.020663744520976832
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.225,
+              "ball_fraction": 0.027551659361302442
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.034439574201628055
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.040701314965560426
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.048215403882279274
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.0625,
+              "ball_fraction": 0.020663744520976832
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.030682529743268627
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.040701314965560426
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.05134627426424546
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.06073888541014402
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.07138384470882905
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.1625,
+              "ball_fraction": 0.033813400125234816
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.050720100187852224
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.525,
+              "ball_fraction": 0.0670006261740764
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.08328115216030056
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.10018785222291797
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.11709455228553538
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.1125,
+              "ball_fraction": 0.053224796493425174
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.07952410770194114
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.75,
+              "ball_fraction": 0.1058234189104571
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.7125,
+              "ball_fraction": 0.1324358171571697
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.675,
+              "ball_fraction": 0.15810895428929242
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.6875,
+              "ball_fraction": 0.18409517845961176
+            }
+          ]
+        },
+        "readout_by_k": {
+          "25": 0.9989134405822492,
+          "40": 0.9981509554444451
+        }
+      }
+    },
+    {
+      "target": "helix-1d-in-3d",
+      "truth": 1.0,
+      "selected": {
+        "k": 25,
+        "max_radius": 5,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 1,
+        "duplicate_fraction": 0.00125,
+        "components_by_k": {
+          "4": {
+            "n_components": 42,
+            "largest_fraction": 0.06504065040650407
+          },
+          "6": {
+            "n_components": 12,
+            "largest_fraction": 0.1813633520950594
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.01125703564727955
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.016885553470919325
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.0225140712945591
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.027517198248905566
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.03314571607254534
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.03814884302689181
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.1,
+              "ball_fraction": 0.013758599124452783
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.025,
+              "ball_fraction": 0.020637898686679174
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.2375,
+              "ball_fraction": 0.027517198248905566
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.03439649781113196
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.04127579737335835
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.04815509693558474
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.020637898686679174
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.030644152595372107
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.04065040650406504
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.05096935584740463
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.060662914321450906
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.07129455909943715
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.1375,
+              "ball_fraction": 0.03377110694183865
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.05034396497811132
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.5375,
+              "ball_fraction": 0.06660412757973734
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.08317698561601
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.10006253908692933
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.116635397123202
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.15,
+              "ball_fraction": 0.0525328330206379
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.07942464040025016
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.7625,
+              "ball_fraction": 0.10569105691056911
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.7125,
+              "ball_fraction": 0.13195747342088807
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.6875,
+              "ball_fraction": 0.158223889931207
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.7,
+              "ball_fraction": 0.1841776110068793
+            }
+          ]
+        },
+        "readout_by_k": {
+          "25": 0.9947909398084924,
+          "40": 0.9985217139097472
+        }
+      }
+    },
+    {
+      "target": "swiss-roll-2d-in-3d",
+      "truth": 2.0,
+      "selected": {
+        "k": 8,
+        "max_radius": 3,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.3875,
+              "ball_fraction": 0.008125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.1875,
+              "ball_fraction": 0.01375
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.175,
+              "ball_fraction": 0.020625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.125,
+              "ball_fraction": 0.02875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0875,
+              "ball_fraction": 0.0384375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.1125,
+              "ball_fraction": 0.0496875
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.4875,
+              "ball_fraction": 0.0125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.3125,
+              "ball_fraction": 0.0228125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.2375,
+              "ball_fraction": 0.03625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.1875,
+              "ball_fraction": 0.0525
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.1875,
+              "ball_fraction": 0.0709375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.1375,
+              "ball_fraction": 0.0921875
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.5375,
+              "ball_fraction": 0.016875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.375,
+              "ball_fraction": 0.031875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.325,
+              "ball_fraction": 0.05125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.275,
+              "ball_fraction": 0.0740625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.2875,
+              "ball_fraction": 0.1
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.2375,
+              "ball_fraction": 0.1265625
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.55,
+              "ball_fraction": 0.020625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.45,
+              "ball_fraction": 0.0403125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.3625,
+              "ball_fraction": 0.0640625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.375,
+              "ball_fraction": 0.090625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.325,
+              "ball_fraction": 0.1234375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.2625,
+              "ball_fraction": 0.1584375
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.5625,
+              "ball_fraction": 0.0321875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.475,
+              "ball_fraction": 0.0596875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.3875,
+              "ball_fraction": 0.094375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.35,
+              "ball_fraction": 0.1353125
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.225,
+              "ball_fraction": 0.1853125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.1125,
+              "ball_fraction": 0.2278125
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.6375,
+              "ball_fraction": 0.0521875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.525,
+              "ball_fraction": 0.0996875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.4125,
+              "ball_fraction": 0.1578125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.1625,
+              "ball_fraction": 0.21875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.274375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.3296875
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.6875,
+              "ball_fraction": 0.0790625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.4375,
+              "ball_fraction": 0.155625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.225,
+              "ball_fraction": 0.238125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.1,
+              "ball_fraction": 0.3196875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0375,
+              "ball_fraction": 0.3975
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0375,
+              "ball_fraction": 0.48625
+            }
+          ]
+        },
+        "readout_by_k": {
+          "8": 1.9181321000741116,
+          "10": 1.9244217288590815,
+          "15": 1.9826218513930092,
+          "25": 1.88673683139733,
+          "40": 1.9244831525857093
+        }
+      }
+    },
+    {
+      "target": "sierpinski-gasket-2d",
+      "truth": 1.5849625007211563,
+      "selected": {
+        "k": 0,
+        "max_radius": 0,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": []
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 7,
+            "largest_fraction": 0.875625
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.2,
+              "ball_fraction": 0.010625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0875,
+              "ball_fraction": 0.0175
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.025
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.025,
+              "ball_fraction": 0.035625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.04625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.05625
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.275,
+              "ball_fraction": 0.01375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.125,
+              "ball_fraction": 0.02375
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0625,
+              "ball_fraction": 0.035625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.025,
+              "ball_fraction": 0.04875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.025,
+              "ball_fraction": 0.0628125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.07875
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.35,
+              "ball_fraction": 0.018125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.075,
+              "ball_fraction": 0.030625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.025,
+              "ball_fraction": 0.045
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.060625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.0784375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.1
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.2875,
+              "ball_fraction": 0.026875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.175,
+              "ball_fraction": 0.04625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0875,
+              "ball_fraction": 0.0678125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.075,
+              "ball_fraction": 0.095
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.12625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.0125,
+              "ball_fraction": 0.1553125
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.4375,
+              "ball_fraction": 0.0434375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.3375,
+              "ball_fraction": 0.075
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.2375,
+              "ball_fraction": 0.11875
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.1375,
+              "ball_fraction": 0.1640625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.0625,
+              "ball_fraction": 0.205625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.2625
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.4,
+              "ball_fraction": 0.07
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.1625,
+              "ball_fraction": 0.130625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.1375,
+              "ball_fraction": 0.1878125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.125,
+              "ball_fraction": 0.263125
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.05,
+              "ball_fraction": 0.3471875
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.025,
+              "ball_fraction": 0.425
+            }
+          ]
+        },
+        "readout_by_k": {}
+      }
+    },
+    {
+      "target": "uniform-cube-3d",
+      "truth": 3.0,
+      "selected": {
+        "k": 4,
+        "max_radius": 8,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.525,
+              "ball_fraction": 0.009375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.5375,
+              "ball_fraction": 0.0203125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.5375,
+              "ball_fraction": 0.039375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.575,
+              "ball_fraction": 0.06625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.6,
+              "ball_fraction": 0.1053125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.675,
+              "ball_fraction": 0.1509375
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.8125,
+              "ball_fraction": 0.0159375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.8125,
+              "ball_fraction": 0.038125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.875,
+              "ball_fraction": 0.076875
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.9375,
+              "ball_fraction": 0.130625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.925,
+              "ball_fraction": 0.19375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.925,
+              "ball_fraction": 0.271875
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.875,
+              "ball_fraction": 0.0221875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.9,
+              "ball_fraction": 0.0571875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.9125,
+              "ball_fraction": 0.1125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.9375,
+              "ball_fraction": 0.1859375
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.9375,
+              "ball_fraction": 0.28375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.9375,
+              "ball_fraction": 0.391875
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.8875,
+              "ball_fraction": 0.02875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.95,
+              "ball_fraction": 0.0734375
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.95,
+              "ball_fraction": 0.148125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.9625,
+              "ball_fraction": 0.2446875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.9625,
+              "ball_fraction": 0.3540625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.775,
+              "ball_fraction": 0.48
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.95,
+              "ball_fraction": 0.04625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.975,
+              "ball_fraction": 0.115
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.219375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.9625,
+              "ball_fraction": 0.361875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.625,
+              "ball_fraction": 0.5159375
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.080625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.9875,
+              "ball_fraction": 0.1953125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.9125,
+              "ball_fraction": 0.363125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.5375,
+              "ball_fraction": 0.55375
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.975,
+              "ball_fraction": 0.131875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.925,
+              "ball_fraction": 0.305625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.525,
+              "ball_fraction": 0.529375
+            }
+          ]
+        },
+        "readout_by_k": {
+          "4": 2.5106419762971814,
+          "6": 2.573782789887128,
+          "8": 2.5343692047189283,
+          "10": 2.460050251974807,
+          "15": 2.534437644574335,
+          "25": 2.5155000590052867,
+          "40": 2.535321079705747
+        }
+      }
+    },
+    {
+      "target": "uniform-4d",
+      "truth": 4.0,
+      "selected": {
+        "k": 4,
+        "max_radius": 8,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.675,
+              "ball_fraction": 0.0103125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.6875,
+              "ball_fraction": 0.0246875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.7375,
+              "ball_fraction": 0.05375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.7625,
+              "ball_fraction": 0.1003125
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.825,
+              "ball_fraction": 0.1696875
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.8375,
+              "ball_fraction": 0.2671875
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.875,
+              "ball_fraction": 0.018125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.8375,
+              "ball_fraction": 0.05125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.8875,
+              "ball_fraction": 0.1165625
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.9125,
+              "ball_fraction": 0.2115625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.95,
+              "ball_fraction": 0.3440625
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.95,
+              "ball_fraction": 0.515
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.9375,
+              "ball_fraction": 0.0265625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.975,
+              "ball_fraction": 0.0815625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.9875,
+              "ball_fraction": 0.1784375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.3221875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.9375,
+              "ball_fraction": 0.5078125
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.035625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.10625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.2384375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.975,
+              "ball_fraction": 0.42625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.625,
+              "ball_fraction": 0.6428125
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.9875,
+              "ball_fraction": 0.0621875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.1815625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.975,
+              "ball_fraction": 0.3853125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.55,
+              "ball_fraction": 0.6403125
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.10875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.975,
+              "ball_fraction": 0.31625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.475,
+              "ball_fraction": 0.6084375
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.1778125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.6125,
+              "ball_fraction": 0.4790625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.835
+            }
+          ]
+        },
+        "readout_by_k": {
+          "4": 2.8821169590989415,
+          "6": 2.9576713999868707,
+          "8": 3.002401885330462,
+          "10": 2.9761858571460102,
+          "15": 3.0178359719747756,
+          "25": 3.0552102605846767,
+          "40": 2.865335988104921
+        }
+      }
+    },
+    {
+      "target": "uniform-6d",
+      "truth": 6.0,
+      "selected": {
+        "k": 4,
+        "max_radius": 7,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.8375,
+              "ball_fraction": 0.013125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.825,
+              "ball_fraction": 0.036875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.8375,
+              "ball_fraction": 0.091875
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.825,
+              "ball_fraction": 0.19875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.925,
+              "ball_fraction": 0.369375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.9125,
+              "ball_fraction": 0.595625
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.95,
+              "ball_fraction": 0.0228125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.95,
+              "ball_fraction": 0.07625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.9875,
+              "ball_fraction": 0.2059375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.43625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.6875,
+              "ball_fraction": 0.7165625
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.0346875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.125625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.338125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.775,
+              "ball_fraction": 0.6434375
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.046875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.1703125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.9875,
+              "ball_fraction": 0.4484375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.1375,
+              "ball_fraction": 0.7890625
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.075625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.2859375
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.375,
+              "ball_fraction": 0.66625
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.14125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.7,
+              "ball_fraction": 0.505
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.975,
+              "ball_fraction": 0.2415625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0,
+              "ball_fraction": 0.749375
+            }
+          ]
+        },
+        "readout_by_k": {
+          "4": 3.30458598673098,
+          "6": 3.4012961303620695,
+          "8": 3.503548924639382,
+          "10": 3.461456838431704,
+          "15": 3.5953109331980344,
+          "25": 3.7431548772983163,
+          "40": 3.6137539232130633
+        }
+      }
+    },
+    {
+      "target": "two-clusters",
+      "truth": null,
+      "selected": {
+        "k": 0,
+        "max_radius": 0,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": []
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 2,
+            "largest_fraction": 0.5
+          },
+          "6": {
+            "n_components": 2,
+            "largest_fraction": 0.5
+          },
+          "8": {
+            "n_components": 2,
+            "largest_fraction": 0.5
+          },
+          "10": {
+            "n_components": 2,
+            "largest_fraction": 0.5
+          },
+          "15": {
+            "n_components": 2,
+            "largest_fraction": 0.5
+          },
+          "25": {
+            "n_components": 2,
+            "largest_fraction": 0.5
+          },
+          "40": {
+            "n_components": 2,
+            "largest_fraction": 0.5
+          }
+        },
+        "window_trace_by_k": {},
+        "readout_by_k": {}
+      }
+    },
+    {
+      "target": "repeated-orbit-f3",
+      "truth": null,
+      "selected": {
+        "k": 4,
+        "max_radius": 8,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 1066,
+        "duplicate_fraction": 1.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.016885553470919325
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.024390243902439025
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.03189493433395872
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.039399624765478425
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.04690431519699812
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.054409005628517824
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.024390243902439025
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.03564727954971857
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.04690431519699812
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.058161350844277676
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.06941838649155722
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.08067542213883677
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.03189493433395872
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.04690431519699812
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.06191369606003752
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.07692307692307693
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.09193245778611632
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.10694183864915573
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.039399624765478425
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.058161350844277676
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.07692307692307693
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.09568480300187618
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.11444652908067542
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.13320825515947468
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.325,
+              "ball_fraction": 0.058161350844277676
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0875,
+              "ball_fraction": 0.08630393996247655
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.11444652908067542
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.1425891181988743
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.17073170731707318
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.19887429643527205
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.1875,
+              "ball_fraction": 0.09568480300187618
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.0875,
+              "ball_fraction": 0.1425891181988743
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.1894934333958724
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.23639774859287055
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.28330206378986866
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.3302063789868668
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.15196998123827393
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.2270168855534709
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.30206378986866794
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.3771106941838649
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.4521575984990619
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 1.0,
+              "ball_fraction": 0.5272045028142589
+            }
+          ]
+        },
+        "readout_by_k": {
+          "4": 1.0,
+          "6": 1.0,
+          "8": 1.0,
+          "10": 1.0,
+          "15": 0.988475816776741,
+          "25": 0.997105665291927,
+          "40": 1.0
+        }
+      }
+    },
+    {
+      "target": "undersampled-trajectory",
+      "truth": 2.06,
+      "selected": {
+        "k": 4,
+        "max_radius": 3,
+        "min_radius": 1,
+        "samples": 80,
+        "well_fit_r_squared": 0.95,
+        "admissible_k": [
+          4,
+          6,
+          8,
+          10,
+          15,
+          25,
+          40
+        ]
+      },
+      "evidence": {
+        "n_duplicates_dropped": 0,
+        "duplicate_fraction": 0.0,
+        "components_by_k": {
+          "4": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "6": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "8": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "10": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "15": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "25": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          },
+          "40": {
+            "n_components": 1,
+            "largest_fraction": 1.0
+          }
+        },
+        "window_trace_by_k": {
+          "4": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.625,
+              "ball_fraction": 0.0084375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.4375,
+              "ball_fraction": 0.015
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.35,
+              "ball_fraction": 0.0234375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.2375,
+              "ball_fraction": 0.033125
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.225,
+              "ball_fraction": 0.044375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.2125,
+              "ball_fraction": 0.056875
+            }
+          ],
+          "6": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.5875,
+              "ball_fraction": 0.0125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.5125,
+              "ball_fraction": 0.023125
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.3875,
+              "ball_fraction": 0.0375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.3125,
+              "ball_fraction": 0.055
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.2875,
+              "ball_fraction": 0.0728125
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.3,
+              "ball_fraction": 0.093125
+            }
+          ],
+          "8": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.7,
+              "ball_fraction": 0.01625
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.5875,
+              "ball_fraction": 0.031875
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.4,
+              "ball_fraction": 0.05375
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.3375,
+              "ball_fraction": 0.0759375
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.25,
+              "ball_fraction": 0.1009375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.25,
+              "ball_fraction": 0.1284375
+            }
+          ],
+          "10": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.7375,
+              "ball_fraction": 0.0209375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.6,
+              "ball_fraction": 0.0415625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.4875,
+              "ball_fraction": 0.0653125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.325,
+              "ball_fraction": 0.095
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.2875,
+              "ball_fraction": 0.126875
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.3,
+              "ball_fraction": 0.1603125
+            }
+          ],
+          "15": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.75,
+              "ball_fraction": 0.033125
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.5,
+              "ball_fraction": 0.065625
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.4125,
+              "ball_fraction": 0.1025
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.4,
+              "ball_fraction": 0.1496875
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.375,
+              "ball_fraction": 0.1996875
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.375,
+              "ball_fraction": 0.2603125
+            }
+          ],
+          "25": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.5625,
+              "ball_fraction": 0.0571875
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.5,
+              "ball_fraction": 0.11
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.4875,
+              "ball_fraction": 0.17125
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.525,
+              "ball_fraction": 0.2609375
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.475,
+              "ball_fraction": 0.354375
+            },
+            {
+              "radius": 8,
+              "well_fit_fraction": 0.3625,
+              "ball_fraction": 0.4609375
+            }
+          ],
+          "40": [
+            {
+              "radius": 3,
+              "well_fit_fraction": 0.6625,
+              "ball_fraction": 0.09375
+            },
+            {
+              "radius": 4,
+              "well_fit_fraction": 0.6375,
+              "ball_fraction": 0.1725
+            },
+            {
+              "radius": 5,
+              "well_fit_fraction": 0.575,
+              "ball_fraction": 0.2771875
+            },
+            {
+              "radius": 6,
+              "well_fit_fraction": 0.425,
+              "ball_fraction": 0.4040625
+            },
+            {
+              "radius": 7,
+              "well_fit_fraction": 0.3,
+              "ball_fraction": 0.5528125
+            }
+          ]
+        },
+        "readout_by_k": {
+          "4": 1.6990019783539483,
+          "6": 1.8856694998355739,
+          "8": 1.9740556228154595,
+          "10": 1.9929623361443878,
+          "15": 2.097064904189881,
+          "25": 1.9810227698001799,
+          "40": 1.918892679778905
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "rows": [
+    {
+      "case": "A = uniform_square(1600, seed=11)",
+      "verdict": "MEASURED",
+      "d_lo": 1.5859211096922787,
+      "d_hi": 2.282224932555988,
+      "contains_2": true,
+      "signals": [],
+      "shell": 1.9340542534946226,
+      "gp": 1.9340917887536437,
+      "k": 6,
+      "max_radius": 3,
+      "inputs_hash": "sha256:763a737993886f6a6f7b53867ffa8e3ec2829528a6fd081cf026666b54745b71"
+    },
+    {
+      "case": "A @ diag(100, 100)  [isotropic control]",
+      "verdict": "MEASURED",
+      "d_lo": 1.5859211096922787,
+      "d_hi": 2.2822249325559874,
+      "contains_2": true,
+      "signals": [],
+      "shell": 1.9340542534946226,
+      "gp": 1.9340917887536435,
+      "k": 6,
+      "max_radius": 3,
+      "inputs_hash": "sha256:750bd83209d3bec3ead003cb3466405f05c1ecf4c0d532e65ec5acedae1e6c88"
+    },
+    {
+      "case": "A @ diag(1, 0.01)   [y in km not m]",
+      "verdict": "MEASURED",
+      "d_lo": 0.6374236790672463,
+      "d_hi": 1.3625763209327537,
+      "contains_2": false,
+      "signals": [],
+      "shell": 1.0152664614837084,
+      "gp": 0.9932200062404001,
+      "k": 25,
+      "max_radius": 7,
+      "inputs_hash": "sha256:f2e6db24130f40be5f3c5073d4401dc17417c90ef6083c46e6bd0bf1b9afe411"
+    }
+  ],
+  "verdict": {
+    "two_measured_intervals_are_disjoint": true,
+    "conclusion": "CALIBRATION VIOLATION: one point set, a dimension-preserving linear map, two disjoint MEASURED intervals, zero abstention signals."
+  }
+}

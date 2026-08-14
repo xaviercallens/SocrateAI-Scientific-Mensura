@@ -1,0 +1,90 @@
+{
+  "target": "Lorenz x-series, Takens delay embedding m=3, n=1600; D_0~D_1~D_2~2.06",
+  "rows": [
+    {
+      "tau": 1,
+      "aspect": 19177.383765802275,
+      "verdict": "MEASURED",
+      "d_lo": 0.6327455799978678,
+      "d_hi": 1.367254420002132,
+      "shell": 1.0128010083537384,
+      "gp": 0.986557397307398,
+      "signals": [],
+      "violation": true
+    },
+    {
+      "tau": 2,
+      "aspect": 4800.171572719787,
+      "verdict": "UNDECIDED",
+      "d_lo": null,
+      "d_hi": null,
+      "shell": 1.0400305076839294,
+      "gp": 1.016838076851461,
+      "signals": [
+        "INSUFFICIENT_ENSEMBLE"
+      ],
+      "violation": false
+    },
+    {
+      "tau": 5,
+      "aspect": 770.68428830505,
+      "verdict": "UNDECIDED",
+      "d_lo": null,
+      "d_hi": null,
+      "shell": 1.7926876855711533,
+      "gp": 1.161107355309485,
+      "signals": [
+        "READOUT_DIVERGENCE"
+      ],
+      "violation": false
+    },
+    {
+      "tau": 10,
+      "aspect": 193.52575083648983,
+      "verdict": "UNDECIDED",
+      "d_lo": null,
+      "d_hi": null,
+      "shell": 1.8993791934255082,
+      "gp": 1.3347321162643808,
+      "signals": [
+        "READOUT_DIVERGENCE"
+      ],
+      "violation": false
+    },
+    {
+      "tau": 20,
+      "aspect": 48.540015880246514,
+      "verdict": "UNDECIDED",
+      "d_lo": null,
+      "d_hi": null,
+      "shell": 1.9243452861865853,
+      "gp": 1.5135469499773275,
+      "signals": [
+        "READOUT_DIVERGENCE"
+      ],
+      "violation": false
+    },
+    {
+      "tau": 50,
+      "aspect": 8.217894198995467,
+      "verdict": "MEASURED",
+      "d_lo": 1.4196805957350227,
+      "d_hi": 2.32915465921058,
+      "shell": 1.9917594862654755,
+      "gp": 1.7570757686801268,
+      "signals": [],
+      "violation": false
+    },
+    {
+      "tau": 100,
+      "aspect": 2.8646484069578553,
+      "verdict": "MEASURED",
+      "d_lo": 1.4956921324968924,
+      "d_hi": 2.3789521008399537,
+      "shell": 2.0302341198396374,
+      "gp": 1.8444101134972084,
+      "signals": [],
+      "violation": false
+    }
+  ]
+}
