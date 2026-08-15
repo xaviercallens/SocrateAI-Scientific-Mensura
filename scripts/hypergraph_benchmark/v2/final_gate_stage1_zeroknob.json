@@ -1,0 +1,917 @@
+{
+ "status": "done",
+ "equivalence": [
+  {
+   "case": "square",
+   "truth": 2.0,
+   "auto": {
+    "settings_auto": {
+     "k0": 30,
+     "k_selected": 4,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 4,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 2.0614284876423543,
+    "gp_local_dimension": 1.6524808042822734,
+    "bracket": {
+     "d_lo": 1.3182289680090569,
+     "d_hi": 2.395680323915571,
+     "hull_lo": 1.6524808042822734,
+     "hull_hi": 2.0614284876423543,
+     "allowance": 0.3342518362732165,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "hand": {
+    "settings_fixed": {
+     "k0": 30,
+     "iterations": 4,
+     "k": 4
+    },
+    "shell_mean_dimension": 2.0614284876423543,
+    "gp_local_dimension": 1.6524808042822734,
+    "bracket": {
+     "d_lo": 1.3182289680090569,
+     "d_hi": 2.395680323915571,
+     "hull_lo": 1.6524808042822734,
+     "hull_hi": 2.0614284876423543,
+     "allowance": 0.3342518362732165,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "auto_contains": true,
+   "hand_contains": true,
+   "auto_selected_equals_hand_picked": true,
+   "shell_exact_equal": true,
+   "gp_exact_equal": true,
+   "bracket_exact_equal": true,
+   "shell_abs_diff": 0.0,
+   "gp_abs_diff": 0.0
+  },
+  {
+   "case": "circle",
+   "truth": 1.0,
+   "auto": {
+    "settings_auto": {
+     "k0": 30,
+     "k_selected": 25,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 1,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 0.991401122833046,
+    "gp_local_dimension": 0.9639325873529621,
+    "bracket": {
+     "d_lo": 0.7839325873529621,
+     "d_hi": 1.171401122833046,
+     "hull_lo": 0.9639325873529621,
+     "hull_hi": 0.991401122833046,
+     "allowance": 0.18,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "hand": {
+    "settings_fixed": {
+     "k0": 30,
+     "iterations": 1,
+     "k": 25
+    },
+    "shell_mean_dimension": 0.991401122833046,
+    "gp_local_dimension": 0.9639325873529621,
+    "bracket": {
+     "d_lo": 0.7839325873529621,
+     "d_hi": 1.171401122833046,
+     "hull_lo": 0.9639325873529621,
+     "hull_hi": 0.991401122833046,
+     "allowance": 0.18,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "auto_contains": true,
+   "hand_contains": true,
+   "auto_selected_equals_hand_picked": true,
+   "shell_exact_equal": true,
+   "gp_exact_equal": true,
+   "bracket_exact_equal": true,
+   "shell_abs_diff": 0.0,
+   "gp_abs_diff": 0.0
+  },
+  {
+   "case": "cube",
+   "truth": 3.0,
+   "auto": {
+    "settings_auto": {
+     "k0": 60,
+     "k_selected": 4,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 5,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 2.7237519107916164,
+    "gp_local_dimension": 2.8169972377371812,
+    "bracket": {
+     "d_lo": 2.2250844874240245,
+     "d_hi": 3.315664661104773,
+     "hull_lo": 2.7237519107916164,
+     "hull_hi": 2.8169972377371812,
+     "allowance": 0.4986674233675918,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "hand": {
+    "settings_fixed": {
+     "k0": 60,
+     "iterations": 5,
+     "k": 4
+    },
+    "shell_mean_dimension": 2.7237519107916164,
+    "gp_local_dimension": 2.8169972377371812,
+    "bracket": {
+     "d_lo": 2.2250844874240245,
+     "d_hi": 3.315664661104773,
+     "hull_lo": 2.7237519107916164,
+     "hull_hi": 2.8169972377371812,
+     "allowance": 0.4986674233675918,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "auto_contains": true,
+   "hand_contains": true,
+   "auto_selected_equals_hand_picked": true,
+   "shell_exact_equal": true,
+   "gp_exact_equal": true,
+   "bracket_exact_equal": true,
+   "shell_abs_diff": 0.0,
+   "gp_abs_diff": 0.0
+  },
+  {
+   "case": "refutation_100to1",
+   "truth": 2.0,
+   "auto": {
+    "settings_auto": {
+     "k0": 30,
+     "k_selected": 10,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 2,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 1.728801493954081,
+    "gp_local_dimension": 1.7215119634093952,
+    "bracket": {
+     "d_lo": 1.4109837522466824,
+     "d_hi": 2.039329705116794,
+     "hull_lo": 1.7215119634093952,
+     "hull_hi": 1.728801493954081,
+     "allowance": 0.31052821116271284,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "hand": {
+    "settings_fixed": {
+     "k0": 30,
+     "iterations": 2,
+     "k": 10
+    },
+    "shell_mean_dimension": 1.728801493954081,
+    "gp_local_dimension": 1.7215119634093952,
+    "bracket": {
+     "d_lo": 1.4109837522466824,
+     "d_hi": 2.039329705116794,
+     "hull_lo": 1.7215119634093952,
+     "hull_hi": 1.728801493954081,
+     "allowance": 0.31052821116271284,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "auto_contains": true,
+   "hand_contains": true,
+   "auto_selected_equals_hand_picked": true,
+   "shell_exact_equal": true,
+   "gp_exact_equal": true,
+   "bracket_exact_equal": true,
+   "shell_abs_diff": 0.0,
+   "gp_abs_diff": 0.0
+  },
+  {
+   "case": "rescale_1000to1",
+   "truth": 2.0,
+   "auto": {
+    "settings_auto": {
+     "k0": 30,
+     "k_selected": 25,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 2,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 0.99511347818449,
+    "gp_local_dimension": 1.7425096641044415,
+    "bracket": {
+     "d_lo": 0.7487273953784862,
+     "d_hi": 1.9888957469104454,
+     "hull_lo": 0.99511347818449,
+     "hull_hi": 1.7425096641044415,
+     "allowance": 0.24638608280600383,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "hand": {
+    "settings_fixed": {
+     "k0": 30,
+     "iterations": 2,
+     "k": 25
+    },
+    "shell_mean_dimension": 0.99511347818449,
+    "gp_local_dimension": 1.7425096641044415,
+    "bracket": {
+     "d_lo": 0.7487273953784862,
+     "d_hi": 1.9888957469104454,
+     "hull_lo": 0.99511347818449,
+     "hull_hi": 1.7425096641044415,
+     "allowance": 0.24638608280600383,
+     "basis": "bracket(shell,gp)"
+    }
+   },
+   "auto_contains": false,
+   "hand_contains": false,
+   "auto_selected_equals_hand_picked": true,
+   "shell_exact_equal": true,
+   "gp_exact_equal": true,
+   "bracket_exact_equal": true,
+   "shell_abs_diff": 0.0,
+   "gp_abs_diff": 0.0
+  }
+ ],
+ "perturbations": [
+  {
+   "case": "square",
+   "perturbation": "seed=12,n=1600",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 4,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 4,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 1.5778911964199276,
+    "d_hi": 2.428693466730344,
+    "hull_lo": 1.938483816103452,
+    "hull_hi": 2.0681008470468196,
+    "allowance": 0.36059261968352446,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 4,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.146337685612822,
+   "shell": 2.0681008470468196,
+   "gp": 1.938483816103452
+  },
+  {
+   "case": "square",
+   "perturbation": "seed=11,n=1440",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 6,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 4,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 1.3079613170690896,
+    "d_hi": 2.4476995091505147,
+    "hull_lo": 1.645970791428854,
+    "hull_hi": 2.1096900347907503,
+    "allowance": 0.3380094743597644,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": true,
+   "base_k": 4,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.0208757671474884,
+   "shell": 2.1096900347907503,
+   "gp": 1.645970791428854
+  },
+  {
+   "case": "square",
+   "perturbation": "seed=11,n=1760",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 4,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 4,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 1.3259947955512152,
+    "d_hi": 2.4126797077471553,
+    "hull_lo": 1.6624755008480687,
+    "hull_hi": 2.076199002450302,
+    "allowance": 0.33648070529685337,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 4,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.01238260568687144,
+   "shell": 2.076199002450302,
+   "gp": 1.6624755008480687
+  },
+  {
+   "case": "circle",
+   "perturbation": "seed=12,n=1600",
+   "truth": 1.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 25,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 1,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 0.7862844504574318,
+    "d_hi": 1.176841590505071,
+    "hull_lo": 0.9662844504574317,
+    "hull_hi": 0.996841590505071,
+    "allowance": 0.18,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 25,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.00389616538824733,
+   "shell": 0.996841590505071,
+   "gp": 0.9662844504574317
+  },
+  {
+   "case": "circle",
+   "perturbation": "seed=11,n=1440",
+   "truth": 1.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 25,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 1,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 0.7718211826536008,
+    "d_hi": 1.1768337581096628,
+    "hull_lo": 0.9518211826536008,
+    "hull_hi": 0.9968337581096629,
+    "allowance": 0.18,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 25,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.003339384711372295,
+   "shell": 0.9968337581096629,
+   "gp": 0.9518211826536008
+  },
+  {
+   "case": "circle",
+   "perturbation": "seed=11,n=1760",
+   "truth": 1.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 25,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 1,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 0.7954848153207945,
+    "d_hi": 1.193706360132903,
+    "hull_lo": 0.9754848153207945,
+    "hull_hi": 1.013706360132903,
+    "allowance": 0.18,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 25,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.016928732633844645,
+   "shell": 1.013706360132903,
+   "gp": 0.9754848153207945
+  },
+  {
+   "case": "cube",
+   "perturbation": "seed=12,n=1600",
+   "truth": 3.0,
+   "settings_auto": {
+    "k0": 60,
+    "k_selected": 4,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 5,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 2.217814177640444,
+    "d_hi": 3.3842186853899556,
+    "hull_lo": 2.7219971353131798,
+    "hull_hi": 2.8800357277172197,
+    "allowance": 0.5041829576727359,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 4,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.030641857250800708,
+   "shell": 2.7219971353131798,
+   "gp": 2.8800357277172197
+  },
+  {
+   "case": "cube",
+   "perturbation": "seed=11,n=1440",
+   "truth": 3.0,
+   "settings_auto": {
+    "k0": 60,
+    "k_selected": 4,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 5,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 2.1922965114092454,
+    "d_hi": 3.436503775592546,
+    "hull_lo": 2.6988885372394065,
+    "hull_hi": 2.9299117497623848,
+    "allowance": 0.5065920258301612,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 4,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.04402556923649659,
+   "shell": 2.6988885372394065,
+   "gp": 2.9299117497623848
+  },
+  {
+   "case": "cube",
+   "perturbation": "seed=11,n=1760",
+   "truth": 3.0,
+   "settings_auto": {
+    "k0": 60,
+    "k_selected": 4,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 5,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 2.2116254649153437,
+    "d_hi": 3.380770580897602,
+    "hull_lo": 2.714941109038509,
+    "hull_hi": 2.877454936774437,
+    "allowance": 0.5033156441231651,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 4,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.025823448642073643,
+   "shell": 2.714941109038509,
+   "gp": 2.877454936774437
+  },
+  {
+   "case": "refutation_100to1",
+   "perturbation": "seed=12,n=1600",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 10,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 2,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 1.4553977447252793,
+    "d_hi": 2.173680478621295,
+    "hull_lo": 1.7820147848264711,
+    "hull_hi": 1.8470634385201035,
+    "allowance": 0.32661704010119175,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 10,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.08938238299154899,
+   "shell": 1.7820147848264711,
+   "gp": 1.8470634385201035
+  },
+  {
+   "case": "refutation_100to1",
+   "perturbation": "seed=11,n=1440",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 8,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 2,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 1.3623309596033488,
+    "d_hi": 2.0650279515758396,
+    "hull_lo": 1.6707932616094758,
+    "hull_hi": 1.7565656495697126,
+    "allowance": 0.30846230200612695,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": true,
+   "base_k": 10,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.01147727309214397,
+   "shell": 1.7565656495697126,
+   "gp": 1.6707932616094758
+  },
+  {
+   "case": "refutation_100to1",
+   "perturbation": "seed=11,n=1760",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 10,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 2,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 1.3804028528769998,
+    "d_hi": 2.08048350739767,
+    "hull_lo": 1.69188262530172,
+    "hull_hi": 1.7690037349729497,
+    "allowance": 0.3114797724247203,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 10,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.005286451455596808,
+   "shell": 1.69188262530172,
+   "gp": 1.7690037349729497
+  },
+  {
+   "case": "rescale_1000to1",
+   "perturbation": "seed=12,n=1600",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 25,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 2,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 0.7496503473527231,
+    "d_hi": 2.0092160135479706,
+    "hull_lo": 0.9979483198337855,
+    "hull_hi": 1.7609180410669083,
+    "allowance": 0.24829797248106242,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": true,
+   "k_flipped_from_base": false,
+   "base_k": 25,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.010621609305881075,
+   "shell": 0.9979483198337855,
+   "gp": 1.7609180410669083
+  },
+  {
+   "case": "rescale_1000to1",
+   "perturbation": "seed=11,n=1440",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 25,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 2,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 0.7478744624352113,
+    "d_hi": 1.9103163927859879,
+    "hull_lo": 0.9871116394051191,
+    "hull_hi": 1.6710792158160799,
+    "allowance": 0.2392371769699079,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": false,
+   "k_flipped_from_base": false,
+   "base_k": 25,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": 0.03971614353386621,
+   "shell": 0.9871116394051191,
+   "gp": 1.6710792158160799
+  },
+  {
+   "case": "rescale_1000to1",
+   "perturbation": "seed=11,n=1760",
+   "truth": 2.0,
+   "settings_auto": {
+    "k0": 30,
+    "k_selected": 25,
+    "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+    "topology_ridge_floor_frac": 0.05,
+    "metric_ridge_floor_frac": 0.001,
+    "global_ridge_floor_frac": 1e-09,
+    "iterations_run": 2,
+    "converged": true,
+    "k_ladder": [
+     4,
+     6,
+     8,
+     10,
+     15,
+     25,
+     40
+    ]
+   },
+   "bracket": {
+    "d_lo": 0.0,
+    "d_hi": NaN,
+    "hull_lo": NaN,
+    "hull_hi": NaN,
+    "allowance": NaN,
+    "basis": "bracket(shell,gp)"
+   },
+   "contains_truth": false,
+   "k_flipped_from_base": false,
+   "base_k": 25,
+   "iterations_changed_from_base": false,
+   "bracket_midpoint_shift_from_base": NaN,
+   "shell": NaN,
+   "gp": 1.7079087470846883
+  }
+ ],
+ "summary": {
+  "n_cases": 5,
+  "n_auto_matches_hand_settings": 5,
+  "n_bracket_exact_equal": 5,
+  "n_perturbation_rows": 15,
+  "n_perturbation_contains": 13,
+  "k_flips": [
+   {
+    "case": "square",
+    "perturbation": "seed=11,n=1440",
+    "k": 6,
+    "base_k": 4,
+    "midshift": 0.0208757671474884,
+    "contains": true
+   },
+   {
+    "case": "refutation_100to1",
+    "perturbation": "seed=11,n=1440",
+    "k": 8,
+    "base_k": 10,
+    "midshift": 0.01147727309214397,
+    "contains": true
+   }
+  ]
+ }
+}

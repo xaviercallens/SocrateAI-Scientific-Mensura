@@ -460,3 +460,80 @@ runtime post-fix. The scratch module installs pure per-instance memoization
 production `core.py` at integration time — it is a pure cache on a frozen
 dataclass, separately testable, and benefits every caller, not just the
 scale-aware path.
+
+---
+
+## 9. Final pre-integration gate: NOT READY, on a decidable blocker
+
+Owner decision §8.5 item 1. Five stages, artifacts in
+`scripts/hypergraph_benchmark/v2/final_gate_*.json`. Stage 3 was verified by
+**executing** `cic._detect` / `build_interval` / `_shell_arm` as library
+calls on the scale-aware readouts — not by the arithmetic §8.3 used.
+
+### 9.1 Validity: CONFIRMED. No violation survives the production gate.
+
+**0 of 10** transition-zone rows produce a MEASURED interval missing the
+truth once the real signal stack runs — including **two violations nobody
+had found before**, both gate-caught:
+
+- **500:1 rescale**, misses truth by 0.0044 (gate margin +0.482, plus
+  `CHAIN_ARTIFACT`)
+- **the 1000:1 family at n=1440**, misses by **0.090** — worse than §8.1's
+  0.011, and found by perturbing n, not the rescale factor
+
+Both belong in the §8.4 pinned regression battery. Bit-identity of the
+optimization was independently re-confirmed (26/26 fields exact against
+*pre-optimization* artifacts). No off-truth drift with n anywhere; at
+n=6400 the square's arms converge on truth (shell 2.087, gp 2.063).
+
+### 9.2 The blocker: §8.3's composition claim fails in execution
+
+§8.3 predicted the gate would convert the extreme tail to UNDECIDED while
+leaving the genuine wins MEASURED. Executed against the real gate, with the
+**local**-gp arm that every §8.1/8.2 bracket was built on (n=1600):
+
+| case | verdict | gap | threshold | margin |
+|---|---|---|---|---|
+| uniform square (isotropic!) | **UNDECIDED** | 0.334 | 0.328 | **+0.007** |
+| isotropic control ×100 | **UNDECIDED** | 0.334 | 0.328 | **+0.007** |
+| 10:1 | **UNDECIDED** | 0.401 | 0.331 | **+0.070** |
+| 20:1 | **UNDECIDED** | — | — | **+0.047** |
+| 50:1 | MEASURED, contains | — | — | −0.049 |
+| 100:1 | MEASURED, contains | 0.106 | 0.319 | −0.214 |
+| 200:1 | UNDECIDED (`NO_SCALING_REGION`) | — | — | — |
+| 1000:1 / 10000:1 | UNDECIDED (+`CHAIN_ARTIFACT`) | 0.747 / 0.850 | 0.246 / 0.256 | +0.501 / +0.594 |
+
+The gate abstains **on the plain isotropic square**, by 2% over threshold,
+because `gp_local` reads systematically low (~1.65) on near-isotropic 2-D
+clouds. That is the owner's explicitly rejected detect-and-abstain
+instrument wearing a scale-aware costume — and the measured region is
+**non-monotonic** (abstain at 1:1–20:1, measure at 50:1–100:1, abstain
+above), which cannot be honestly pre-registered as a boundary.
+
+**The gate is not at fault and must not be loosened.** It is what caught
+every violation, including the two new ones. Loosening a calibration gate
+so wins pass is the exact anti-pattern in `docs/LL.md` lessons 8–9.
+
+### 9.3 The fix is identified and evidence-backed
+
+**The global-Mahalanobis gp arm reproduces §8.3's promised table exactly —
+MEASURED-and-correct from 1:1 through 100:1, UNDECIDED at ≥1000:1,
+monotonic — at every n tested.** The blocker is therefore a decidable
+composition choice, not a research problem.
+
+A hypothesis for *why*, offered as such and not yet tested: the refutation
+family is a **global affine** transform, so a global metric correction is
+exactly matched to it, while per-point local metrics add covariance
+*estimation variance* without adding correction power for that failure
+mode — and that variance is what drags `gp_local` low on isotropic clouds
+and trips the divergence gate. If true, the division of labour is: local
+metrics for **topology** (neighbour selection, where they demonstrably fix
+the chain artifact), global metric for the **distance-based** arm.
+Confirming this is a §8.5-item-2 Stage-4 question, not a blocker.
+
+Also fragile, and n-dependent rather than factor-dependent: the scratch
+fixed-window bracket goes NaN on the circle at n=3200, where the
+**production** window selection reads 1.029 → MEASURED [0.645, 1.355]
+containing 1.0. Integration per §8.4 uses production windowing, so this
+argues for integration rather than against it — but it means no further
+scratch-bracket evidence should be trusted on 1-D supports.

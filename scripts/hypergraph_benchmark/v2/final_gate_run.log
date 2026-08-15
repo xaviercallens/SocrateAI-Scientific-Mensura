@@ -1,0 +1,163 @@
+====================================================================================================
+STAGE 1 -- zero-knob vs hand-picked equivalence + auto-selector perturbation robustness
+====================================================================================================
+  square             AUTO(k0=30,k=4,it=4) [1.318,2.396]  HAND [1.318,2.396] exact_bracket=True shell_diff=0.00e+00 gp_diff=0.00e+00
+  circle             AUTO(k0=30,k=25,it=1) [0.784,1.171]  HAND [0.784,1.171] exact_bracket=True shell_diff=0.00e+00 gp_diff=0.00e+00
+  cube               AUTO(k0=60,k=4,it=5) [2.225,3.316]  HAND [2.225,3.316] exact_bracket=True shell_diff=0.00e+00 gp_diff=0.00e+00
+  refutation_100to1  AUTO(k0=30,k=10,it=2) [1.411,2.039]  HAND [1.411,2.039] exact_bracket=True shell_diff=0.00e+00 gp_diff=0.00e+00
+  rescale_1000to1    AUTO(k0=30,k=25,it=2) [0.749,1.989]  HAND [0.749,1.989] exact_bracket=True shell_diff=0.00e+00 gp_diff=0.00e+00
+  square             seed=12,n=1600  k=4(base 4) it=4 [1.578,2.429] contains=True midshift=0.146
+  square             seed=11,n=1440  k=6(base 4) it=4 [1.308,2.448] contains=True midshift=0.021
+  square             seed=11,n=1760  k=4(base 4) it=4 [1.326,2.413] contains=True midshift=0.012
+  circle             seed=12,n=1600  k=25(base 25) it=1 [0.786,1.177] contains=True midshift=0.004
+  circle             seed=11,n=1440  k=25(base 25) it=1 [0.772,1.177] contains=True midshift=0.003
+  circle             seed=11,n=1760  k=25(base 25) it=1 [0.795,1.194] contains=True midshift=0.017
+  cube               seed=12,n=1600  k=4(base 4) it=5 [2.218,3.384] contains=True midshift=0.031
+  cube               seed=11,n=1440  k=4(base 4) it=5 [2.192,3.437] contains=True midshift=0.044
+  cube               seed=11,n=1760  k=4(base 4) it=5 [2.212,3.381] contains=True midshift=0.026
+  refutation_100to1  seed=12,n=1600  k=10(base 10) it=2 [1.455,2.174] contains=True midshift=0.089
+  refutation_100to1  seed=11,n=1440  k=8(base 10) it=2 [1.362,2.065] contains=True midshift=0.011
+  refutation_100to1  seed=11,n=1760  k=10(base 10) it=2 [1.380,2.080] contains=True midshift=0.005
+  rescale_1000to1    seed=12,n=1600  k=25(base 25) it=2 [0.750,2.009] contains=True midshift=0.011
+  rescale_1000to1    seed=11,n=1440  k=25(base 25) it=2 [0.748,1.910] contains=False midshift=0.040
+  rescale_1000to1    seed=11,n=1760  k=25(base 25) it=2 [0.000,nan] contains=False midshift=nan
+STAGE 1 SUMMARY: {
+ "n_cases": 5,
+ "n_auto_matches_hand_settings": 5,
+ "n_bracket_exact_equal": 5,
+ "n_perturbation_rows": 15,
+ "n_perturbation_contains": 13,
+ "k_flips": [
+  {
+   "case": "square",
+   "perturbation": "seed=11,n=1440",
+   "k": 6,
+   "base_k": 4,
+   "midshift": 0.0208757671474884,
+   "contains": true
+  },
+  {
+   "case": "refutation_100to1",
+   "perturbation": "seed=11,n=1440",
+   "k": 8,
+   "base_k": 10,
+   "midshift": 0.01147727309214397,
+   "contains": true
+  }
+ ]
+}
+====================================================================================================
+STAGE 3 -- production signal stack (cic._detect) EXECUTED on scale-aware readouts, n=1600
+====================================================================================================
+  square_ident(A)                        local_gp=UNDECIDED  signals=READOUT_DIVERGENCE | global_gp=MEASURED   signals=- (prod shell=1.9867 gp_loc=1.6525 k_spread=0.252)
+  circle                                 local_gp=MEASURED   signals=- | global_gp=MEASURED   signals=- (prod shell=0.9962 gp_loc=0.9639 k_spread=0.000)
+  cube                                   local_gp=MEASURED   signals=- | global_gp=MEASURED   signals=- (prod shell=2.7319 gp_loc=2.8170 k_spread=0.224)
+  isotropic_control(A@diag(100,100))     local_gp=UNDECIDED  signals=READOUT_DIVERGENCE | global_gp=MEASURED   signals=- (prod shell=1.9867 gp_loc=1.6525 k_spread=0.252)
+  rescale_10to1(A@diag(1,0.1))           local_gp=UNDECIDED  signals=READOUT_DIVERGENCE | global_gp=MEASURED   signals=- (prod shell=2.0402 gp_loc=1.6390 k_spread=0.120)
+  rescale_100to1(A@diag(1,0.01))         local_gp=MEASURED   signals=- | global_gp=MEASURED   signals=- (prod shell=1.8273 gp_loc=1.7215 k_spread=0.041)
+  rescale_1000to1(A@diag(1,0.001))       local_gp=UNDECIDED  signals=READOUT_DIVERGENCE,CHAIN_ARTIFACT | global_gp=UNDECIDED  signals=READOUT_DIVERGENCE,CHAIN_ARTIFACT (prod shell=0.9951 gp_loc=1.7425 k_spread=0.003)
+  rescale_10000to1(A@diag(1,0.0001))     local_gp=UNDECIDED  signals=READOUT_DIVERGENCE,CHAIN_ARTIFACT | global_gp=UNDECIDED  signals=READOUT_DIVERGENCE,CHAIN_ARTIFACT (prod shell=0.9956 gp_loc=1.8455 k_spread=0.005)
+STAGE 3 done.
+====================================================================================================
+STAGE 2 -- correctness at n=3200 (and one n=6400 direction check), with production gate
+====================================================================================================
+  uniform-square-2d/n=3200/seed=555    k=6 shell=2.1720 gp_loc=2.2330 [1.776,2.629] contains=True verdict_loc=MEASURED wall=33.8s
+  uniform-cube-3d/n=3200/seed=555      k=4 shell=2.7328 gp_loc=2.8793 [2.228,3.384] contains=True verdict_loc=MEASURED wall=55.0s
+  circle-1d/n=3200/seed=11             k=15 shell=nan gp_loc=0.9880 [0.000,nan] contains=False verdict_loc=MEASURED wall=15.9s
+  A32_ident/n=3200/seed=11             k=6 shell=2.1337 gp_loc=1.8439 [1.486,2.492] contains=True verdict_loc=MEASURED wall=34.3s
+  A32@diag(1,0.01)/n=3200              k=8 shell=1.8754 gp_loc=1.9432 [1.532,2.287] contains=True verdict_loc=MEASURED wall=25.6s
+  A32@diag(1,0.001)/n=3200             k=25 shell=1.0191 gp_loc=1.8667 [0.759,2.126] contains=True verdict_loc=UNDECIDED wall=21.3s
+  optimizer cross-check: [{"case": "uniform-square-2d/n=3200/seed=555", "shell_exact": true, "gp_exact": true, "bracket_exact": true}, {"case": "uniform-cube-3d/n=3200/seed=555", "shell_exact": true, "gp_exact": true, "bracket_exact": true}]
+  n=6400 square: k=4 shell=2.0870 gp=2.0634 [1.690,2.461] contains=True wall=71.8s
+STAGE 2 done.
+====================================================================================================
+STAGE 5 -- transition zone rescale factors {0.05,0.02,0.01,0.005,0.002}, +/- random rotation, n=1600
+====================================================================================================
+  rescale(0.05)                shell=1.9784 gp=1.6323 [1.307,2.303] scratch_contains=True gate=UNDECIDED signals=READOUT_DIVERGENCE SURVIVING_VIOLATION=False
+  rescale(0.05)+rot(46.7deg)   shell=1.9784 gp=1.6323 [1.307,2.303] scratch_contains=True gate=UNDECIDED signals=READOUT_DIVERGENCE SURVIVING_VIOLATION=False
+  rescale(0.02)                shell=1.8826 gp=1.6764 [1.356,2.203] scratch_contains=True gate=MEASURED signals=- SURVIVING_VIOLATION=False
+  rescale(0.02)+rot(53.8deg)   shell=1.8826 gp=1.6764 [1.356,2.203] scratch_contains=True gate=MEASURED signals=- SURVIVING_VIOLATION=False
+  rescale(0.01)                shell=1.7288 gp=1.7215 [1.411,2.039] scratch_contains=True gate=MEASURED signals=- SURVIVING_VIOLATION=False
+  rescale(0.01)+rot(35.6deg)   shell=1.7288 gp=1.7215 [1.411,2.039] scratch_contains=True gate=MEASURED signals=- SURVIVING_VIOLATION=False
+  rescale(0.005)               shell=1.7896 gp=1.7888 [1.467,2.112] scratch_contains=True gate=UNDECIDED signals=NO_SCALING_REGION SURVIVING_VIOLATION=False
+  rescale(0.005)+rot(20.5deg)  shell=1.7896 gp=1.7888 [1.467,2.112] scratch_contains=True gate=UNDECIDED signals=NO_SCALING_REGION SURVIVING_VIOLATION=False
+  rescale(0.002)               shell=1.0161 gp=1.7469 [0.767,1.996] scratch_contains=False gate=UNDECIDED signals=READOUT_DIVERGENCE,CHAIN_ARTIFACT SURVIVING_VIOLATION=False
+  rescale(0.002)+rot(5.8deg)   shell=1.0161 gp=1.7469 [0.767,1.996] scratch_contains=False gate=UNDECIDED signals=READOUT_DIVERGENCE,CHAIN_ARTIFACT SURVIVING_VIOLATION=False
+STAGE 5 SUMMARY: {
+ "n_rows": 10,
+ "n_scratch_violations": 2,
+ "n_gate_undecided": 6,
+ "n_violations_surviving_gate": 0,
+ "boundary_map": [
+  {
+   "case": "rescale(0.05)",
+   "ratio": 20.0,
+   "verdict": "UNDECIDED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.05)+rot(46.7deg)",
+   "ratio": 20.0,
+   "verdict": "UNDECIDED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.02)",
+   "ratio": 50.0,
+   "verdict": "MEASURED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.02)+rot(53.8deg)",
+   "ratio": 50.0,
+   "verdict": "MEASURED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.01)",
+   "ratio": 100.0,
+   "verdict": "MEASURED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.01)+rot(35.6deg)",
+   "ratio": 100.0,
+   "verdict": "MEASURED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.005)",
+   "ratio": 200.0,
+   "verdict": "UNDECIDED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.005)+rot(20.5deg)",
+   "ratio": 200.0,
+   "verdict": "UNDECIDED",
+   "scratch_contains": true,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.002)",
+   "ratio": 500.0,
+   "verdict": "UNDECIDED",
+   "scratch_contains": false,
+   "surviving_violation": false
+  },
+  {
+   "case": "rescale(0.002)+rot(5.8deg)",
+   "ratio": 500.0,
+   "verdict": "UNDECIDED",
+   "scratch_contains": false,
+   "surviving_violation": false
+  }
+ ]
+}

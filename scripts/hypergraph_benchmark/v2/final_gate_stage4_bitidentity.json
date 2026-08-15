@@ -1,0 +1,306 @@
+{
+ "status": "done",
+ "protocol": "3 battery cases re-run with the CURRENT (optimized) scratch code and compared field-by-field against numbers recorded by the UNOPTIMIZED code in scale_aware_v2.json (round 2) and skeptic_rescale_battery.json (stopped skeptic). Floats compared for exact equality (== on float).",
+ "cases": [
+  {
+   "case": "A = uniform_square(1600,11) == IDENT_2D_seed11",
+   "fields": [
+    {
+     "field": "shell_mean_dimension(vs v2.json)",
+     "current": 2.0614284876423543,
+     "original": 2.0614284876423543,
+     "exact_match": true
+    },
+    {
+     "field": "gp_local_dimension(vs v2.json)",
+     "current": 1.6524808042822734,
+     "original": 1.6524808042822734,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_lo(vs v2.json)",
+     "current": 1.3182289680090569,
+     "original": 1.3182289680090569,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_hi(vs v2.json)",
+     "current": 2.395680323915571,
+     "original": 2.395680323915571,
+     "exact_match": true
+    },
+    {
+     "field": "k_selected(vs v2.json)",
+     "current": 4,
+     "original": 4,
+     "exact_match": true
+    },
+    {
+     "field": "iterations(vs v2.json)",
+     "current": 4,
+     "original": 4,
+     "exact_match": true
+    },
+    {
+     "field": "shell_mean_dimension(vs skeptic)",
+     "current": 2.0614284876423543,
+     "original": 2.0614284876423543,
+     "exact_match": true
+    },
+    {
+     "field": "gp_local_dimension(vs skeptic)",
+     "current": 1.6524808042822734,
+     "original": 1.6524808042822734,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_lo(vs skeptic)",
+     "current": 1.3182289680090569,
+     "original": 1.3182289680090569,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_hi(vs skeptic)",
+     "current": 2.395680323915571,
+     "original": 2.395680323915571,
+     "exact_match": true
+    }
+   ],
+   "current_row": {
+    "n": 1600,
+    "d": 2,
+    "settings_auto": {
+     "k0": 30,
+     "k_selected": 4,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 4,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 2.0614284876423543,
+    "shell_degenerate_fraction": 0.0,
+    "shell_near_degenerate_fraction": 0.0,
+    "gp_local_dimension": 1.6524808042822734,
+    "gp_local_r_squared": 0.9846675370108101,
+    "bracket": {
+     "d_lo": 1.3182289680090569,
+     "d_hi": 2.395680323915571,
+     "hull_lo": 1.6524808042822734,
+     "hull_hi": 2.0614284876423543,
+     "allowance": 0.3342518362732165,
+     "basis": "bracket(shell,gp)"
+    },
+    "k_selection_failed": false,
+    "wall_time_s": 22.713187090994325
+   }
+  },
+  {
+   "case": "rescale_y_factor=0.001 [pinned 8.1 violation row]",
+   "fields": [
+    {
+     "field": "shell_mean_dimension",
+     "current": 0.99511347818449,
+     "original": 0.99511347818449,
+     "exact_match": true
+    },
+    {
+     "field": "shell_near_degenerate_fraction",
+     "current": 0.6,
+     "original": 0.6,
+     "exact_match": true
+    },
+    {
+     "field": "gp_local_dimension",
+     "current": 1.7425096641044415,
+     "original": 1.7425096641044415,
+     "exact_match": true
+    },
+    {
+     "field": "gp_local_r_squared",
+     "current": 0.9956542746784136,
+     "original": 0.9956542746784136,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_lo",
+     "current": 0.7487273953784862,
+     "original": 0.7487273953784862,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_hi",
+     "current": 1.9888957469104454,
+     "original": 1.9888957469104454,
+     "exact_match": true
+    },
+    {
+     "field": "k_selected",
+     "current": 25,
+     "original": 25,
+     "exact_match": true
+    },
+    {
+     "field": "iterations",
+     "current": 2,
+     "original": 2,
+     "exact_match": true
+    }
+   ],
+   "current_row": {
+    "n": 1600,
+    "d": 2,
+    "settings_auto": {
+     "k0": 30,
+     "k_selected": 25,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 2,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 0.99511347818449,
+    "shell_degenerate_fraction": 0.0,
+    "shell_near_degenerate_fraction": 0.6,
+    "gp_local_dimension": 1.7425096641044415,
+    "gp_local_r_squared": 0.9956542746784136,
+    "bracket": {
+     "d_lo": 0.7487273953784862,
+     "d_hi": 1.9888957469104454,
+     "hull_lo": 0.99511347818449,
+     "hull_hi": 1.7425096641044415,
+     "allowance": 0.24638608280600383,
+     "basis": "bracket(shell,gp)"
+    },
+    "k_selection_failed": false,
+    "wall_time_s": 16.248975783004425
+   }
+  },
+  {
+   "case": "uniform-cube-3d/n=1600/seed=11",
+   "fields": [
+    {
+     "field": "shell_mean_dimension",
+     "current": 2.7237519107916164,
+     "original": 2.7237519107916164,
+     "exact_match": true
+    },
+    {
+     "field": "gp_local_dimension",
+     "current": 2.8169972377371812,
+     "original": 2.8169972377371812,
+     "exact_match": true
+    },
+    {
+     "field": "gp_global_dimension",
+     "current": 2.9034532648775278,
+     "original": 2.9034532648775278,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_lo",
+     "current": 2.2250844874240245,
+     "original": 2.2250844874240245,
+     "exact_match": true
+    },
+    {
+     "field": "bracket.d_hi",
+     "current": 3.315664661104773,
+     "original": 3.315664661104773,
+     "exact_match": true
+    },
+    {
+     "field": "k0",
+     "current": 60,
+     "original": 60,
+     "exact_match": true
+    },
+    {
+     "field": "k_selected",
+     "current": 4,
+     "original": 4,
+     "exact_match": true
+    },
+    {
+     "field": "iterations",
+     "current": 5,
+     "original": 5,
+     "exact_match": true
+    }
+   ],
+   "current_row": {
+    "n": 1600,
+    "d": 3,
+    "settings_auto": {
+     "k0": 60,
+     "k_selected": 4,
+     "bootstrap": "global (fixed, not selected -- see module docstring/negative control)",
+     "topology_ridge_floor_frac": 0.05,
+     "metric_ridge_floor_frac": 0.001,
+     "global_ridge_floor_frac": 1e-09,
+     "iterations_run": 5,
+     "converged": true,
+     "k_ladder": [
+      4,
+      6,
+      8,
+      10,
+      15,
+      25,
+      40
+     ]
+    },
+    "shell_mean_dimension": 2.7237519107916164,
+    "shell_degenerate_fraction": 0.0,
+    "shell_near_degenerate_fraction": 0.0,
+    "gp_local_dimension": 2.8169972377371812,
+    "gp_local_r_squared": 0.9867922502297279,
+    "bracket": {
+     "d_lo": 2.2250844874240245,
+     "d_hi": 3.315664661104773,
+     "hull_lo": 2.7237519107916164,
+     "hull_hi": 2.8169972377371812,
+     "allowance": 0.4986674233675918,
+     "basis": "bracket(shell,gp)"
+    },
+    "k_selection_failed": false,
+    "wall_time_s": 32.873345603002235,
+    "gp_global_dimension": 2.9034532648775278,
+    "gp_global_r_squared": 0.9994156051615884,
+    "bracket_global_gp": {
+     "d_lo": 2.2173034449813933,
+     "d_hi": 3.409901730687751,
+     "hull_lo": 2.7237519107916164,
+     "hull_hi": 2.9034532648775278,
+     "allowance": 0.506448465810223,
+     "basis": "bracket(shell,gp)"
+    }
+   }
+  }
+ ],
+ "summary": {
+  "n_fields": 26,
+  "n_exact": 26,
+  "mismatches": []
+ }
+}

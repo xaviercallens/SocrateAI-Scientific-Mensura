@@ -1,0 +1,325 @@
+{
+ "date": "2026-08-15",
+ "role": "final pre-integration verification gate (MENSURA_BENCH_V2 section 8.5 item 1)",
+ "stage_verdicts": {
+  "stage1_zero_knob_vs_hand_picked": {
+   "verdict": "CONFIRMED, with one FRAGILE family",
+   "evidence": "5/5 cases: auto-selected (k0, iterations, k) equal the round-2 hand-picked values and the resulting brackets are bit-identical (shell_diff=0, gp_diff=0). Perturbation probe (seed change, n +/- 10%): 13/15 rows contain truth; two benign k flips (square n=1440: 4->6, refutation n=1440: 10->8) with bracket midpoint shifts <= 0.021 and containment kept.",
+   "fragility": "The 1000:1 family only: seed=12 contains 2.0 by 0.009; n=1440 MISSES by 0.090 (a second scratch calibration violation, worse than the pinned 0.011 miss); n=1760 shell arm returns NaN (bracket [0, nan]). Confirms 8.1's 'accidental containment' reading: at >=1000:1 the scratch bracket's verdict is seed/n noise, not measurement."
+  },
+  "stage2_scalability_with_correctness": {
+   "verdict": "CONFIRMED, with one scratch-harness fragility finding",
+   "evidence": "n=3200: square [1.776,2.629] contains 2.0; cube [2.228,3.384] contains 3.0; A32 ident [1.486,2.492] contains; 100:1 [1.532,2.287] contains; 1000:1 [0.759,2.126] luck-contains and the production gate fires exactly as at n=1600 (margin +0.588). n=6400 square: [1.690,2.461], shell 2.087 / gp 2.063 -- both arms converging toward truth 2.0; no drift-off-truth with n anywhere.",
+   "finding": "circle n=3200: auto-selection picks k=15 (admissible under cic's own criteria) but the SCRATCH shell_estimate (fixed max_radius=6, samples=80) returns NaN -> scratch bracket [0, nan]. The production shell arm at the same k=15 reads 1.0289 and the composed production verdict is MEASURED [0.645,1.355] containing 1.0. The prototype's fixed-window scratch bracket is n-fragile on 1-D supports; the production window selection (what 8.4 would actually integrate) is not."
+  },
+  "stage3_production_gate_composition": {
+   "verdict": "claim (a) CONFIRMED; claim (b) PARTIALLY REFUTED; claim (c) REFUTED at n=1600 for the local-gp arm (the arm the 8.3 story is built on); the global-gp arm satisfies the full 8.3 table",
+   "a_1000to1_and_10000to1_gated": "CONFIRMED by executing cic._detect: both rows UNDECIDED on both gp arms; READOUT_DIVERGENCE margins +0.501 and +0.594; CHAIN_ARTIFACT fires redundantly on both. Also at n=3200 (+0.588).",
+   "b_genuine_wins_survive": "The named 100:1 row survives: MEASURED, margin -0.214 (n=1600) and -0.281 (n=3200), interval [1.402,2.147] contains truth. BUT 10:1 (margin +0.070) and 20:1 (margin +0.047) are killed to UNDECIDED on the local-gp arm -- the gate eats the mild-anisotropy wins 8.3's table promises as MEASURED.",
+   "c_isotropic_stays_measured": "REFUTED at n=1600 for the local-gp arm: the identity square AND the isotropic control are UNDECIDED, READOUT_DIVERGENCE by margin +0.0067 (gap 0.3342 vs threshold 0.3275) -- a knife-edge miss caused by gp_local_mahalanobis's low bias (1.652) on uniform 2-D clouds at n=1600. Circle and cube stay MEASURED. At n=3200 the square recovers to MEASURED (margin -0.049). The global-gp arm keeps every isotropic case MEASURED at every n tested.",
+   "consequence": "Composed with the local-gp arm as 8.3 specifies, the instrument's measured region is NON-MONOTONIC in anisotropy at n=1600: UNDECIDED at 1:1-20:1 (2-D uniforms), MEASURED at 50:1-100:1, UNDECIDED >= 200:1. No calibration violation survives anywhere (validity holds), but this is partially the owner's rejected detect-and-abstain outcome on the EASY cases. The global-Mahalanobis gp arm composition matches the 8.3 table exactly and is the composition that should be specified -- but that choice is a design decision that must be made and re-verified before integration."
+  },
+  "stage4_bit_identity_spot_check": {
+   "verdict": "CONFIRMED",
+   "evidence": "26/26 fields bit-exact (float ==) across 3 battery cases (identity square, pinned 1000:1 violation row, 3-D cube) re-run with current optimized code vs the pre-optimization artifacts scale_aware_v2.json and skeptic_rescale_battery.json; plus 6/6 fields exact vs optimize_results.json at n=3200."
+  },
+  "stage5_transition_zone_hunt": {
+   "verdict": "NO VIOLATION SURVIVES THE PRODUCTION GATE (0/10 rows); one NEW scratch violation found and gate-caught",
+   "new_violation": "rescale(0.002) i.e. 500:1: scratch bracket [0.7674,1.9956] misses truth 2.0 by 0.0044 (with and without rotation). Production gate: UNDECIDED (READOUT_DIVERGENCE margin +0.482 + CHAIN_ARTIFACT). Should join the 8.4 item-3 pinned regression battery alongside the 1000:1 row.",
+   "rotation_equivariance": "Re-confirmed: at all 5 factors the rotated twin produces byte-identical output to the axis-aligned case."
+  }
+ },
+ "measured_undecided_boundary_local_gp_arm_n1600_2d_uniform_family": [
+  {
+   "ratio": "1:1 (identity/isotropic-control)",
+   "verdict": "UNDECIDED (READOUT_DIVERGENCE, margin +0.0067)"
+  },
+  {
+   "ratio": "10:1",
+   "verdict": "UNDECIDED (READOUT_DIVERGENCE, margin +0.070)"
+  },
+  {
+   "ratio": "20:1",
+   "verdict": "UNDECIDED (READOUT_DIVERGENCE, margin +0.047)"
+  },
+  {
+   "ratio": "50:1",
+   "verdict": "MEASURED [1.350,2.281] contains truth (margin -0.049)"
+  },
+  {
+   "ratio": "100:1",
+   "verdict": "MEASURED [1.402,2.147] contains truth (margin -0.214)"
+  },
+  {
+   "ratio": "200:1",
+   "verdict": "UNDECIDED (NO_SCALING_REGION)"
+  },
+  {
+   "ratio": "500:1",
+   "verdict": "UNDECIDED (READOUT_DIVERGENCE +0.482, CHAIN_ARTIFACT); scratch bracket VIOLATES (miss 0.0044)"
+  },
+  {
+   "ratio": "1000:1",
+   "verdict": "UNDECIDED (READOUT_DIVERGENCE +0.501, CHAIN_ARTIFACT); scratch bracket VIOLATES (miss 0.011)"
+  },
+  {
+   "ratio": "10000:1",
+   "verdict": "UNDECIDED (READOUT_DIVERGENCE +0.594, CHAIN_ARTIFACT)"
+  },
+  {
+   "note": "boundary is NON-MONOTONIC at n=1600; at n=3200 the low end recovers (identity margin -0.049, 100:1 margin -0.281). Global-gp arm: MEASURED-and-correct at 1:1 through 100:1, UNDECIDED >= 1000:1 (monotonic, matches the 8.3 table)."
+  }
+ ],
+ "production_gate_margins_stage3_n1600": [
+  {
+   "case": "square_ident(A)",
+   "n": 1600,
+   "local_gp_verdict": "UNDECIDED",
+   "local_gp_signals": [
+    "READOUT_DIVERGENCE"
+   ],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 1.9867199333295684,
+   "gp_local": 1.6524808042822734,
+   "arm_gap": 0.334239129047295,
+   "divergence_threshold": 0.3275280663850657,
+   "margin_gap_minus_threshold": 0.006711062662229317
+  },
+  {
+   "case": "circle",
+   "n": 1600,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 0.9961510383662461,
+   "gp_local": 0.9639325873529621,
+   "arm_gap": 0.03221845101328402,
+   "divergence_threshold": 0.18,
+   "margin_gap_minus_threshold": -0.14778154898671597,
+   "local_interval": [
+    0.6275420081506948,
+    1.3724579918493052
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "cube",
+   "n": 1600,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 2.731937414882011,
+   "gp_local": 2.8169972377371812,
+   "arm_gap": 0.08505982285517044,
+   "divergence_threshold": 0.4994041187357272,
+   "margin_gap_minus_threshold": -0.41434429588055677,
+   "local_interval": [
+    2.2325332961462836,
+    3.3164013564729085
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "isotropic_control(A@diag(100,100))",
+   "n": 1600,
+   "local_gp_verdict": "UNDECIDED",
+   "local_gp_signals": [
+    "READOUT_DIVERGENCE"
+   ],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 1.9867199333295684,
+   "gp_local": 1.6524808042822732,
+   "arm_gap": 0.33423912904729525,
+   "divergence_threshold": 0.3275280663850657,
+   "margin_gap_minus_threshold": 0.006711062662229539
+  },
+  {
+   "case": "rescale_10to1(A@diag(1,0.1))",
+   "n": 1600,
+   "local_gp_verdict": "UNDECIDED",
+   "local_gp_signals": [
+    "READOUT_DIVERGENCE"
+   ],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 2.0402143377880755,
+   "gp_local": 1.639006830545113,
+   "arm_gap": 0.4012075072429624,
+   "divergence_threshold": 0.3311299051499869,
+   "margin_gap_minus_threshold": 0.07007760209297548
+  },
+  {
+   "case": "rescale_100to1(A@diag(1,0.01))",
+   "n": 1600,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 1.8272514708055783,
+   "gp_local": 1.7215119634093952,
+   "arm_gap": 0.1057395073961831,
+   "divergence_threshold": 0.3193887090793476,
+   "margin_gap_minus_threshold": -0.21364920168316448,
+   "local_interval": [
+    1.4021232543300477,
+    2.1466401798849257
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "rescale_1000to1(A@diag(1,0.001))",
+   "n": 1600,
+   "local_gp_verdict": "UNDECIDED",
+   "local_gp_signals": [
+    "READOUT_DIVERGENCE",
+    "CHAIN_ARTIFACT"
+   ],
+   "global_gp_verdict": "UNDECIDED",
+   "global_gp_signals": [
+    "READOUT_DIVERGENCE",
+    "CHAIN_ARTIFACT"
+   ],
+   "prod_shell": 0.99511347818449,
+   "gp_local": 1.7425096641044415,
+   "arm_gap": 0.7473961859199515,
+   "divergence_threshold": 0.24638608280600383,
+   "margin_gap_minus_threshold": 0.5010101031139477
+  },
+  {
+   "case": "rescale_10000to1(A@diag(1,0.0001))",
+   "n": 1600,
+   "local_gp_verdict": "UNDECIDED",
+   "local_gp_signals": [
+    "READOUT_DIVERGENCE",
+    "CHAIN_ARTIFACT"
+   ],
+   "global_gp_verdict": "UNDECIDED",
+   "global_gp_signals": [
+    "READOUT_DIVERGENCE",
+    "CHAIN_ARTIFACT"
+   ],
+   "prod_shell": 0.9955904774478366,
+   "gp_local": 1.845451200817868,
+   "arm_gap": 0.8498607233700315,
+   "divergence_threshold": 0.2556937510439134,
+   "margin_gap_minus_threshold": 0.594166972326118
+  }
+ ],
+ "production_gate_margins_stage2_n3200": [
+  {
+   "case": "uniform-square-2d/n=3200/seed=555",
+   "n": 3200,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 2.1525601435017956,
+   "gp_local": 2.2329626271539165,
+   "arm_gap": 0.08040248365212088,
+   "divergence_threshold": 0.394697049359014,
+   "margin_gap_minus_threshold": -0.3142945657068931,
+   "local_interval": [
+    1.7578630941427815,
+    2.6276596765129305
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "uniform-cube-3d/n=3200/seed=555",
+   "n": 3200,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 2.784193967849019,
+   "gp_local": 2.879252970481593,
+   "arm_gap": 0.09505900263257416,
+   "divergence_threshold": 0.509710224449755,
+   "margin_gap_minus_threshold": -0.41465122181718084,
+   "local_interval": [
+    2.274483743399264,
+    3.388963194931348
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "circle-1d/n=3200/seed=11",
+   "n": 3200,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 1.0289218063809393,
+   "gp_local": 0.9879945131851368,
+   "arm_gap": 0.04092729319580257,
+   "divergence_threshold": 0.18152246876094683,
+   "margin_gap_minus_threshold": -0.14059517556514425,
+   "local_interval": [
+    0.6450506253969965,
+    1.3549493746030035
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "A32_ident/n=3200/seed=11",
+   "n": 3200,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 2.1545946885192593,
+   "gp_local": 1.843892773362989,
+   "arm_gap": 0.3107019151562702,
+   "divergence_threshold": 0.35986387156940236,
+   "margin_gap_minus_threshold": -0.049161956413132146,
+   "local_interval": [
+    1.4840289017935868,
+    2.5144585600886615
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "A32@diag(1,0.01)/n=3200",
+   "n": 3200,
+   "local_gp_verdict": "MEASURED",
+   "local_gp_signals": [],
+   "global_gp_verdict": "MEASURED",
+   "global_gp_signals": [],
+   "prod_shell": 2.0192848573131035,
+   "gp_local": 1.9432202960308016,
+   "arm_gap": 0.07606456128230188,
+   "divergence_threshold": 0.35662546380095145,
+   "margin_gap_minus_threshold": -0.28056090251864957,
+   "local_interval": [
+    1.5865948322298502,
+    2.375910321114055
+   ],
+   "local_interval_contains_truth": true
+  },
+  {
+   "case": "A32@diag(1,0.001)/n=3200",
+   "n": 3200,
+   "local_gp_verdict": "UNDECIDED",
+   "local_gp_signals": [
+    "READOUT_DIVERGENCE",
+    "CHAIN_ARTIFACT"
+   ],
+   "global_gp_verdict": "UNDECIDED",
+   "global_gp_signals": [
+    "READOUT_DIVERGENCE",
+    "CHAIN_ARTIFACT"
+   ],
+   "prod_shell": 1.0191442230145245,
+   "gp_local": 1.866729225555958,
+   "arm_gap": 0.8475850025414335,
+   "divergence_threshold": 0.25972861037134337,
+   "margin_gap_minus_threshold": 0.5878563921700901
+  }
+ ],
+ "final_verdict": "NOT READY",
+ "strongest_reason": "The 8.3 composition claim fails in execution on its own easy cases: with the local-Mahalanobis gp arm (the arm every 8.1/8.2 bracket was built on), the real production gate turns the isotropic uniform square, its isotropic control, and 10:1-20:1 mild anisotropy into UNDECIDED at n=1600 (READOUT_DIVERGENCE, margins +0.007 to +0.070), because gp_local reads systematically low on near-isotropic 2-D clouds. No calibration violation survives the gate anywhere tested (validity is confirmed, including a newly found 500:1 scratch violation that the gate catches), so the blocker is not validity but composition: which gp arm builds the bracket must be decided (the global-Mahalanobis arm reproduces the promised 8.3 table exactly) and the battery re-verified under that choice before wiring into cic.py."
+}
