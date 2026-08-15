@@ -51,7 +51,45 @@ class Hypergraph:
 
     @property
     def nodes(self) -> frozenset[Node]:
-        return frozenset(n for e in self.edges for n in e)
+        """The inferred node set, computed once per instance.
+
+        Memoized for the same reason `adjacency()` is, and measured to matter
+        more: profiling a scale-aware dimension run (n=1600 uniform square)
+        found this property rebuilding its frozenset over ~20k edges on each
+        of 824 calls -- 20.4M generator steps, 25.1s of a 44.9s run, making
+        it the single dominant cost of the whole measurement. Every caller
+        that walks radii or nodes (`ball`, `local_dimension`, `mean_dimension`
+        and everything above them) hits it repeatedly.
+
+        Safe because `Hypergraph` is frozen: the value cannot go stale
+        without producing a different instance. The cache lives outside the
+        dataclass fields, so equality, hashing, and `repr` are unaffected.
+        """
+        cached = self.__dict__.get("_nodes_cache")
+        if cached is None:
+            cached = frozenset(n for e in self.edges for n in e)
+            object.__setattr__(self, "_nodes_cache", cached)
+        return cached
+
+    def __hash__(self) -> int:
+        """Memoized form of the hash the frozen dataclass would generate.
+
+        Identical in value to the generated `hash((self.edges,))`, but
+        computed once per instance instead of on every lookup. This is not a
+        micro-optimization: `adjacency()` is an `lru_cache` keyed by the
+        hypergraph itself, so every cache *hit* was re-hashing the entire
+        nested edge tuple first (2.0s of the 44.9s run above) -- the cache
+        was paying an O(total nodes) key cost to avoid an O(total nodes)
+        rebuild.
+
+        Consistency with `__eq__` is preserved: equal hypergraphs have equal
+        `edges` and therefore equal hashes.
+        """
+        cached = self.__dict__.get("_hash_cache")
+        if cached is None:
+            cached = hash((self.edges,))
+            object.__setattr__(self, "_hash_cache", cached)
+        return cached
 
     @property
     def num_nodes(self) -> int:
