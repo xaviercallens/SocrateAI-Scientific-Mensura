@@ -1,0 +1,30 @@
+==============================================================================================================
+STAGE pinned
+==============================================================================================================
+  9.1a_500to1_n1600        shell=1.0161 gp 1.7469->1.8917 scratch_bracket_after={'d_lo': 0.7543850631997286, 'd_hi': 2.1534155693976915, 'hull_lo': 1.0160871201334964, 'hull_hi': 1.8917135124639237, 'allowance': 0.2617020569337678, 'basis': 'bracket(shell,gp)'} | BEFORE UNDECIDED | AFTER UNDECIDED contains=None 
+  9.1b_1000to1_n1440       shell=0.9908 gp 1.6711->1.8750 scratch_bracket_after={'d_lo': 0.7295195205935302, 'd_hi': 2.13261513286857, 'hull_lo': 0.9871116394051191, 'hull_hi': 1.8750230140569808, 'allowance': 0.25759211881158894, 'basis': 'bracket(shell,gp)'} | BEFORE UNDECIDED | AFTER UNDECIDED contains=None 
+  8.1_1000to1_n1600        shell=0.9951 gp 1.7425->1.8888 scratch_bracket_after={'d_lo': 0.7355613032812114, 'd_hi': 2.148351751199663, 'hull_lo': 0.99511347818449, 'hull_hi': 1.8887995762963843, 'allowance': 0.25955217490327864, 'basis': 'bracket(shell,gp)'} | BEFORE UNDECIDED | AFTER UNDECIDED contains=None 
+{
+ "n_rows": 3,
+ "before": {
+  "n_measured": 0,
+  "n_undecided": 3,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 0,
+  "violations": []
+ },
+ "after": {
+  "n_measured": 0,
+  "n_undecided": 3,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 0,
+  "violations": []
+ },
+ "global": {
+  "n_measured": 0,
+  "n_undecided": 3,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 0,
+  "violations": []
+ }
+}

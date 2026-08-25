@@ -1,0 +1,34 @@
+{
+ "n=1600": {
+  "rows": 24,
+  "gp_before_median_s": 0.4807,
+  "gp_after_median_s": 0.4754,
+  "gp_global_median_s": 0.1298,
+  "delta_median_s": -0.0053,
+  "delta_pct_of_gp_arm": -1.11,
+  "construction_median_s": 3.537,
+  "total_row_median_s": 6.596,
+  "delta_pct_of_whole_row": -0.081,
+  "wls_effective_n_radii_min_med_max": [
+   3.39,
+   5.09,
+   9.85
+  ]
+ },
+ "n=3200": {
+  "rows": 24,
+  "gp_before_median_s": 1.9566,
+  "gp_after_median_s": 1.977,
+  "gp_global_median_s": 0.3672,
+  "delta_median_s": 0.0204,
+  "delta_pct_of_gp_arm": 1.04,
+  "construction_median_s": 11.169,
+  "total_row_median_s": 20.73,
+  "delta_pct_of_whole_row": 0.098,
+  "wls_effective_n_radii_min_med_max": [
+   3.4,
+   5.04,
+   9.68
+  ]
+ }
+}

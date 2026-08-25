@@ -1,0 +1,51 @@
+==============================================================================================================
+STAGE battery3200
+==============================================================================================================
+  n=3200 uniform_square(A)                        shell=2.1546 gp 1.8439->1.9793 | BEFORE MEASURED  m=-0.049 contains=True | AFTER MEASURED  m=-0.197 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 circle                                   shell=1.0289 gp 0.9880->0.9953 | BEFORE MEASURED  m=-0.141 contains=True | AFTER MEASURED  m=-0.149 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 cube                                     shell=2.8222 gp 2.9908->2.9430 | BEFORE MEASURED  m=-0.355 contains=True | AFTER MEASURED  m=-0.398 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 line_segment_1d                          shell=0.9950 gp 0.9935->0.9959 | BEFORE MEASURED  m=-0.178 contains=True | AFTER MEASURED  m=-0.179 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 ellipse_aspect_0.05                      shell=0.9952 gp 0.9927->0.9934 | BEFORE MEASURED  m=-0.178 contains=True | AFTER MEASURED  m=-0.178 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 ellipse_aspect_0.01                      shell=0.9973 gp 0.9929->0.9953 | BEFORE MEASURED  m=-0.176 contains=True | AFTER MEASURED  m=-0.178 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 helix_1d_in_3d                           shell=0.9976 gp 0.9861->0.9766 | BEFORE MEASURED  m=-0.169 contains=True | AFTER MEASURED  m=-0.159 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 isotropic_control(A@diag(100,100))       shell=2.1546 gp 1.8439->1.9793 | BEFORE MEASURED  m=-0.049 contains=True | AFTER MEASURED  m=-0.197 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_10to1                            shell=2.0997 gp 1.8030->1.9239 | BEFORE MEASURED  m=-0.054 contains=True | AFTER MEASURED  m=-0.186 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_10to1+rot(50.9deg)               shell=2.0997 gp 1.8030->1.9239 | BEFORE MEASURED  m=-0.054 contains=True | AFTER MEASURED  m=-0.186 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_20to1                            shell=2.0828 gp 1.8464->1.9360 | BEFORE MEASURED  m=-0.117 contains=True | AFTER MEASURED  m=-0.215 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_20to1+rot(39.0deg)               shell=2.0828 gp 1.8464->1.9360 | BEFORE MEASURED  m=-0.117 contains=True | AFTER MEASURED  m=-0.215 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_50to1                            shell=1.9441 gp 1.8729->1.9313 | BEFORE MEASURED  m=-0.272 contains=True | AFTER MEASURED  m=-0.336 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_50to1+rot(75.5deg)               shell=1.9441 gp 1.8729->1.9313 | BEFORE MEASURED  m=-0.272 contains=True | AFTER MEASURED  m=-0.336 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_100to1                           shell=2.0193 gp 1.9432->1.9330 | BEFORE MEASURED  m=-0.281 contains=True | AFTER MEASURED  m=-0.269 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_100to1+rot(28.9deg)              shell=2.0193 gp 1.9432->1.9330 | BEFORE MEASURED  m=-0.281 contains=True | AFTER MEASURED  m=-0.269 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_200to1                           shell=1.9280 gp 1.9962->1.9399 | BEFORE MEASURED  m=-0.285 contains=True | AFTER MEASURED  m=-0.336 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_200to1+rot(56.0deg)              shell=1.9280 gp 1.9962->1.9399 | BEFORE MEASURED  m=-0.285 contains=True | AFTER MEASURED  m=-0.336 contains=True | GLOBAL MEASURED  contains=True 
+  n=3200 rescale_500to1                           shell=1.0307 gp 1.9120->1.9205 | BEFORE UNDECIDED m=+0.616 contains=None | AFTER UNDECIDED m=+0.624 contains=None | GLOBAL UNDECIDED contains=None 
+  n=3200 rescale_500to1+rot(62.1deg)              shell=1.0307 gp 1.9120->1.9205 | BEFORE UNDECIDED m=+0.616 contains=None | AFTER UNDECIDED m=+0.624 contains=None | GLOBAL UNDECIDED contains=None 
+  n=3200 rescale_1000to1                          shell=1.0191 gp 1.8667->1.9130 | BEFORE UNDECIDED m=+0.588 contains=None | AFTER UNDECIDED m=+0.630 contains=None | GLOBAL UNDECIDED contains=None 
+  n=3200 rescale_1000to1+rot(74.2deg)             shell=1.0191 gp 1.8667->1.9130 | BEFORE UNDECIDED m=+0.588 contains=None | AFTER UNDECIDED m=+0.630 contains=None | GLOBAL UNDECIDED contains=None 
+  n=3200 rescale_10000to1                         shell=1.0071 gp 1.9044->1.8421 | BEFORE UNDECIDED m=+0.635 contains=None | AFTER UNDECIDED m=+0.579 contains=None | GLOBAL UNDECIDED contains=None 
+  n=3200 rescale_10000to1+rot(65.4deg)            shell=1.0071 gp 1.9044->1.8421 | BEFORE UNDECIDED m=+0.635 contains=None | AFTER UNDECIDED m=+0.579 contains=None | GLOBAL UNDECIDED contains=None 
+{
+ "n_rows": 24,
+ "before": {
+  "n_measured": 18,
+  "n_undecided": 6,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 18,
+  "violations": []
+ },
+ "after": {
+  "n_measured": 18,
+  "n_undecided": 6,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 18,
+  "violations": []
+ },
+ "global": {
+  "n_measured": 18,
+  "n_undecided": 6,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 18,
+  "violations": []
+ }
+}

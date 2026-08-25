@@ -1,0 +1,57 @@
+==============================================================================================================
+STAGE transition
+==============================================================================================================
+  n=1440/rescale(0.05)                     shell=1.9364 gp 1.6417->1.9118 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1440/rescale(0.05)+rot(46.7deg)        shell=1.9364 gp 1.6417->1.9118 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1440/rescale(0.02)                     shell=1.9762 gp 1.6491->1.8948 | BEFORE UNDECIDED contains=None | AFTER MEASURED  contains=True 
+  n=1440/rescale(0.02)+rot(53.8deg)        shell=1.9762 gp 1.6491->1.8948 | BEFORE UNDECIDED contains=None | AFTER MEASURED  contains=True 
+  n=1440/rescale(0.01)                     shell=1.8703 gp 1.6708->1.8882 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1440/rescale(0.01)+rot(35.6deg)        shell=1.8703 gp 1.6708->1.8882 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1440/rescale(0.005)                    shell=nan gp 1.6983->1.8912 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1440/rescale(0.005)+rot(20.5deg)       shell=nan gp 1.6983->1.8912 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1440/rescale(0.002)                    shell=1.0013 gp 1.6754->1.8773 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1440/rescale(0.002)+rot(5.8deg)        shell=1.0013 gp 1.6754->1.8773 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1600/rescale(0.05)                     shell=2.0064 gp 1.6323->1.8975 | BEFORE UNDECIDED contains=None | AFTER MEASURED  contains=True 
+  n=1600/rescale(0.05)+rot(46.7deg)        shell=2.0064 gp 1.6323->1.8975 | BEFORE UNDECIDED contains=None | AFTER MEASURED  contains=True 
+  n=1600/rescale(0.02)                     shell=1.9540 gp 1.6764->1.8874 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1600/rescale(0.02)+rot(53.8deg)        shell=1.9540 gp 1.6764->1.8874 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1600/rescale(0.01)                     shell=1.8273 gp 1.7215->1.8821 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1600/rescale(0.01)+rot(35.6deg)        shell=1.8273 gp 1.7215->1.8821 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1600/rescale(0.005)                    shell=nan gp 1.7888->1.8973 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1600/rescale(0.005)+rot(20.5deg)       shell=nan gp 1.7888->1.8973 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1600/rescale(0.002)                    shell=1.0161 gp 1.7469->1.8917 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1600/rescale(0.002)+rot(5.8deg)        shell=1.0161 gp 1.7469->1.8917 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1760/rescale(0.05)                     shell=2.0386 gp 1.6422->1.9076 | BEFORE UNDECIDED contains=None | AFTER MEASURED  contains=True 
+  n=1760/rescale(0.05)+rot(46.7deg)        shell=2.0386 gp 1.6422->1.9076 | BEFORE UNDECIDED contains=None | AFTER MEASURED  contains=True 
+  n=1760/rescale(0.02)                     shell=1.9527 gp 1.7028->1.9069 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1760/rescale(0.02)+rot(53.8deg)        shell=1.9527 gp 1.7028->1.9069 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1760/rescale(0.01)                     shell=1.9086 gp 1.7690->1.8934 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1760/rescale(0.01)+rot(35.6deg)        shell=1.9086 gp 1.7690->1.8934 | BEFORE MEASURED  contains=True | AFTER MEASURED  contains=True 
+  n=1760/rescale(0.005)                    shell=1.0592 gp 1.7611->1.8992 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1760/rescale(0.005)+rot(20.5deg)       shell=1.0592 gp 1.7611->1.8992 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1760/rescale(0.002)                    shell=1.0148 gp 1.7024->1.8856 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+  n=1760/rescale(0.002)+rot(5.8deg)        shell=1.0148 gp 1.7024->1.8856 | BEFORE UNDECIDED contains=None | AFTER UNDECIDED contains=None 
+{
+ "n_rows": 30,
+ "before": {
+  "n_measured": 12,
+  "n_undecided": 18,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 12,
+  "violations": []
+ },
+ "after": {
+  "n_measured": 18,
+  "n_undecided": 12,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 18,
+  "violations": []
+ },
+ "global": {
+  "n_measured": 18,
+  "n_undecided": 12,
+  "n_degenerate_exact": 0,
+  "n_measured_containing_truth": 18,
+  "violations": []
+ }
+}

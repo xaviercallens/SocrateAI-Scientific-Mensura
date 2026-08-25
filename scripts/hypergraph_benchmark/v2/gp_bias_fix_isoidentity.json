@@ -1,0 +1,117 @@
+{
+ "rows": [
+  {
+   "n": 1600,
+   "field": "shell",
+   "A": 1.9867199333295684,
+   "A_scaled": 1.9867199333295684,
+   "exact_equal": true
+  },
+  {
+   "n": 1600,
+   "field": "gp_before",
+   "A": 1.6524808042822734,
+   "A_scaled": 1.6524808042822732,
+   "exact_equal": false
+  },
+  {
+   "n": 1600,
+   "field": "gp_after",
+   "A": 1.9346618705860308,
+   "A_scaled": 1.9346618705860297,
+   "exact_equal": false
+  },
+  {
+   "n": 1600,
+   "field": "gp_after_r2",
+   "A": 0.9947652518024496,
+   "A_scaled": 0.9947652518024496,
+   "exact_equal": true
+  },
+  {
+   "n": 1600,
+   "field": "k_spread",
+   "A": 0.25176062309168823,
+   "A_scaled": 0.25176062309168823,
+   "exact_equal": true
+  },
+  {
+   "n": 1600,
+   "field": "verdict_after",
+   "A": "MEASURED",
+   "A_scaled": "MEASURED",
+   "exact_equal": true
+  },
+  {
+   "n": 1600,
+   "field": "d_lo_after",
+   "A": 1.581737508233627,
+   "A_scaled": 1.5817375082336258,
+   "exact_equal": false
+  },
+  {
+   "n": 1600,
+   "field": "d_hi_after",
+   "A": 2.3396442956819725,
+   "A_scaled": 2.339644295681972,
+   "exact_equal": false
+  },
+  {
+   "n": 3200,
+   "field": "shell",
+   "A": 2.1545946885192593,
+   "A_scaled": 2.1545946885192593,
+   "exact_equal": true
+  },
+  {
+   "n": 3200,
+   "field": "gp_before",
+   "A": 1.843892773362989,
+   "A_scaled": 1.8438927733629888,
+   "exact_equal": false
+  },
+  {
+   "n": 3200,
+   "field": "gp_after",
+   "A": 1.979325571283149,
+   "A_scaled": 1.9793255712831488,
+   "exact_equal": false
+  },
+  {
+   "n": 3200,
+   "field": "gp_after_r2",
+   "A": 0.9989126466133896,
+   "A_scaled": 0.9989126466133896,
+   "exact_equal": true
+  },
+  {
+   "n": 3200,
+   "field": "k_spread",
+   "A": 0.11564410596596897,
+   "A_scaled": 0.11564410596596897,
+   "exact_equal": true
+  },
+  {
+   "n": 3200,
+   "field": "verdict_after",
+   "A": "MEASURED",
+   "A_scaled": "MEASURED",
+   "exact_equal": true
+  },
+  {
+   "n": 3200,
+   "field": "d_lo_after",
+   "A": 1.6072727479009323,
+   "A_scaled": 1.607272747900932,
+   "exact_equal": false
+  },
+  {
+   "n": 3200,
+   "field": "d_hi_after",
+   "A": 2.526647511901476,
+   "A_scaled": 2.526647511901476,
+   "exact_equal": true
+  }
+ ],
+ "all_exact_equal": false
+}

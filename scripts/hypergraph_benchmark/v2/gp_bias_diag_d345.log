@@ -1,0 +1,27 @@
+D3 square(A):
+    k0=15   D=1.7571 med_eig_ratio=4.844 it=4 t=6.2s
+    k0=30   D=1.6525 med_eig_ratio=4.208 it=4 t=7.0s
+    k0=60   D=1.6946 med_eig_ratio=3.393 it=4 t=7.3s
+    k0=120  D=1.6507 med_eig_ratio=2.584 it=4 t=5.3s
+    k0=240  D=1.6400 med_eig_ratio=2.305 it=3 t=6.1s
+    k0=480  D=1.6686 med_eig_ratio=2.899 it=3 t=8.5s
+D4 square(A):
+    k0=15   median_eig_ratio=1.801 p90=3.146 max=9.22 scale_cv=0.2898
+    k0=30   median_eig_ratio=1.550 p90=2.563 max=6.57 scale_cv=0.2033
+    k0=60   median_eig_ratio=1.423 p90=2.740 max=5.77 scale_cv=0.1435
+    k0=120  median_eig_ratio=1.300 p90=2.709 max=4.60 scale_cv=0.1060
+    k0=240  median_eig_ratio=1.445 p90=2.674 max=4.19 scale_cv=0.0854
+D4 cube:
+    k0=15   median_eig_ratio=3.004 p90=5.731 max=16.31 scale_cv=0.2385
+    k0=30   median_eig_ratio=2.319 p90=4.022 max=8.73 scale_cv=0.1766
+    k0=60   median_eig_ratio=2.032 p90=3.710 max=6.75 scale_cv=0.1389
+    k0=120  median_eig_ratio=2.044 p90=3.322 max=5.05 scale_cv=0.1162
+    k0=240  median_eig_ratio=2.080 p90=3.158 max=4.60 scale_cv=0.0950
+  D5 square n=400: local=1.4878 const=1.4919
+  D5 cube n=400: local=2.8853 const=2.7972
+  D5 square n=800: local=1.6530 const=1.6811
+  D5 cube n=800: local=3.2871 const=2.9172
+  D5 square n=1600: local=1.6525 const=1.6895
+  D5 cube n=1600: local=2.8170 const=2.4252
+  D5 square n=3200: local=1.8439 const=1.8035
+  D5 cube n=3200: local=2.9908 const=2.7263

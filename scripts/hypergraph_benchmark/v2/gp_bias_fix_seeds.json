@@ -1,0 +1,111 @@
+{
+ "status": "done",
+ "rows": [
+  {
+   "case": "square",
+   "seed": 11,
+   "truth": 2.0,
+   "gp_before": 1.6524808042822734,
+   "gp_after": 1.9346618705860308,
+   "effective_n_radii": 4.920835798697796,
+   "r_squared_after": 0.9947652518024496
+  },
+  {
+   "case": "cube",
+   "seed": 11,
+   "truth": 3.0,
+   "gp_before": 2.8169972377371812,
+   "gp_after": 2.93741990527802,
+   "effective_n_radii": 3.3881958280051636,
+   "r_squared_after": 0.9989962303205315
+  },
+  {
+   "case": "square",
+   "seed": 12,
+   "truth": 2.0,
+   "gp_before": 1.938483816103452,
+   "gp_after": 2.0654666676925344,
+   "effective_n_radii": 4.691505297502192,
+   "r_squared_after": 0.9986679725509647
+  },
+  {
+   "case": "cube",
+   "seed": 12,
+   "truth": 3.0,
+   "gp_before": 2.8800357277172197,
+   "gp_after": 2.9451250947530823,
+   "effective_n_radii": 3.4049126053824326,
+   "r_squared_after": 0.9994779063723942
+  },
+  {
+   "case": "square",
+   "seed": 13,
+   "truth": 2.0,
+   "gp_before": 1.8328433701109679,
+   "gp_after": 1.9908670368662456,
+   "effective_n_radii": 4.880312791341586,
+   "r_squared_after": 0.998495353057091
+  },
+  {
+   "case": "cube",
+   "seed": 13,
+   "truth": 3.0,
+   "gp_before": 2.8783834327484845,
+   "gp_after": 3.0198520389911483,
+   "effective_n_radii": 3.300405270807609,
+   "r_squared_after": 0.9992093559288603
+  },
+  {
+   "case": "square",
+   "seed": 14,
+   "truth": 2.0,
+   "gp_before": 1.9222062094457277,
+   "gp_after": 1.9898040783448434,
+   "effective_n_radii": 4.902654836235787,
+   "r_squared_after": 0.9994313490513157
+  },
+  {
+   "case": "cube",
+   "seed": 14,
+   "truth": 3.0,
+   "gp_before": 2.6302576667482924,
+   "gp_after": 2.795784707294095,
+   "effective_n_radii": 3.5032193476538285,
+   "r_squared_after": 0.9983651333681628
+  },
+  {
+   "case": "square",
+   "seed": 15,
+   "truth": 2.0,
+   "gp_before": 1.8341392932439724,
+   "gp_after": 1.994611458688091,
+   "effective_n_radii": 4.851585007673687,
+   "r_squared_after": 0.9974523001024976
+  },
+  {
+   "case": "cube",
+   "seed": 15,
+   "truth": 3.0,
+   "gp_before": 2.607681105841994,
+   "gp_after": 2.8677447807863827,
+   "effective_n_radii": 3.4241014558318006,
+   "r_squared_after": 0.997168973029968
+  }
+ ],
+ "square_summary": {
+  "before_mean": 1.8360306986372787,
+  "before_std": 0.113608054442527,
+  "before_rmse": 0.1929024722930006,
+  "after_mean": 1.9950822224355491,
+  "after_std": 0.04650386345424697,
+  "after_rmse": 0.041884030239584334
+ },
+ "cube_summary": {
+  "before_mean": 2.7626710341586347,
+  "before_std": 0.13385658801990116,
+  "before_rmse": 0.26581780781654885,
+  "after_mean": 2.9131853054205457,
+  "after_std": 0.08490141303735313,
+  "after_rmse": 0.1153403274813945
+ }
+}

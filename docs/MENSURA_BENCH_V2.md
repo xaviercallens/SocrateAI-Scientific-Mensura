@@ -537,3 +537,109 @@ fixed-window bracket goes NaN on the circle at n=3200, where the
 containing 1.0. Integration per §8.4 uses production windowing, so this
 argues for integration rather than against it — but it means no further
 scratch-bracket evidence should be trusted on 1-D supports.
+
+---
+
+## 10. The gp_local bias: FIXED, and the diagnosis overturned the hypothesis
+
+§9's blocker is resolved. The fix is four lines of arithmetic, adds no
+constant, and the diagnosis that produced it refuted the hypothesis it was
+sent to test — including the fix I had proposed, which measurement shows
+would have quietly reintroduced the outcome the owner rejected.
+
+### 10.1 Diagnosis: not metric noise — the fit window
+
+The hypothesis was that per-point covariance noise on isotropic data smears
+pairwise distances and flattens the log-log slope. The sharp discriminator:
+feed a **constant** metric through the local arm's own radius rule, removing
+100% of per-point noise with everything else fixed.
+
+| metric fed to the local arm | D (truth 2.0) |
+|---|---|
+| per-point local (the blocker) | **1.6525** |
+| global covariance, broadcast | 1.6895 |
+| identity, broadcast | 1.6855 |
+| global arm, its own radius rule | 1.9343 |
+
+Removing *all* the noise recovers **0.037 of the 0.348 deficit — 10%**.
+Prediction (a) fails outright: k0 = 15…480 leaves D flat (1.757…1.669)
+while the median local eigenvalue ratio falls 4.84 → 2.31. Conditioning
+improves; the bias does not move. Prediction (d) inverts in 3-D, where the
+local metric reads *better* than a constant one (cube 2.817 vs 2.425).
+
+**The actual mechanism.** The local arm fits r ∈ [0.01, 0.5]·`ref_scale`
+with `ref_scale` the median 20th-Mahalanobis-neighbour distance, so the
+**entire window** spans mean neighbour counts **0.009 to 4.5 per point** —
+all at or below point spacing. At the bottom, ~14 pairs out of 2.6M survive,
+and the `0 < C(r) < 1` filter silently conditions on "at least one pair
+survived", flooring log C. Smoking gun: the mean local slope over the
+window's lower half is **1.168**, over the upper half **1.976**. The top of
+the window already reads the truth; unweighted OLS averages truth with
+artifact. The global arm was immune only because its window
+([0.01, 0.2]·bbox diagonal ⇒ 1…400 neighbours) sits two decades higher.
+
+### 10.2 Fix: inverse-variance weighted least squares
+
+`Var(log C_j) ≈ 1/P_j`, and the pair count P_j spans 14 … 7.2×10⁶ across
+this window — OLS is simply the wrong error model. Weights `w_j = P_j`.
+**The weights are the observed pair counts, so there is no new constant, no
+threshold, and no caller-facing parameter**; radius grid, reference scale,
+metric and distance arithmetic are untouched, so §8.2's anisotropy
+correction is preserved by construction and the fit stays exactly
+scale-equivariant.
+
+Result: square 1.6525 → **1.9347** (truth 2.0). Estimator variance improves
+too — square RMSE 0.193 → **0.042**, cube 0.266 → **0.115** across 5 seeds —
+so no bias/variance trade was made. Cost is ±1% of the gp arm, ±0.1% of a
+row.
+
+### 10.3 The proposed shrinkage fix was measured and rejected — for a reason worth keeping
+
+Ledoit–Wolf shrinkage of local covariance toward the global was implemented
+and tested. It fails twice over: its ceiling is the 10% term (1.6471 with
+OLS, no better than plain), and — the important part — **its intensity runs
+backwards**. Median α = **0.176 on the isotropic square** but **1.000 on
+the 100:1 and 1000:1 anisotropic clouds**, because on a globally-affine
+cloud each Σᵢ is already nearly proportional to the global covariance, so
+LW's target looks perfect and α saturates. Adopting it would have silently
+converted the distance arm into the **global** arm on precisely the
+refutation family — the outcome §9's decision explicitly kept. A fix that
+appears principled and inverts its own premise on the cases that matter is
+exactly what an execution-first gate exists to catch.
+
+### 10.4 Gate composition: the §8.3 promise now holds in execution
+
+Real `cic._detect` / `build_interval` / `_shell_arm`, n=1600
+(margin = arm gap − threshold; negative = MEASURED):
+
+| case | margin before | margin after | verdict |
+|---|---|---|---|
+| uniform square (isotropic) | +0.007 | **−0.301** | UNDECIDED → **MEASURED** ✓ |
+| isotropic control ×100 | +0.007 | **−0.301** | UNDECIDED → **MEASURED** ✓ |
+| 10:1 (±rot) | +0.070 | **−0.231** | UNDECIDED → **MEASURED** ✓ |
+| 20:1 (±rot) | +0.047 | **−0.242** | UNDECIDED → **MEASURED** ✓ |
+| 50:1 / 100:1 (±rot) | −0.049 / −0.214 | −0.279 / −0.279 | MEASURED ✓ |
+| 500:1 / 1000:1 / 10000:1 | +0.482 / +0.501 / +0.594 | +0.614 / +0.634 / +0.455 | UNDECIDED ✓ |
+
+**Monotonicity MET at every n** — MEASURED 1:1…100:1 then UNDECIDED above
+at n=1600; MEASURED 1:1…200:1 then UNDECIDED above at n=3200. The
+abstain/measure/abstain alternation of §9.2 is gone, so the measured region
+is now honestly pre-registrable.
+
+**Zero new calibration violations across 81 gate-executed rows** (24 at
+n=1600, 24 at n=3200, 33 in the transition hunt along the exact n-axis that
+found §9.1's second violation). All three named regression rows stay
+UNDECIDED; their scratch brackets now also contain 2.0, so §8.1's
+scratch-level violation is removed as well — though the gate still correctly
+abstains there, because the shell arm has collapsed to the chain artifact.
+
+### 10.5 Honest limitation, and what it means for the §9 choice
+
+The fixed local arm and the global arm now agree closely (1.9347 vs 1.9343)
+and produce **identical gate verdicts on all 81 rows**. The evidence shows
+the local arm no longer *under*performs the global one; it does **not** show
+it *out*performing it on this battery. Keeping local-gp is defensible and
+now unblocked, but on present evidence it is a choice about which arm to
+carry forward, not a measured superiority. The reach ceiling (~100:1 at
+n=1600) is unchanged — that is §8.1's structural shell-arm limit, untouched
+by this defect or its fix.

@@ -1,0 +1,47 @@
+D1 square(A):
+    per_point_local (production)   D=1.6525 r2=0.9847 used=20 nbrs=[0.009,4.5] slope_lo=1.168 slope_hi=1.976
+    global_cov_broadcast           D=1.6895 r2=0.9878 used=20 nbrs=[0.009,5.2] slope_lo=1.308 slope_hi=1.928
+    identity_broadcast             D=1.6855 r2=0.9875 used=20 nbrs=[0.009,5.2] slope_lo=1.321 slope_hi=1.916
+    shape_noise_only               D=1.6569 r2=0.9844 used=20 nbrs=[0.009,4.6] slope_lo=1.198 slope_hi=1.968
+    scale_noise_only               D=1.6701 r2=0.9890 used=20 nbrs=[0.009,5.5] slope_lo=1.347 slope_hi=1.919
+    global arm (own radius rule) D=1.9343
+D1 cube:
+    per_point_local (production)   D=2.8170 r2=0.9868 used=15 nbrs=[0.000,2.3] slope_lo=2.233 slope_hi=2.982
+    global_cov_broadcast           D=2.4252 r2=0.9543 used=18 nbrs=[0.000,2.7] slope_lo=1.456 slope_hi=2.852
+    identity_broadcast             D=2.4280 r2=0.9543 used=18 nbrs=[0.000,2.7] slope_lo=1.456 slope_hi=2.856
+    shape_noise_only               D=2.8257 r2=0.9886 used=15 nbrs=[0.000,2.4] slope_lo=2.160 slope_hi=3.082
+    scale_noise_only               D=2.3099 r2=0.9526 used=19 nbrs=[0.000,3.0] slope_lo=1.318 slope_hi=2.886
+    global arm (own radius rule) D=2.9035
+D1 rescale_100to1:
+    per_point_local (production)   D=1.7215 r2=0.9923 used=20 nbrs=[0.004,4.9] slope_lo=1.733 slope_hi=1.924
+    global_cov_broadcast           D=1.6895 r2=0.9878 used=20 nbrs=[0.009,5.2] slope_lo=1.308 slope_hi=1.928
+    identity_broadcast             D=1.8052 r2=0.9983 used=20 nbrs=[0.006,6.3] slope_lo=1.648 slope_hi=1.878
+    shape_noise_only               D=1.7072 r2=0.9943 used=20 nbrs=[0.005,5.3] slope_lo=1.630 slope_hi=1.912
+    scale_noise_only               D=1.7757 r2=0.9969 used=20 nbrs=[0.007,6.0] slope_lo=1.505 slope_hi=1.895
+    global arm (own radius rule) D=1.9339
+D2 square(A):
+    win=[0.01,0.5] per_point_local    D=1.6525 r2=0.9847 used=20 nbrs=[0.009,4.5]
+    win=[0.01,0.5] global_broadcast   D=1.6895 r2=0.9878 used=20 nbrs=[0.009,5.2]
+    win=[0.05,0.5] per_point_local    D=1.9451 r2=0.9980 used=20 nbrs=[0.056,4.5]
+    win=[0.05,0.5] global_broadcast   D=1.9349 r2=0.9996 used=20 nbrs=[0.059,5.2]
+    win=[0.1,1.0] per_point_local    D=2.0693 r2=0.9997 used=20 nbrs=[0.175,20.0]
+    win=[0.1,1.0] global_broadcast   D=1.9602 r2=0.9997 used=20 nbrs=[0.230,20.3]
+    win=[0.2,2.0] per_point_local    D=2.0157 r2=0.9987 used=20 nbrs=[0.687,66.3]
+    win=[0.2,2.0] global_broadcast   D=1.9650 r2=0.9999 used=20 nbrs=[0.834,76.6]
+    win=[0.5,4.0] per_point_local    D=1.8602 r2=0.9978 used=20 nbrs=[4.456,228.2]
+    win=[0.5,4.0] global_broadcast   D=1.9058 r2=0.9998 used=20 nbrs=[5.234,274.3]
+    win=[1.0,8.0] per_point_local    D=1.7226 r2=0.9994 used=20 nbrs=[19.991,676.6]
+    win=[1.0,8.0] global_broadcast   D=1.8039 r2=0.9988 used=20 nbrs=[20.340,832.2]
+D2 rescale_100to1:
+    win=[0.01,0.5] per_point_local    D=1.7215 r2=0.9923 used=20 nbrs=[0.004,4.9]
+    win=[0.01,0.5] global_broadcast   D=1.6895 r2=0.9878 used=20 nbrs=[0.009,5.2]
+    win=[0.05,0.5] per_point_local    D=1.9020 r2=0.9983 used=20 nbrs=[0.069,4.9]
+    win=[0.05,0.5] global_broadcast   D=1.9349 r2=0.9996 used=20 nbrs=[0.059,5.2]
+    win=[0.1,1.0] per_point_local    D=1.9773 r2=0.9999 used=20 nbrs=[0.209,19.5]
+    win=[0.1,1.0] global_broadcast   D=1.9602 r2=0.9997 used=20 nbrs=[0.230,20.3]
+    win=[0.2,2.0] per_point_local    D=1.9194 r2=0.9992 used=20 nbrs=[0.802,63.3]
+    win=[0.2,2.0] global_broadcast   D=1.9650 r2=0.9999 used=20 nbrs=[0.834,76.6]
+    win=[0.5,4.0] per_point_local    D=1.7218 r2=0.9959 used=20 nbrs=[4.894,172.2]
+    win=[0.5,4.0] global_broadcast   D=1.9058 r2=0.9998 used=20 nbrs=[5.234,274.3]
+    win=[1.0,8.0] per_point_local    D=1.4148 r2=0.9915 used=20 nbrs=[19.476,362.3]
+    win=[1.0,8.0] global_broadcast   D=1.8039 r2=0.9988 used=20 nbrs=[20.340,832.2]

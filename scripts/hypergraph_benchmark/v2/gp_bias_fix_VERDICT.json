@@ -1,0 +1,134 @@
+{
+ "blocker": "MENSURA_BENCH_V2 section 9.2 -- gp_local_mahalanobis reads ~1.65 on isotropic 2-D clouds, tripping READOUT_DIVERGENCE on the plain uniform square",
+ "diagnosis": {
+  "owner_hypothesis": "per-point local-covariance ESTIMATION NOISE smears pairwise distances and biases the log-log slope down",
+  "verdict_on_hypothesis": "REFUTED as the dominant mechanism (it is a real but ~10% term)",
+  "prediction_a_bias_shrinks_with_k0": {
+   "result": "FAILS",
+   "evidence": "k0 15/30/60/120/240/480 -> D 1.7571/1.6525/1.6946/1.6507/1.6400/1.6686 while median local eigenvalue ratio falls 4.844->2.305; the conditioning improves and the bias does not move"
+  },
+  "prediction_b_global_metric_removes_bias": {
+   "result": "FAILS (recovers 10%)",
+   "evidence": "same radius rule, per-point metric D=1.6525; global-covariance metric D=1.6895; identity metric D=1.6855; deficit vs truth 0.3475, recovered 0.0370"
+  },
+  "prediction_c_eig_ratio_spread_gt_1": {
+   "result": "HOLDS but is not causal",
+   "evidence": "raw local covariances on the isotropic square at k0=30: median eigenvalue ratio 1.550, p90 2.563, max 6.57; but (a) shows collapsing that spread does not move D"
+  },
+  "prediction_d_worse_at_small_n_and_high_d": {
+   "result": "MIXED; the n-trend is real but belongs to the fit window, not the metric",
+   "evidence": "square n=400/800/1600/3200 local D=1.4878/1.6530/1.6525/1.8439 and CONSTANT-metric D=1.4919/1.6811/1.6895/1.8035 -- identical trend, so it is not metric noise; in 3-D the LOCAL metric reads BETTER than the constant one (cube n=1600: 2.8170 vs 2.4252), the opposite of the prediction"
+  },
+  "actual_mechanism": {
+   "name": "fit-window depletion + survivorship conditioning, amplified by unweighted OLS",
+   "statement": "gp_local_mahalanobis fits r in [0.01,0.5]*ref_scale where ref_scale is the median 20th-Mahalanobis-neighbour distance. A radius of f*r_20 holds ~20*f^d neighbours, so the ENTIRE window spans mean neighbour counts 0.009..4.5 per point at n=1600 -- at or below the point-spacing scale. At the bottom the total pair count is ~14 of 2.6M, and the `0 < C(r) < 1` filter conditions on 'at least one pair survived', flooring log C and flattening the curve.",
+   "smoking_gun": "on the isotropic square the mean LOCAL slope over the lower half of the window is 1.168 and over the upper half is 1.976 -- the top of the window already reads the truth; unweighted OLS averages the truth with the artifact",
+   "why_the_global_arm_is_immune": "it goes through baseline.correlation_dimension, whose window is [0.01,0.2]*bounding-box diagonal = mean neighbour counts ~1..400, two decades higher"
+  }
+ },
+ "fix": {
+  "name": "inverse-variance weighted log-log fit",
+  "change": "replace OLS on (log r, log C) with WLS using weights w_j = P_j, the observed pair count at radius j",
+  "rationale": "Var(log C_j) ~ 1/P_j to leading order and P_j spans 14..7.2e6 across this window, so OLS is the wrong error model; w_j = 1/Var is the standard correction",
+  "zero_knob": "introduces no constant, no threshold and no caller-facing parameter -- the weights ARE the data; the radius grid, reference scale, metric and distance arithmetic are unchanged",
+  "certificate_fields": [
+   "weighting",
+   "effective_n_radii (Kish)",
+   "weighted_mean_neighbors_per_point",
+   "min_pair_count",
+   "max_pair_count",
+   "r_squared (weighted)"
+  ],
+  "scale_equivariance": "rescaling the cloud rescales every radius and leaves every count identical, so the fit is exactly scale-equivariant -- the isotropic-control property is preserved by construction",
+  "interaction_with_ridge_floors": "none. The topology floor (0.05) and metric floor (0.001) act on the covariance eigenvalues; this acts on the log-log regression. Neither is touched and neither subsumes the other."
+ },
+ "shrinkage_proposal": {
+  "implemented": "gp_bias_fix.shrunk_local_covariances (Ledoit-Wolf 2004 intensity, per point, target = global covariance rescaled to the point's own trace)",
+  "adopted": false,
+  "reason_1_wrong_size": "its best possible effect is bounded above by the global_cov_broadcast row (D=1.6895 vs truth 2.0) -- it addresses the 10% term, and on its own still fails the gate: measured shrinkage+OLS on the square gives 1.6471, no better than plain OLS",
+  "reason_2_intensity_goes_the_wrong_way": "the hypothesis predicted high intensity on isotropic data and mild on anisotropic. MEASURED: median alpha = 0.176 on the isotropic square and 1.000 on the 100:1 and 1000:1 anisotropic clouds. Ledoit-Wolf's denominator is ||Sigma_i - T||_F^2, and on a globally affine cloud the local covariance is already nearly proportional to the global one, so the target looks perfect and alpha saturates at 1. Adopting it would silently convert the distance arm into the GLOBAL arm on exactly the refutation family the local arm exists for -- the outcome the owner rejected.",
+  "composability": "shrinkage+WLS was also measured (square 1.9228, cube 2.9521, 100:1 1.9494) and is neither needed nor harmful; it is left available but off."
+ },
+ "acceptance": {
+  "isotropic_square_n1600": "UNDECIDED (margin +0.007) -> MEASURED [1.582, 2.340], contains 2.0 (margin -0.301)",
+  "isotropic_control_n1600": "same, identical to the square to the last ULP as before the fix",
+  "mild_anisotropy_10to1_n1600": "UNDECIDED (+0.070) -> MEASURED, contains truth (-0.231)",
+  "mild_anisotropy_20to1_n1600": "UNDECIDED (+0.047) -> MEASURED, contains truth (-0.242)",
+  "extreme_1000to1_and_10000to1": "UNDECIDED at n=1600 and n=3200, before and after",
+  "monotonic_measured_region": true,
+  "measured_region_n1600": "1:1 .. 100:1 MEASURED; 200:1 and above UNDECIDED",
+  "measured_region_n3200": "1:1 .. 200:1 MEASURED; 500:1 and above UNDECIDED",
+  "measured_region_n1440_1760": "20:1 .. 100:1 MEASURED; 200:1 and above UNDECIDED (transition stage)",
+  "new_calibration_violations": 0,
+  "rows_run_through_real_gate": 81
+ },
+ "cost": {
+  "n=1600": {
+   "rows": 24,
+   "gp_before_median_s": 0.4807,
+   "gp_after_median_s": 0.4754,
+   "gp_global_median_s": 0.1298,
+   "delta_median_s": -0.0053,
+   "delta_pct_of_gp_arm": -1.11,
+   "construction_median_s": 3.537,
+   "total_row_median_s": 6.596,
+   "delta_pct_of_whole_row": -0.081,
+   "wls_effective_n_radii_min_med_max": [
+    3.39,
+    5.09,
+    9.85
+   ]
+  },
+  "n=3200": {
+   "rows": 24,
+   "gp_before_median_s": 1.9566,
+   "gp_after_median_s": 1.977,
+   "gp_global_median_s": 0.3672,
+   "delta_median_s": 0.0204,
+   "delta_pct_of_gp_arm": 1.04,
+   "construction_median_s": 11.169,
+   "total_row_median_s": 20.73,
+   "delta_pct_of_whole_row": 0.098,
+   "wls_effective_n_radii_min_med_max": [
+    3.4,
+    5.04,
+    9.68
+   ]
+  }
+ },
+ "seed_variance": {
+  "square_before": {
+   "mean": 1.836,
+   "std": 0.1136,
+   "rmse": 0.1929
+  },
+  "square_after": {
+   "mean": 1.9951,
+   "std": 0.0465,
+   "rmse": 0.0419
+  },
+  "cube_before": {
+   "mean": 2.7627,
+   "std": 0.1339,
+   "rmse": 0.2658
+  },
+  "cube_after": {
+   "mean": 2.9132,
+   "std": 0.0849,
+   "rmse": 0.1154
+  },
+  "note": "the weighted fit is both LESS biased and LESS variable -- no bias/variance trade was made"
+ },
+ "artifacts": [
+  "gp_bias_fix_diag.json",
+  "gp_bias_fix_candidates.json",
+  "gp_bias_fix_battery_n1600.json",
+  "gp_bias_fix_battery_n3200.json",
+  "gp_bias_fix_transition.json",
+  "gp_bias_fix_pinned.json",
+  "gp_bias_fix_seeds.json",
+  "gp_bias_fix_isoidentity.json",
+  "gp_bias_fix_cost.json"
+ ],
+ "final": "FIXED -- ready to integrate with the local-gp arm"
+}
