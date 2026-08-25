@@ -14,3 +14,6 @@ rev = "v4.32.2"
 
 [[lean_lib]]
 name = "CallensDualScale"
+
+[[lean_lib]]
+name = "QuantumFluidsShell"
