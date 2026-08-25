@@ -71,6 +71,30 @@ moving from -0.39 to +0.99 as `k` alone varied from 10 to 15. A caller
 choosing `k` chooses the answer. The selection rule is `select_settings()`,
 its output is recorded verbatim on the certificate, and the only arguments
 `certify()` accepts besides the data are provenance labels.
+
+SCALE-AWARENESS, AND WHY IT IS A CORRECTNESS PROPERTY
+------------------------------------------------------
+Dimension is a bi-Lipschitz invariant, so `certify(X)` and `certify(X @ M)`
+for an invertible `M` must agree or one of them must abstain. Under plain
+Euclidean readouts they did not: v2 section 7.1 records the same uniform
+square returning MEASURED [1.5859, 2.2822] and, after rescaling one
+coordinate by 0.01, MEASURED [0.6374, 1.3626] -- two DISJOINT measured
+intervals for one set, with no signal raised, and reachable by ordinary use
+(a Takens delay embedding at lag 1 lands there). Both arms collapsed toward 1
+TOGETHER -- the shell arm because the k-NN graph degenerates into a chain
+along the long axis, the correlation-sum arm because its radii were fractions
+of the raw bounding-box diagonal, which the long axis dominates -- and
+`READOUT_DIVERGENCE` fires only when the arms DISAGREE, so it was silent
+exactly when they shared the bias.
+
+Both readouts are therefore taken under a converged per-point Mahalanobis
+metric estimated from the data (`pointcloud.local_mahalanobis_metric`, and
+`baseline.local_mahalanobis_correlation_dimension` for the distance arm).
+This is a change to the READOUTS ONLY. Every abstention constant and every
+signal rule below is exactly as it was, and that is deliberate: the measured
+region grows to ~100:1 anisotropy at n=1600 with any rotation, and beyond
+that ceiling -- which is structural, not a tuning shortfall -- the unchanged
+gate turns what were silent violations into honest UNDECIDED verdicts.
 """
 
 from __future__ import annotations
@@ -88,7 +112,7 @@ from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
-from .baseline import correlation_dimension
+from .baseline import local_mahalanobis_correlation_dimension
 from .core import Hypergraph, Node
 from .dimension import (
     DimensionEstimate,
@@ -97,15 +121,35 @@ from .dimension import (
     local_dimension,
     near_constant_consensus,
 )
-from .pointcloud import _bbox_diagonal, _duplicate_clusters, knn_hypergraph
+from .pointcloud import (
+    GLOBAL_RIDGE_FLOOR_FRAC,
+    MAX_METRIC_ITERATIONS,
+    METRIC_CONVERGENCE_OVERLAP,
+    METRIC_RIDGE_FLOOR_FRAC,
+    TOPOLOGY_RIDGE_FLOOR_FRAC,
+    LocalMetric,
+    _bbox_diagonal,
+    _duplicate_clusters,
+    auto_covariance_window,
+    hypergraph_from_neighbours,
+    local_mahalanobis_metric,
+    mahalanobis_knn_indices,
+)
 
 # --------------------------------------------------------------------------
 # Contract identity. Bump on ANY change to a constant below or to the
 # selection/abstention logic: a certificate is only replayable against the
 # contract it was issued under.
+#
+# cic-1.0 -> cic-1.1: the two readouts became scale-aware. Neighbour selection
+# now runs under a converged per-point Mahalanobis metric instead of the raw
+# Euclidean one, and the correlation-sum arm measures distances under that
+# same metric with an inverse-variance weighted log-log fit instead of radii
+# taken as fractions of the raw bounding-box diagonal. NOT ONE ABSTENTION
+# CONSTANT OR SIGNAL RULE CHANGED -- see the note above `_detect`.
 # --------------------------------------------------------------------------
-CIC_CONTRACT_VERSION = "cic-1.0"
-DEFAULT_ADAPTER = "knn-shell-growth+gp-correlation-sum"
+CIC_CONTRACT_VERSION = "cic-1.1"
+DEFAULT_ADAPTER = "local-mahalanobis-knn-shell-growth+local-mahalanobis-correlation-sum"
 
 # --------------------------------------------------------------------------
 # MEASURED CONSTANTS. Every one is a number read off a recorded experiment,
@@ -293,7 +337,14 @@ class Signal:
 
 @dataclass(frozen=True)
 class SelectedSettings:
-    """What the method chose for itself. A caller may not supply any of it."""
+    """What the method chose for itself. A caller may not supply any of it.
+
+    The metric block is as much a setting as `k` is: which points count as
+    neighbours is chosen from the data, so the certificate has to say under
+    what metric, from how big a covariance window, after how many refinement
+    rounds, and at which ridge floors -- otherwise a replay cannot tell
+    whether it reproduced the measurement or merely resembled it.
+    """
 
     k: int
     max_radius: int
@@ -303,6 +354,15 @@ class SelectedSettings:
     admissible_k: tuple[int, ...]
     k_ladder: tuple[int, ...]
     selection_rule: str
+    # --- the scale-aware metric, self-selected and recorded (v2 section 8.4) ---
+    metric: str = "euclidean"
+    covariance_window_k0: int = 0
+    metric_iterations: int = 0
+    metric_converged: bool = False
+    metric_final_overlap: float = 0.0
+    topology_ridge_floor: float = 0.0
+    metric_ridge_floor: float = 0.0
+    global_ridge_floor: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -380,6 +440,30 @@ class Diagnostics:
     # optional provenance-only statistic; see the module docstring on why the
     # Theiler window is NOT auto-applied
     temporal_adjacency_fraction: float | None = None
+
+    # --- the scale-aware metric, recorded, never a gate ---------------------
+    # How anisotropic the local metric ended up, and how hard it had to work to
+    # get there. `metric_final_overlap` below 1.0 with `metric_iterations` at
+    # MAX_METRIC_ITERATIONS means the refinement never settled, which is worth
+    # reading on any surprising row -- but it is NOT a signal, because no
+    # threshold on it has been measured.
+    metric_global_cov_cond: float = float("nan")
+    metric_median_topology_cond: float = float("nan")
+    metric_median_cond: float = float("nan")
+    metric_max_cond: float = float("nan")
+    metric_round_overlaps: tuple[float, ...] = ()
+
+    # --- what the weighted correlation-sum fit leaned on --------------------
+    # The weights are the observed pair counts, which span five orders of
+    # magnitude across the radius grid, so "20 radii were fitted" is not a
+    # useful statement on its own. `gp_effective_n_radii` is Kish's effective
+    # sample size over those weights and is the honest count.
+    gp_ref_scale: float = float("nan")
+    gp_n_radii_used: int = 0
+    gp_effective_n_radii: float = float("nan")
+    gp_weighted_mean_neighbors: float = float("nan")
+    gp_min_pair_count: float = float("nan")
+    gp_max_pair_count: float = float("nan")
 
 
 @dataclass(frozen=True)
@@ -471,22 +555,43 @@ def _components(hg: Hypergraph, n_nodes: int) -> tuple[int, float]:
     return int(n_comp) + isolated, float(sizes.max()) / n_nodes if n_nodes else 0.0
 
 
-def build_ladder(arr: np.ndarray) -> tuple[_GraphAtK, ...]:
-    """Build the k-NN graph at every rung of `K_LADDER` and measure its components.
+def build_ladder(arr: np.ndarray) -> tuple[tuple[_GraphAtK, ...], LocalMetric | None]:
+    """Build the proximity graph at every rung of `K_LADDER`, SCALE-AWARELY,
+    and measure its components. Returns `(rungs, metric)`.
 
     Reads only structure. No dimension estimate is computed here, so this half
     of the selection provably cannot select for an answer.
+
+    THE ONE CHANGE FROM cic-1.0, and everything that follows from it: the
+    edges come from `pointcloud.mahalanobis_knn_indices` under the converged
+    per-point metric, not from a Euclidean k-NN query. The ladder is then
+    prefixes of ONE neighbour query rather than one query per rung -- correct
+    because `mahalanobis_knn_indices` returns each row ascending by distance,
+    so its first `k` entries are exactly that point's `k` nearest, and it
+    keeps the O(n^2 d^2) search to a single pass.
+
+    The query is deliberately made FRESH under `sigma_inv_topology` rather
+    than reusing the refinement's last neighbour sets: those were selected by
+    the metric one round earlier, and at convergence "nearly the same" is not
+    "the same". That gap was measured to decide rung admissibility on a
+    Lorenz cloud (stale sets: no admissible rung anywhere on the ladder;
+    fresh query under the reported metric: k=25 admissible). The metric a
+    certificate reports must be the metric that selected the edges.
     """
     n = len(arr)
-    points = [tuple(row) for row in arr]
+    if n < 4:
+        return (), None
+    metric = local_mahalanobis_metric(arr, k0=auto_covariance_window(n, arr.shape[1]))
+    query_len = min(max(max(K_LADDER), metric.k0), n - 1)
+    neighbours = mahalanobis_knn_indices(arr, metric.sigma_inv_topology, query_len)
     rungs: list[_GraphAtK] = []
     for k in K_LADDER:
-        if k >= n:
+        if k >= n or k > query_len:
             continue
-        hg = knn_hypergraph(points, k, dedupe=False, duplicate_tolerance=0.0)
+        hg = hypergraph_from_neighbours(neighbours[:, :k])
         n_comp, largest = _components(hg, n)
         rungs.append(_GraphAtK(k, hg, n_comp, largest))
-    return tuple(rungs)
+    return tuple(rungs), metric
 
 
 def select_max_radius(
@@ -576,8 +681,41 @@ _SELECTION_RULE = (
     "with k (+0.004 at k=6 to +0.21 at k=15). max_radius = the LONGEST such window that "
     f"also keeps median ball(r-1) <= {BALL_FRACTION_CAP} of the graph. min_radius fixed "
     "at 1: v2 section 6 measured no window rule that improves all k, so the window "
-    "starts where every recorded number started."
+    "starts where every recorded number started. NEIGHBOURS are selected under a "
+    "per-point Mahalanobis metric, itself selected from the data: covariance window "
+    "k0 = auto_covariance_window(n, d), bootstrapped from the whole-cloud covariance "
+    "(never from a Euclidean neighbourhood, which under anisotropy is already the "
+    "artifact being corrected), then refined by re-selection until consecutive rounds "
+    f"agree on >= {METRIC_CONVERGENCE_OVERLAP} of every neighbour set or "
+    f"{MAX_METRIC_ITERATIONS} rounds have run."
 )
+
+
+def _settings_from(
+    admissible: Sequence[int],
+    max_radius: int,
+    metric: LocalMetric | None,
+) -> SelectedSettings:
+    """Assemble the recorded settings. One function so `select_settings()` and
+    `certify()` cannot drift apart -- a test asserts they agree exactly."""
+    return SelectedSettings(
+        k=admissible[0] if admissible else 0,
+        max_radius=max_radius,
+        min_radius=MIN_RADIUS,
+        samples=SAMPLES,
+        well_fit_r_squared=WELL_FIT_R_SQUARED,
+        admissible_k=tuple(admissible),
+        k_ladder=K_LADDER,
+        selection_rule=_SELECTION_RULE,
+        metric="local-mahalanobis" if metric is not None else "euclidean",
+        covariance_window_k0=metric.k0 if metric is not None else 0,
+        metric_iterations=metric.iterations if metric is not None else 0,
+        metric_converged=metric.converged if metric is not None else False,
+        metric_final_overlap=metric.final_overlap if metric is not None else 0.0,
+        topology_ridge_floor=TOPOLOGY_RIDGE_FLOOR_FRAC if metric is not None else 0.0,
+        metric_ridge_floor=METRIC_RIDGE_FLOOR_FRAC if metric is not None else 0.0,
+        global_ridge_floor=GLOBAL_RIDGE_FLOOR_FRAC if metric is not None else 0.0,
+    )
 
 
 def select_settings(points: Sequence[Sequence[float]] | np.ndarray) -> SelectedSettings:
@@ -588,20 +726,11 @@ def select_settings(points: Sequence[Sequence[float]] | np.ndarray) -> SelectedS
     """
     arr = _as_array(points)
     arr, _, _ = _dedupe(arr)
-    rungs = build_ladder(arr) if len(arr) > min(K_LADDER) else ()
+    rungs, metric = build_ladder(arr) if len(arr) > min(K_LADDER) else ((), None)
     arms, _ = _shell_arms(rungs)
     admissible = tuple(sorted(arms))
     k = admissible[0] if admissible else 0
-    return SelectedSettings(
-        k=k,
-        max_radius=arms[k].max_radius if k else 0,
-        min_radius=MIN_RADIUS,
-        samples=SAMPLES,
-        well_fit_r_squared=WELL_FIT_R_SQUARED,
-        admissible_k=admissible,
-        k_ladder=K_LADDER,
-        selection_rule=_SELECTION_RULE,
-    )
+    return _settings_from(admissible, arms[k].max_radius if k else 0, metric)
 
 
 # --------------------------------------------------------------------------
@@ -940,6 +1069,16 @@ def _detect(
     Ordered structural-first, because a fragmented graph makes every downstream
     number meaningless and the report is more useful naming the cause than the
     symptom.
+
+    DO NOT LOOSEN ANYTHING IN HERE TO LET A RESULT THROUGH. This gate is what
+    caught every calibration violation this project has found, including two
+    that only the final pre-integration gate discovered (a 500:1 rescale
+    missing truth by 0.0044, and the 1000:1 family at n=1440 missing by
+    0.090 -- the second found by perturbing n, not the rescale factor).
+    Making the scale-aware readouts pass was the job of the READOUTS; the
+    thresholds and factors here are exactly those of cic-1.0, deliberately.
+    Loosening a calibration gate so wins pass is the anti-pattern recorded in
+    docs/LL.md lessons 8-9.
     """
     signals: list[str] = []
 
@@ -1033,9 +1172,7 @@ def certify(
     if time_indices is not None and n_dropped == 0 and len(time_indices) == len(arr):
         times = np.asarray(time_indices)
 
-    cloud = [tuple(row) for row in arr]
-
-    rungs = build_ladder(arr) if len(arr) > min(K_LADDER) else ()
+    rungs, metric = build_ladder(arr) if len(arr) > min(K_LADDER) else ((), None)
     largest_fraction = max((r.largest_fraction for r in rungs), default=0.0)
     arms, traces = _shell_arms(rungs)
     admissible = tuple(sorted(arms))
@@ -1050,15 +1187,20 @@ def certify(
         t and t[0][2] > BALL_FRACTION_CAP for t in traces.values()
     )
 
-    # the correlation-sum arm: the other side of the bracket
+    # The correlation-sum arm: the other side of the bracket, measured under
+    # the SAME per-point metric the edges were selected under -- but floored at
+    # METRIC_RIDGE_FLOOR rather than TOPOLOGY_RIDGE_FLOOR, because this arm has
+    # no graph to grow spurious shortcut edges in and so tolerates a much more
+    # aggressive correction. See the floor commentary in `pointcloud`.
     gp_dimension, gp_r_squared, n_pair_counts = float("nan"), 0.0, 0
-    if len(cloud) >= 3:
+    gp: Any | None = None
+    if metric is not None and len(arr) >= 3:
         try:
-            gp = correlation_dimension(cloud)
+            gp = local_mahalanobis_correlation_dimension(arr, metric.sigma_inv_metric)
             gp_dimension, gp_r_squared = gp.dimension, gp.r_squared
             n_pair_counts = gp.n_pair_counts
         except ValueError:
-            pass
+            gp = None
 
     signals = _detect(
         selected=selected,
@@ -1077,16 +1219,7 @@ def certify(
     k_spread = (max(readouts) - min(readouts)) if len(readouts) >= 2 else 0.0
     selected_hg = next((r.hg for r in rungs if r.k == k_chosen), None)
 
-    settings = SelectedSettings(
-        k=k_chosen or 0,
-        max_radius=selected.max_radius if selected else 0,
-        min_radius=MIN_RADIUS,
-        samples=SAMPLES,
-        well_fit_r_squared=WELL_FIT_R_SQUARED,
-        admissible_k=admissible,
-        k_ladder=K_LADDER,
-        selection_rule=_SELECTION_RULE,
-    )
+    settings = _settings_from(admissible, selected.max_radius if selected else 0, metric)
 
     # --- verdict and interval ---
     d_lo: float | None = None
@@ -1195,6 +1328,17 @@ def certify(
         temporal_adjacency_fraction=(
             _temporal_adjacency_fraction(selected_hg, times) if selected_hg is not None else None
         ),
+        metric_global_cov_cond=metric.global_cov_cond if metric else float("nan"),
+        metric_median_topology_cond=metric.median_topology_cond if metric else float("nan"),
+        metric_median_cond=metric.median_metric_cond if metric else float("nan"),
+        metric_max_cond=metric.max_metric_cond if metric else float("nan"),
+        metric_round_overlaps=metric.round_overlaps if metric else (),
+        gp_ref_scale=gp.ref_scale if gp else float("nan"),
+        gp_n_radii_used=gp.n_radii_used if gp else 0,
+        gp_effective_n_radii=gp.effective_n_radii if gp else float("nan"),
+        gp_weighted_mean_neighbors=gp.weighted_mean_neighbors_per_point if gp else float("nan"),
+        gp_min_pair_count=gp.min_pair_count if gp else float("nan"),
+        gp_max_pair_count=gp.max_pair_count if gp else float("nan"),
     )
 
     certificate = Certificate(
@@ -1224,6 +1368,11 @@ def certify(
             ("SAMPLES", float(SAMPLES)),
             ("RADIUS_CAP", float(RADIUS_CAP)),
             ("BALL_FRACTION_CAP", BALL_FRACTION_CAP),
+            ("GLOBAL_RIDGE_FLOOR_FRAC", GLOBAL_RIDGE_FLOOR_FRAC),
+            ("TOPOLOGY_RIDGE_FLOOR_FRAC", TOPOLOGY_RIDGE_FLOOR_FRAC),
+            ("METRIC_RIDGE_FLOOR_FRAC", METRIC_RIDGE_FLOOR_FRAC),
+            ("METRIC_CONVERGENCE_OVERLAP", METRIC_CONVERGENCE_OVERLAP),
+            ("MAX_METRIC_ITERATIONS", float(MAX_METRIC_ITERATIONS)),
         ),
     )
 

@@ -80,6 +80,7 @@ array (verified by test).
 
 from __future__ import annotations
 
+import dataclasses
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -458,3 +459,201 @@ def minimum_points_for_target_accuracy(
         if all(math.isfinite(d) and abs(d - true_dimension) <= tolerance for _, d in results[i:]):
             return n
     return None
+
+
+# ==========================================================================
+# LOCAL-MAHALANOBIS CORRELATION SUM
+#
+# WHY THIS EXISTS. `correlation_dimension` above expresses its radii as
+# hard-coded fractions (0.01-0.2) of the point cloud's raw BOUNDING-BOX
+# DIAGONAL. On an anisotropic cloud the long axis dominates that diagonal, so
+# a fixed fraction of it is the wrong scale on every other axis and the
+# estimate collapses toward 1 -- the correlation-sum half of the refutation in
+# docs/MENSURA_BENCH_V2.md section 7.1, where a metres-to-kilometres rescale
+# of one coordinate moved `cic.certify` between two DISJOINT measured
+# intervals with no signal raised. Because the shell arm collapses the same
+# way at the same time, `READOUT_DIVERGENCE` -- which only fires when the two
+# arms DISAGREE -- is silent exactly when they share the bias.
+#
+# The fix is the same one `pointcloud.local_mahalanobis_metric` applies to
+# neighbour selection: measure distance under each point's own local
+# Mahalanobis metric, and set the radius grid from a DATA-DRIVEN reference
+# scale (the median over points of that point's own 20th Mahalanobis-
+# neighbour distance) instead of the raw bounding box.
+#
+# WHAT THIS IS NOT. Each term of the sum uses a DIFFERENT metric, so this is
+# a per-point-metric generalisation of the classical correlation integral,
+# not the classical D_2 itself. Stated here rather than presented as a
+# drop-in replacement.
+# ==========================================================================
+
+
+@dataclass(frozen=True)
+class LocalMahalanobisCorrelationEstimate:
+    """Result of a local-Mahalanobis, inverse-variance-weighted correlation fit.
+
+    `dimension` and `r_squared` carry the same meaning as on
+    `CorrelationDimensionEstimate` (and `r_squared` is compared against the
+    same threshold), so the two are interchangeable at a call site that only
+    reads the fit. The remaining fields record what the WEIGHTED fit actually
+    leaned on, so a certificate can state that rather than only that a fit
+    happened.
+    """
+
+    dimension: float
+    r_squared: float
+    n_points: int
+    n_radii_used: int
+    n_pair_counts: int
+    ref_scale: float
+    # Kish's effective sample size, (sum w)^2 / sum w^2, over the radius grid.
+    effective_n_radii: float
+    weighted_mean_neighbors_per_point: float
+    min_pair_count: float
+    max_pair_count: float
+
+    def is_well_fit(self, threshold: float = 0.9) -> bool:
+        return self.r_squared >= threshold
+
+
+def _weighted_log_log_fit(
+    log_r: np.ndarray, log_c: np.ndarray, weights: np.ndarray
+) -> tuple[float, float]:
+    """Weighted least-squares slope and weighted R^2. `weights` unnormalised.
+
+    WHY WEIGHTED, and why this is a correction rather than a tuning choice
+    (v2 section 10.1-10.2, which OVERTURNED the hypothesis it was sent to
+    test). The suspicion was that per-point covariance noise smears the
+    pairwise distances and flattens the slope. Feeding a CONSTANT metric
+    through this arm's own radius rule -- removing 100% of that noise with
+    everything else fixed -- recovered only 10% of the deficit, so the
+    hypothesis is refuted as the dominant mechanism.
+
+    The actual mechanism is the fit window. With radii spanning
+    [0.01, 0.5] x the median 20th-neighbour distance, the ENTIRE window sits
+    at or below point spacing: mean neighbour counts run 0.009 to 4.5 per
+    point at n=1600, and at the bottom roughly 14 pairs out of 2.6 million
+    survive. The `0 < C(r) < 1` filter then silently conditions on "at least
+    one pair survived", which floors log C and flattens the curve exactly
+    where the sample is empty. Measured on an isotropic square: the mean
+    local slope over the window's lower half is 1.168 and over its upper half
+    1.976 -- the top of the window already reads the truth, and unweighted
+    OLS averages the truth with an artifact.
+
+    C(r) is a pair count, so Var(log C_j) ~ 1/P_j and P_j spans 14 to 7.2e6
+    across this window. OLS is simply the wrong error model; inverse-variance
+    weights w_j = P_j are the standard correction. THE WEIGHTS ARE THE
+    OBSERVED PAIR COUNTS, so this introduces no constant, no threshold and no
+    caller-facing parameter, and it leaves the radius grid, the reference
+    scale, the metric and the distance arithmetic untouched -- the anisotropy
+    correction is preserved by construction and the fit stays exactly
+    scale-equivariant. Measured effect on the isotropic square (truth 2.0):
+    1.6525 -> 1.9347, with RMSE across 5 seeds also improving 0.193 -> 0.042,
+    so no bias/variance trade was made.
+
+    WITHOUT THIS, the integration does not work: the unweighted arm reads
+    ~1.65 on a plain isotropic square, which trips the unchanged
+    `READOUT_DIVERGENCE` gate and abstains on the easiest target in the
+    battery.
+    """
+    w = weights / weights.sum()
+    sw = np.sqrt(w)
+    a = np.vstack([log_r, np.ones_like(log_r)]).T
+    coef, *_ = np.linalg.lstsq(a * sw[:, None], log_c * sw, rcond=None)
+    pred = a @ coef
+    ss_res = float(np.sum(w * (log_c - pred) ** 2))
+    mean_w = float(np.sum(w * log_c))
+    ss_tot = float(np.sum(w * (log_c - mean_w) ** 2))
+    return float(coef[0]), (1.0 - ss_res / ss_tot if ss_tot > 0 else 0.0)
+
+
+def local_mahalanobis_correlation_dimension(
+    points: Sequence[Sequence[float]] | np.ndarray,
+    sigma_inv: np.ndarray,
+    *,
+    n_radii: int = 20,
+    r_min_frac: float = 0.01,
+    r_max_frac: float = 0.5,
+    ref_neighbors: int = 20,
+    chunk: int = 256,
+) -> LocalMahalanobisCorrelationEstimate:
+    """Correlation sum in which each point counts neighbours under ITS OWN
+    local Mahalanobis metric, fit by inverse-variance weighted least squares.
+
+        C(r) = (1/(n(n-1))) * #{(i,j), i != j : d_i(x_i, x_j) < r}
+
+    where ``d_i`` is the Mahalanobis distance under ``sigma_inv[i]`` -- in
+    practice the converged per-point metric from
+    `pointcloud.local_mahalanobis_metric`, floored at its METRIC ridge floor.
+
+    Radii are log-spaced over ``[r_min_frac, r_max_frac] * ref_scale`` with
+    ``ref_scale`` the median over points of each point's own
+    ``ref_neighbors``-th Mahalanobis-neighbour distance -- a scale read off
+    the data under the same metric the distances use, so the whole statistic
+    is exactly equivariant under rescaling the cloud.
+
+    Cost is O(n^2 d^2) for the distances plus O(n^2 log n) for the per-row
+    sort. `chunk` partitions that work and cannot change the result.
+    """
+    arr = np.ascontiguousarray(np.asarray(points, dtype=float))
+    n = len(arr)
+    if n < 3:
+        raise ValueError("need at least 3 points for a correlation-sum estimate")
+    sigma_inv = np.asarray(sigma_inv, dtype=float)
+    if sigma_inv.ndim != 3 or len(sigma_inv) != n:
+        raise ValueError(
+            f"sigma_inv must be one (d, d) matrix per point: got {sigma_inv.shape} for {n} points"
+        )
+
+    kth = min(ref_neighbors, n - 2)
+    d_sorted = np.empty((n, n))
+    for start in range(0, n, chunk):
+        end = min(start + chunk, n)
+        diffs = arr[None, :, :] - arr[start:end, None, :]
+        d2c = np.einsum("cnd,cde,cne->cn", diffs, sigma_inv[start:end], diffs)
+        # A point is not its own neighbour; +inf sorts it to the end.
+        d2c[np.arange(end - start), np.arange(start, end)] = np.inf
+        d_sorted[start:end] = np.sort(d2c, axis=1)
+    np.sqrt(d_sorted, out=d_sorted)  # sqrt is monotone, so the order is unchanged
+
+    ref_scale = float(np.median(d_sorted[:, kth]))
+    empty = LocalMahalanobisCorrelationEstimate(
+        dimension=float("nan"), r_squared=0.0, n_points=n, n_radii_used=0,
+        n_pair_counts=n_radii, ref_scale=ref_scale, effective_n_radii=0.0,
+        weighted_mean_neighbors_per_point=0.0, min_pair_count=0.0, max_pair_count=0.0,
+    )
+    if ref_scale <= 0:
+        return empty
+
+    radii = np.logspace(
+        math.log10(r_min_frac * ref_scale), math.log10(r_max_frac * ref_scale), n_radii
+    )
+    counts = np.zeros(n_radii, dtype=np.int64)
+    for i in range(n):
+        # searchsorted on the sorted row == count_nonzero(d < r); integer, so
+        # summation order cannot affect the total.
+        counts += np.searchsorted(d_sorted[i], radii, side="left")
+    c = counts.astype(float) / (n * (n - 1))
+
+    # Radii at either boundary carry no information about a log-log slope.
+    keep = (c > 0) & (c < 1)
+    if int(keep.sum()) < 2:
+        return dataclasses.replace(empty, n_radii_used=int(keep.sum()))
+
+    log_r = np.log(radii[keep])
+    log_c = np.log(c[keep])
+    pairs = counts[keep].astype(float)
+    slope, r_squared = _weighted_log_log_fit(log_r, log_c, pairs)
+    normalized = pairs / pairs.sum()
+    return LocalMahalanobisCorrelationEstimate(
+        dimension=slope,
+        r_squared=r_squared,
+        n_points=n,
+        n_radii_used=int(keep.sum()),
+        n_pair_counts=n_radii,
+        ref_scale=ref_scale,
+        effective_n_radii=float(1.0 / np.sum(normalized**2)),
+        weighted_mean_neighbors_per_point=float(np.sum(normalized * pairs) / n),
+        min_pair_count=float(pairs.min()),
+        max_pair_count=float(pairs.max()),
+    )
